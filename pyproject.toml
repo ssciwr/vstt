@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "motor_task_prototype"
+description = "Motor task prototype"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Liam Keegan", email = "ssc@iwr.uni-heidelberg.de" }]
+requires-python = ">=3.6"
+classifiers = [
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Education",
+  "Natural Language :: English",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+]
+dependencies = ["psychopy", "numpy"]
+dynamic = ["version"]
+
+[project.urls]
+Github = "https://github.com/ssciwr/motor-task-prototype"
+Issues = "https://github.com/ssciwr/motor-task-prototype/issues"
+
+[project.optional-dependencies]
+tests = ["pytest", "pytest-cov"]
+docs = ["sphinx>=4.5.0", "sphinx_rtd_theme>=1.0.0"]
+
+[tool.setuptools.dynamic]
+version = { attr = "motor_task_prototype.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
