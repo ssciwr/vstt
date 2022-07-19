@@ -12,11 +12,12 @@ from psychopy.clock import Clock
 from psychopy import core
 from psychopy.event import Mouse, xydist
 from psychopy.hardware.keyboard import Keyboard
-from motor_task_prototype.geometry import points_on_circle, rotate_point
 from dataclasses import dataclass
 from typing import List, Tuple
 from enum import Enum
 import numpy as np
+from motor_task_prototype import geometry as mtpgeom
+from motor_task_prototype import analysis as mtpanalysis
 
 
 def make_cursor(window: Window) -> ShapeStim:
@@ -42,9 +43,10 @@ def make_targets(
     radius: float,
     point_radius: float,
     center_point_radius: float,
+    opacity: float = 1,
 ) -> List[Circle]:
     circles = []
-    for pos in points_on_circle(n_circles, radius):
+    for pos in mtpgeom.points_on_circle(n_circles, radius):
         circles.append(
             Circle(
                 window,
@@ -53,6 +55,7 @@ def make_targets(
                 lineColor="black",
                 lineWidth=3,
                 fillColor=None,
+                opacity=opacity,
             )
         )
     circles.append(
@@ -63,6 +66,7 @@ def make_targets(
             lineColor="black",
             lineWidth=3,
             fillColor=None,
+            opacity=opacity,
         )
     )
     return circles
@@ -213,7 +217,7 @@ class MotorTask:
             while dist > self.settings.point_radius and clock.getTime() < 0:
                 mouse_pos = mouse.getPos()
                 if self.settings.rotate_cursor_radians != 0:
-                    mouse_pos = rotate_point(
+                    mouse_pos = mtpgeom.rotate_point(
                         mouse_pos, self.settings.rotate_cursor_radians
                     )
                 if self.settings.show_cursor:
@@ -231,15 +235,14 @@ class MotorTask:
     def display_results(self, win: Window, results: List[MotorTaskTargetResult]):
         clock = Clock()
         kb = Keyboard()
-        targets = make_targets(
+        drawables = make_targets(
             win,
             self.settings.n_points,
             self.settings.outer_radius,
             self.settings.point_radius,
             self.settings.center_point_radius,
+            0.3,
         )
-        drawables = targets
-
         for result, color in zip(results, colors):
             drawables.append(
                 Line(
@@ -260,13 +263,19 @@ class MotorTask:
                     lineWidth=3,
                 )
             )
+            reac, move = mtpanalysis.reaction_movement_times(
+                result.mouse_times, result.mouse_positions
+            )
+            dist = mtpanalysis.distance(result.mouse_positions)
+            rmse = mtpanalysis.rmse(result.mouse_positions, result.target_position)
             drawables.append(
                 TextBox2(
                     win,
-                    f"{result.mouse_times[-1]-result.mouse_times[0]:.3f}s",
+                    f"Reaction time: {reac:.3f}s\nMovement time: {move:.3f}s\nDistance: {dist:.3f}\nRMSE: {rmse:.3f}",
                     pos=result.target_position,
                     color=color,
                     alignment="center",
+                    letterHeight=0.02,
                 )
             )
         clock.reset()
