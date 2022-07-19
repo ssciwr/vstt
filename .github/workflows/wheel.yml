@@ -17,10 +17,11 @@ jobs:
           python-version: 3.9
       - run: pip install --upgrade build
       - run: python -m build
+      - run: mv dist/motor_task_prototype-*-py3-none-any.whl motor_task_prototype-latest-py3-none-any.whl
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dist/*
+          file: motor_task_prototype-latest-py3-none-any.whl
           tag: latest
           overwrite: true
           file_glob: true
