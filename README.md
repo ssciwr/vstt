@@ -2,7 +2,7 @@
 
 Prototype for motor task application
 
-![screenshot](screenshot.png)
+![screenshot](https://raw.githubusercontent.com/ssciwr/motor-task-prototype/main/screenshot.png)
 
 ## User Installation
 
