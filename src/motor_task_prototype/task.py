@@ -3,12 +3,15 @@ from psychopy.visual.window import Window
 from psychopy.visual.circle import Circle
 from psychopy.visual.line import Line
 from psychopy.visual.shape import ShapeStim
+from psychopy.visual.textbox2 import TextBox2
+from psychopy.colors import colors
+
+colors.pop("none")
 from psychopy.sound import Sound
 from psychopy.clock import Clock
 from psychopy import core
 from psychopy.event import Mouse, xydist
 from psychopy.hardware.keyboard import Keyboard
-import psychtoolbox as ptb
 from motor_task_prototype.geometry import points_on_circle, rotate_point
 from dataclasses import dataclass
 from typing import List, Tuple
@@ -43,7 +46,14 @@ def make_targets(
     circles = []
     for pos in points_on_circle(n_circles, radius):
         circles.append(
-            Circle(window, radius=point_radius, pos=pos, lineColor="black", lineWidth=3)
+            Circle(
+                window,
+                radius=point_radius,
+                pos=pos,
+                lineColor="black",
+                lineWidth=3,
+                fillColor=None,
+            )
         )
     circles.append(
         Circle(
@@ -52,6 +62,7 @@ def make_targets(
             pos=(0, 0),
             lineColor="black",
             lineWidth=3,
+            fillColor=None,
         )
     )
     return circles
@@ -111,11 +122,11 @@ def get_settings_from_user(
     dialog_dict = {
         "Number of targets": settings.n_points,
         "Order of targets": order_of_targets,
-        "Target Duration (secs)": 5,
-        "Interval between targets (secs)": 2,
-        "Distance of targets (screen height)": 0.45,
-        "Size of targets (screen height)": 0.04,
-        "Size of center point (screen height)": 0.02,
+        "Target Duration (secs)": settings.time_per_point,
+        "Interval between targets (secs)": settings.time_between_points,
+        "Distance of targets (screen height)": settings.outer_radius,
+        "Size of targets (screen height)": settings.point_radius,
+        "Size of center point (screen height)": settings.center_point_radius,
         "Audible tone on target display": ["Yes", "No"],
         "Display cursor": ["Yes", "No"],
         "Display cursor path": ["Yes", "No"],
@@ -154,7 +165,7 @@ class MotorTask:
             rng = np.random.default_rng()
             rng.shuffle(self.target_indices)
 
-    def run(self, win) -> List[MotorTaskTargetResult]:
+    def run(self, win: Window) -> List[MotorTaskTargetResult]:
         results = []
         mouse = Mouse(visible=False)
         clock = Clock()
@@ -170,12 +181,17 @@ class MotorTask:
         cursor = make_cursor(win)
         if self.settings.show_cursor:
             drawables.append(cursor)
+        cursor_path = ShapeStim(
+            win, vertices=[(0, 0)], lineColor="white", closeShape=False
+        )
+        if self.settings.show_cursor_line:
+            drawables.append(cursor_path)
         for target_index in self.target_indices:
             result = MotorTaskTargetResult(
                 target_index, targets[target_index].pos, [], []
             )
             select_target(targets, None)
-            drawables = [x for x in drawables if type(x) != Line]
+            cursor_path.vertices = [(0, 0)]
             cursor.setPos((0.0, 0.0))
             clock.reset()
             clock.add(self.settings.time_between_points)
@@ -195,7 +211,6 @@ class MotorTask:
             win.flip()
             mouse.setPos(mouse_pos)
             while dist > self.settings.point_radius and clock.getTime() < 0:
-                prev_mouse_pos = mouse_pos
                 mouse_pos = mouse.getPos()
                 if self.settings.rotate_cursor_radians != 0:
                     mouse_pos = rotate_point(
@@ -203,12 +218,58 @@ class MotorTask:
                     )
                 if self.settings.show_cursor:
                     cursor.setPos(mouse_pos)
-                if self.settings.show_cursor_line:
-                    drawables.append(Line(win, prev_mouse_pos, mouse_pos))
                 result.mouse_times.append(clock.getTime() - t0)
                 result.mouse_positions.append(mouse_pos)
+                if self.settings.show_cursor_line:
+                    cursor_path.vertices = result.mouse_positions
                 dist = xydist(mouse_pos, targets[target_index].pos)
                 draw_and_flip(win, drawables, kb)
             results.append(result)
         win.flip()
         return results
+
+    def display_results(self, win: Window, results: List[MotorTaskTargetResult]):
+        clock = Clock()
+        kb = Keyboard()
+        targets = make_targets(
+            win,
+            self.settings.n_points,
+            self.settings.outer_radius,
+            self.settings.point_radius,
+            self.settings.center_point_radius,
+        )
+        drawables = targets
+
+        for result, color in zip(results, colors):
+            drawables.append(
+                Line(
+                    win,
+                    (0, 0),
+                    result.target_position,
+                    lineColor=color,
+                    opacity=0.3,
+                    lineWidth=1,
+                )
+            )
+            drawables.append(
+                ShapeStim(
+                    win,
+                    vertices=result.mouse_positions,
+                    lineColor=color,
+                    closeShape=False,
+                    lineWidth=3,
+                )
+            )
+            drawables.append(
+                TextBox2(
+                    win,
+                    f"{result.mouse_times[-1]-result.mouse_times[0]:.3f}s",
+                    pos=result.target_position,
+                    color=color,
+                    alignment="center",
+                )
+            )
+        clock.reset()
+        clock.add(30)
+        while clock.getTime() < 0:
+            draw_and_flip(win, drawables, kb)
