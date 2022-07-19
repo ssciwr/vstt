@@ -2,6 +2,8 @@
 
 Prototype for motor task application
 
+![screenshot](screenshot.png)
+
 ## Installation
 
 ### Pre-requisites

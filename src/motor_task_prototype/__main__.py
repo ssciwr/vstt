@@ -9,6 +9,7 @@ def main():
     window = Window(fullscr=True, units="height")
     motor_task = task.MotorTask(settings)
     results = motor_task.run(window)
+    motor_task.display_results(window, results)
     window.close()
     core.quit()
 
