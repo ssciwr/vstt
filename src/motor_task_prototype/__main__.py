@@ -4,7 +4,7 @@ from motor_task_prototype import task
 import numpy as np
 
 
-def main():
+def main() -> None:
     settings = task.get_settings_from_user()
     window = Window(fullscr=True, units="height")
     motor_task = task.MotorTask(settings)

@@ -2,7 +2,7 @@ import motor_task_prototype.analysis as analysis
 import numpy as np
 
 
-def test_distance():
+def test_distance() -> None:
     assert np.allclose(analysis.distance([(0, 0)]), [0])
     assert np.allclose(analysis.distance([(0, 0), (1, 1)]), [np.sqrt(2)])
     assert np.allclose(analysis.distance([(0, 0), (1, 1), (0, 0)]), [2.0 * np.sqrt(2)])
@@ -18,7 +18,7 @@ def test_distance():
     )
 
 
-def test_reaction_movement_times():
+def test_reaction_movement_times() -> None:
     for times in [
         [0.0],
         [0.0, 0.1],
@@ -37,7 +37,7 @@ def test_reaction_movement_times():
             )
 
 
-def test_rmse():
+def test_rmse() -> None:
     target = (1, 1)
     origin = (0, 0)
     # all points lie on line
