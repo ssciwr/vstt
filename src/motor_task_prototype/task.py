@@ -260,23 +260,14 @@ class MotorTask:
     ) -> None:
         clock = Clock()
         kb = Keyboard()
-        drawables: List[BaseVisualStim] = make_targets(
-            win,
-            self.settings.n_points,
-            self.settings.outer_radius,
-            self.settings.point_radius,
-            self.settings.center_point_radius,
-            0.3,
-        )
+        drawables: List[BaseVisualStim] = []
         for result, color in zip(results, colors):
             drawables.append(
-                Line(
+                Circle(
                     win,
-                    (0, 0),
-                    result.target_position,
-                    lineColor=color,
-                    opacity=0.3,
-                    lineWidth=1,
+                    radius=self.settings.point_radius,
+                    pos=result.target_position,
+                    fillColor=color,
                 )
             )
             drawables.append(
@@ -293,11 +284,15 @@ class MotorTask:
             )
             dist = mtpanalysis.distance(result.mouse_positions)
             rmse = mtpanalysis.rmse(result.mouse_positions, result.target_position)
+            if result.target_position[0] > 0:
+                text_pos = result.target_position[0] + 0.16, result.target_position[1]
+            else:
+                text_pos = result.target_position[0] - 0.16, result.target_position[1]
             drawables.append(
                 TextBox2(
                     win,
-                    f"Reaction time: {reac:.3f}s\nMovement time: {move:.3f}s\nDistance: {dist:.3f}\nRMSE: {rmse:.3f}",
-                    pos=result.target_position,
+                    f"Reaction: {reac:.3f}s\nMovement: {move:.3f}s\nDistance: {dist:.3f}\nRMSE: {rmse:.3f}",
+                    pos=text_pos,
                     color=color,
                     alignment="center",
                     letterHeight=0.02,
