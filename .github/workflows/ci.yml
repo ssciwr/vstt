@@ -16,10 +16,13 @@ concurrency:
 jobs:
   ci-pip:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python-version }}
       - run: pip install -e .[tests] --verbose
       - run: python -m pytest -v
