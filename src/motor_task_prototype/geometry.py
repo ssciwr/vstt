@@ -2,7 +2,7 @@ import numpy as np
 from typing import List, Tuple
 
 
-def equidistant_angles(n_points: int) -> np.array:
+def equidistant_angles(n_points: int) -> np.ndarray:
     return np.linspace(0, n_points - 1.0, n_points) * (2.0 * np.pi / n_points)
 
 

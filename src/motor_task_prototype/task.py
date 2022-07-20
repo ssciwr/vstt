@@ -15,6 +15,13 @@ from psychopy.event import Mouse, xydist
 from psychopy.hardware.keyboard import Keyboard
 from dataclasses import dataclass
 from typing import List, Tuple
+import sys
+
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
+
 from enum import Enum
 import numpy as np
 from motor_task_prototype import geometry as mtpgeom
@@ -80,7 +87,7 @@ def select_target(targets: List[BaseShapeStim], index: int = None) -> None:
         targets[index].setFillColor("red")
 
 
-def draw_and_flip(win: Window, drawables: List[BaseVisualStim], kb: Keyboard):
+def draw_and_flip(win: Window, drawables: List[BaseVisualStim], kb: Keyboard) -> None:
     for drawable in drawables:
         drawable.draw()
     if kb.getKeys(["escape"]):
@@ -109,6 +116,24 @@ class MotorTaskSettings:
     rotate_cursor_radians: float = 0
 
 
+MotorTaskSettingsDict = TypedDict(
+    "MotorTaskSettingsDict",
+    {
+        "Number of targets": int,
+        "Order of targets": List[str],
+        "Target Duration (secs)": float,
+        "Interval between targets (secs)": float,
+        "Distance of targets (screen height)": float,
+        "Size of targets (screen height)": float,
+        "Size of center point (screen height)": float,
+        "Audible tone on target display": bool,
+        "Display cursor": bool,
+        "Display cursor path": bool,
+        "Rotate cursor (degrees)": float,
+    },
+)
+
+
 @dataclass
 class MotorTaskTargetResult:
     target_index: int
@@ -124,7 +149,7 @@ def get_settings_from_user(
     for target_order in TargetOrder:
         if target_order != settings.order_of_targets:
             order_of_targets.append(target_order.value)
-    dialog_dict = {
+    dialog_dict: MotorTaskSettingsDict = {
         "Number of targets": settings.n_points,
         "Order of targets": order_of_targets,
         "Target Duration (secs)": settings.time_per_point,
@@ -132,10 +157,10 @@ def get_settings_from_user(
         "Distance of targets (screen height)": settings.outer_radius,
         "Size of targets (screen height)": settings.point_radius,
         "Size of center point (screen height)": settings.center_point_radius,
-        "Audible tone on target display": ["Yes", "No"],
-        "Display cursor": ["Yes", "No"],
-        "Display cursor path": ["Yes", "No"],
-        "Rotate cursor (degrees)": 0,
+        "Audible tone on target display": settings.play_sound,
+        "Display cursor": settings.show_cursor,
+        "Display cursor path": settings.show_cursor_line,
+        "Rotate cursor (degrees)": settings.rotate_cursor_radians,
     }
     dialog = DlgFromDict(dialog_dict, title="Motor task settings", sortKeys=False)
     if dialog.OK:
@@ -148,9 +173,9 @@ def get_settings_from_user(
         settings.center_point_radius = dialog_dict[
             "Size of center point (screen height)"
         ]
-        settings.play_sound = dialog_dict["Audible tone on target display"] == "Yes"
-        settings.show_cursor = dialog_dict["Display cursor"] == "Yes"
-        settings.show_cursor_line = dialog_dict["Display cursor path"] == "Yes"
+        settings.play_sound = dialog_dict["Audible tone on target display"]
+        settings.show_cursor = dialog_dict["Display cursor"]
+        settings.show_cursor_line = dialog_dict["Display cursor path"]
         settings.rotate_cursor_radians = dialog_dict["Rotate cursor (degrees)"] * (
             2.0 * np.pi / 360.0
         )
@@ -159,7 +184,7 @@ def get_settings_from_user(
 
 class MotorTask:
     settings: MotorTaskSettings
-    target_indices: np.array
+    target_indices: np.ndarray
 
     def __init__(self, settings: MotorTaskSettings = MotorTaskSettings()):
         self.settings = settings
@@ -230,7 +255,9 @@ class MotorTask:
         win.flip()
         return results
 
-    def display_results(self, win: Window, results: List[MotorTaskTargetResult]):
+    def display_results(
+        self, win: Window, results: List[MotorTaskTargetResult]
+    ) -> None:
         clock = Clock()
         kb = Keyboard()
         drawables: List[BaseVisualStim] = make_targets(
