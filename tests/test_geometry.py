@@ -39,3 +39,19 @@ def test_rotate_point():
                 geometry.rotate_point(point, -np.pi, pivot),
             )
     # todo: non-trivial tests of rotations
+
+
+def test_rotated_point():
+    for angle in [0, -0.1, 0.3, 0.66, np.pi, -np.pi, 4.5]:
+        rp = geometry.RotatedPoint(angle)
+        for point in [
+            (1, 0.2),
+            (-1, 0.2),
+            (-0.7, -0.5),
+            (0.7, 0.0),
+            (0.0, 0.6),
+            (0, 0),
+        ]:
+            p1 = rp(point)
+            p2 = geometry.rotate_point(point, angle, (0, 0))
+            assert np.allclose([p1], [p2])

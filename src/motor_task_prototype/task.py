@@ -2,7 +2,8 @@ from psychopy.gui import DlgFromDict
 from psychopy.visual.window import Window
 from psychopy.visual.circle import Circle
 from psychopy.visual.line import Line
-from psychopy.visual.shape import ShapeStim
+from psychopy.visual.shape import BaseShapeStim, ShapeStim
+from psychopy.visual.basevisual import BaseVisualStim
 from psychopy.visual.textbox2 import TextBox2
 from psychopy.colors import colors
 
@@ -72,14 +73,14 @@ def make_targets(
     return circles
 
 
-def select_target(targets, index=None) -> None:
+def select_target(targets: List[BaseShapeStim], index: int = None) -> None:
     for target in targets:
         target.setFillColor("none")
     if index is not None:
         targets[index].setFillColor("red")
 
 
-def draw_and_flip(win, drawables, kb):
+def draw_and_flip(win: Window, drawables: List[BaseVisualStim], kb: Keyboard):
     for drawable in drawables:
         drawable.draw()
     if kb.getKeys(["escape"]):
@@ -174,17 +175,18 @@ class MotorTask:
         mouse = Mouse(visible=False)
         clock = Clock()
         kb = Keyboard()
-        targets = make_targets(
+        targets: List[BaseShapeStim] = make_targets(
             win,
             self.settings.n_points,
             self.settings.outer_radius,
             self.settings.point_radius,
             self.settings.center_point_radius,
         )
-        drawables = targets
+        drawables: List[BaseVisualStim] = targets
         cursor = make_cursor(win)
         if self.settings.show_cursor:
             drawables.append(cursor)
+        rotated_point = mtpgeom.RotatedPoint(self.settings.rotate_cursor_radians)
         cursor_path = ShapeStim(
             win, vertices=[(0, 0)], lineColor="white", closeShape=False
         )
@@ -215,11 +217,7 @@ class MotorTask:
             win.flip()
             mouse.setPos(mouse_pos)
             while dist > self.settings.point_radius and clock.getTime() < 0:
-                mouse_pos = mouse.getPos()
-                if self.settings.rotate_cursor_radians != 0:
-                    mouse_pos = mtpgeom.rotate_point(
-                        mouse_pos, self.settings.rotate_cursor_radians
-                    )
+                mouse_pos = rotated_point(mouse.getPos())
                 if self.settings.show_cursor:
                     cursor.setPos(mouse_pos)
                 result.mouse_times.append(clock.getTime() - t0)
@@ -235,7 +233,7 @@ class MotorTask:
     def display_results(self, win: Window, results: List[MotorTaskTargetResult]):
         clock = Clock()
         kb = Keyboard()
-        drawables = make_targets(
+        drawables: List[BaseVisualStim] = make_targets(
             win,
             self.settings.n_points,
             self.settings.outer_radius,

@@ -4,8 +4,10 @@ from psychopy.event import xydist
 
 
 def reaction_movement_times(
-    mouse_times: List[float], mouse_positions: List[Tuple[float, float]], epsilon=1e-12
-):
+    mouse_times: List[float],
+    mouse_positions: List[Tuple[float, float]],
+    epsilon: float = 1e-12,
+) -> Tuple[float, float]:
     assert len(mouse_times) == len(
         mouse_positions
     ), "Mouse times and positions lists must have the same number of elements"
@@ -17,7 +19,7 @@ def reaction_movement_times(
     return reaction_time, movement_time
 
 
-def distance(mouse_positions: List[Tuple[float, float]]):
+def distance(mouse_positions: List[Tuple[float, float]]) -> float:
     dist = 0
     for i in range(len(mouse_positions) - 1):
         dist += xydist(mouse_positions[i + 1], mouse_positions[i])
@@ -28,7 +30,7 @@ def rmse(
     mouse_positions: List[Tuple[float, float]],
     target: Tuple[float, float],
     origin: Tuple[float, float] = (0, 0),
-):
+) -> float:
     norm = np.power(origin[0] - target[0], 2) + np.power(origin[1] - target[1], 2)
     norm *= len(mouse_positions)
     dx = target[0] - origin[0]
