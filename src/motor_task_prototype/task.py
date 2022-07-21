@@ -225,27 +225,27 @@ class MotorTask:
             cursor_path.vertices = [(0, 0)]
             cursor.setPos((0.0, 0.0))
             clock.reset()
-            clock.add(self.settings.time_between_points)
-            while clock.getTime() < 0:
+            while clock.getTime() < self.settings.time_between_points:
                 draw_and_flip(win, drawables, kb)
-            clock.reset()
-            clock.add(self.settings.time_per_point)
             select_target(targets, target_index)
             if self.settings.play_sound:
                 Sound("A", secs=0.3, blockSize=512).play()
-            t0 = clock.getTime()
             mouse_pos = (0.0, 0.0)
             dist = xydist(mouse_pos, targets[target_index].pos)
             result.mouse_times.append(0)
             result.mouse_positions.append(mouse_pos)
             mouse.setPos(mouse_pos)
             win.flip()
+            clock.reset()
             mouse.setPos(mouse_pos)
-            while dist > self.settings.point_radius and clock.getTime() < 0:
+            while (
+                dist > self.settings.point_radius
+                and clock.getTime() < self.settings.time_per_point
+            ):
                 mouse_pos = rotated_point(mouse.getPos())
                 if self.settings.show_cursor:
                     cursor.setPos(mouse_pos)
-                result.mouse_times.append(clock.getTime() - t0)
+                result.mouse_times.append(clock.getTime())
                 result.mouse_positions.append(mouse_pos)
                 if self.settings.show_cursor_line:
                     cursor_path.vertices = result.mouse_positions
@@ -299,6 +299,5 @@ class MotorTask:
                 )
             )
         clock.reset()
-        clock.add(30)
-        while clock.getTime() < 0:
+        while clock.getTime() < 30:
             draw_and_flip(win, drawables, kb)
