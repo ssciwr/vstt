@@ -221,9 +221,10 @@ class MotorTask:
             result.mouse_times.append(0)
             result.mouse_positions.append(mouse_pos)
             mouse.setPos(mouse_pos)
-            win.flip()
+            draw_and_flip(win, drawables, kb)
             clock.reset()
             mouse.setPos(mouse_pos)
+            win.recordFrameIntervals = True
             while (
                 dist > self.settings.point_radius
                 and clock.getTime() < self.settings.time_per_point
@@ -237,6 +238,9 @@ class MotorTask:
                     cursor_path.vertices = result.mouse_positions
                 dist = xydist(mouse_pos, targets.xys[target_index])
                 draw_and_flip(win, drawables, kb)
+            win.recordFrameIntervals = False
+            if win.nDroppedFrames > 0:
+                print(f"Warning: dropped {win.nDroppedFrames} frames")
             results.append(result)
         win.flip()
         return results
