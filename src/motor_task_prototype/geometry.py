@@ -6,11 +6,16 @@ def equidistant_angles(n_points: int) -> np.ndarray:
     return np.linspace(0, n_points - 1.0, n_points) * (2.0 * np.pi / n_points)
 
 
-def points_on_circle(n_points: int, radius: float) -> List[Tuple[float, float]]:
-    return [
-        (radius * np.sin(angle), radius * np.cos(angle))
+def points_on_circle(
+    n_points: int, radius: float, include_centre: bool = False
+) -> np.ndarray:
+    points = [
+        [radius * np.sin(angle), radius * np.cos(angle)]
         for angle in equidistant_angles(n_points)
     ]
+    if include_centre:
+        points.append([0, 0])
+    return np.array(points)
 
 
 def rotate_point(
