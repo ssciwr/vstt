@@ -13,6 +13,9 @@ def test_equidistant_angles() -> None:
 
 def test_points_on_circle() -> None:
     assert np.allclose(geometry.points_on_circle(1, 0.2), [(0.0, 0.2)])
+    assert np.allclose(
+        geometry.points_on_circle(1, 0.2, include_centre=True), [(0.0, 0.2), (0.0, 0.0)]
+    )
     assert np.allclose(geometry.points_on_circle(2, 0.5), [(0.0, 0.5), (0.0, -0.5)])
     assert np.allclose(
         geometry.points_on_circle(4, 1.0), [(0, 1), (1, 0), (0, -1), (-1, 0)]

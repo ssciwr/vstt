@@ -1,11 +1,11 @@
 from psychopy.gui import DlgFromDict
 from psychopy.visual.window import Window
 from psychopy.visual.circle import Circle
-from psychopy.visual.line import Line
+from psychopy.visual.elementarray import ElementArrayStim
 from psychopy.visual.shape import BaseShapeStim, ShapeStim
 from psychopy.visual.basevisual import BaseVisualStim
 from psychopy.visual.textbox2 import TextBox2
-from psychopy.colors import colors
+from psychopy.colors import Color, colors
 
 colors.pop("none")
 from psychopy.sound import Sound
@@ -14,7 +14,7 @@ from psychopy import core
 from psychopy.event import Mouse, xydist
 from psychopy.hardware.keyboard import Keyboard
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import sys
 
 if sys.version_info >= (3, 8):
@@ -51,40 +51,26 @@ def make_targets(
     radius: float,
     point_radius: float,
     center_point_radius: float,
-    opacity: float = 1,
-) -> List[Circle]:
-    circles = []
-    for pos in mtpgeom.points_on_circle(n_circles, radius):
-        circles.append(
-            Circle(
-                window,
-                radius=point_radius,
-                pos=pos,
-                lineColor="black",
-                lineWidth=3,
-                fillColor=None,
-                opacity=opacity,
-            )
-        )
-    circles.append(
-        Circle(
-            window,
-            radius=center_point_radius,
-            pos=(0, 0),
-            lineColor="black",
-            lineWidth=3,
-            fillColor=None,
-            opacity=opacity,
-        )
+) -> ElementArrayStim:
+    return ElementArrayStim(
+        window,
+        units="height",
+        fieldShape="circle",
+        nElements=n_circles + 1,
+        sizes=[2.0 * point_radius] * n_circles + [2.0 * center_point_radius],
+        xys=mtpgeom.points_on_circle(n_circles, radius, include_centre=True),
+        elementTex=None,
+        elementMask="circle",
     )
-    return circles
 
 
-def select_target(targets: List[BaseShapeStim], index: int = None) -> None:
-    for target in targets:
-        target.setFillColor("none")
+def select_target(targets: ElementArrayStim, index: int = None) -> None:
+    c = np.array([[0.1, 0.1, 0.1]] * targets.nElements)
     if index is not None:
-        targets[index].setFillColor("red")
+        c[index][0] = 1
+        c[index][1] = -1
+        c[index][2] = -1
+    targets.setColors(c, colorSpace="rgb")
 
 
 def draw_and_flip(win: Window, drawables: List[BaseVisualStim], kb: Keyboard) -> None:
@@ -200,14 +186,14 @@ class MotorTask:
         mouse = Mouse(visible=False)
         clock = Clock()
         kb = Keyboard()
-        targets: List[BaseShapeStim] = make_targets(
+        targets: ElementArrayStim = make_targets(
             win,
             self.settings.n_points,
             self.settings.outer_radius,
             self.settings.point_radius,
             self.settings.center_point_radius,
         )
-        drawables: List[BaseVisualStim] = targets
+        drawables: List[Union[BaseVisualStim, ElementArrayStim]] = [targets]
         cursor = make_cursor(win)
         if self.settings.show_cursor:
             drawables.append(cursor)
@@ -219,7 +205,7 @@ class MotorTask:
             drawables.append(cursor_path)
         for target_index in self.target_indices:
             result = MotorTaskTargetResult(
-                target_index, targets[target_index].pos, [], []
+                target_index, targets.xys[target_index], [], []
             )
             select_target(targets, None)
             cursor_path.vertices = [(0, 0)]
@@ -231,7 +217,7 @@ class MotorTask:
             if self.settings.play_sound:
                 Sound("A", secs=0.3, blockSize=512).play()
             mouse_pos = (0.0, 0.0)
-            dist = xydist(mouse_pos, targets[target_index].pos)
+            dist = xydist(mouse_pos, targets.xys[target_index])
             result.mouse_times.append(0)
             result.mouse_positions.append(mouse_pos)
             mouse.setPos(mouse_pos)
@@ -249,7 +235,7 @@ class MotorTask:
                 result.mouse_positions.append(mouse_pos)
                 if self.settings.show_cursor_line:
                     cursor_path.vertices = result.mouse_positions
-                dist = xydist(mouse_pos, targets[target_index].pos)
+                dist = xydist(mouse_pos, targets.xys[target_index])
                 draw_and_flip(win, drawables, kb)
             results.append(result)
         win.flip()
