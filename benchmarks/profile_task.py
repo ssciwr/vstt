@@ -5,8 +5,9 @@ import cProfile
 
 
 window = Window(fullscr=True, units="height")
-settings = task.MotorTaskSettings()
-settings.time_between_points = 0
+settings = task.get_default_motor_task_trial()
+settings["weight"] = 1
+settings["inter_target_duration"] = 0
 motor_task = task.MotorTask(settings)
 with cProfile.Profile() as pr:
     results = motor_task.run(window)
