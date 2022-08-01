@@ -1,3 +1,6 @@
+from typing import List
+from typing import Optional
+
 import numpy as np
 from psychopy.clock import Clock
 from psychopy.colors import colors
@@ -15,7 +18,6 @@ colors.pop("none")
 from psychopy import core
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype import stat as mtpstat
-from typing import List
 
 
 def make_cursor(window: Window) -> ShapeStim:
@@ -65,10 +67,12 @@ def update_target_colors(targets: ElementArrayStim, index: int = None) -> None:
     targets.setColors(c, colorSpace="rgb")
 
 
-def draw_and_flip(win: Window, drawables: List[BaseVisualStim], kb: Keyboard) -> None:
+def draw_and_flip(
+    win: Window, drawables: List[BaseVisualStim], kb: Optional[Keyboard] = None
+) -> None:
     for drawable in drawables:
         drawable.draw()
-    if kb.getKeys(["escape"]):
+    if kb is not None and kb.getKeys(["escape"]):
         core.quit()
     win.flip()
 
@@ -121,4 +125,6 @@ def display_results(win: Window, results: TrialHandlerExt) -> None:
         )
     clock.reset()
     while clock.getTime() < 30:
-        draw_and_flip(win, drawables, kb)
+        if kb.getKeys(["escape"]):
+            return
+        draw_and_flip(win, drawables)
