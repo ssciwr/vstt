@@ -1,14 +1,14 @@
-from psychopy.visual.window import Window
+import motor_task_prototype as mtp
 from psychopy import core
-from motor_task_prototype import task
+from psychopy.visual.window import Window
 
 
 def main() -> None:
-    settings = task.get_settings_from_user()
+    trial = mtp.get_trial_from_user()
     window = Window(fullscr=True, units="height")
-    motor_task = task.MotorTask(settings)
+    motor_task = mtp.MotorTask(trial)
     results = motor_task.run(window)
-    motor_task.display_results(window, results)
+    mtp.display_results(window, results)
     window.close()
     core.quit()
 

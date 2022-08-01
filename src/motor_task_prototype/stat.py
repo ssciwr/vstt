@@ -1,5 +1,7 @@
+from typing import List
+from typing import Tuple
+
 import numpy as np
-from typing import List, Tuple
 from psychopy.event import xydist
 
 
