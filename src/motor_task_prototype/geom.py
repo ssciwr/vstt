@@ -1,5 +1,6 @@
+from typing import Tuple
+
 import numpy as np
-from typing import List, Tuple
 
 
 def equidistant_angles(n_points: int) -> np.ndarray:

@@ -1,14 +1,16 @@
-from psychopy.visual.window import Window
-from psychopy import core
-from motor_task_prototype import task
 import cProfile
+
+from motor_task_prototype import MotorTask
+from motor_task_prototype.trial import default_trial
+from psychopy import core
+from psychopy.visual.window import Window
 
 
 window = Window(fullscr=True, units="height")
-settings = task.get_default_motor_task_trial()
-settings["weight"] = 1
-settings["inter_target_duration"] = 0
-motor_task = task.MotorTask(settings)
+trial = default_trial()
+trial["weight"] = 1
+trial["inter_target_duration"] = 0
+motor_task = MotorTask(trial)
 with cProfile.Profile() as pr:
     results = motor_task.run(window)
 pr.dump_stats("profile_task.prof")
