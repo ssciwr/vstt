@@ -44,9 +44,9 @@ def test_rotate_point() -> None:
     # todo: non-trivial tests of rotations
 
 
-def test_rotated_point() -> None:
+def test_point_rotator() -> None:
     for angle in [0, -0.1, 0.3, 0.66, np.pi, -np.pi, 4.5]:
-        rp = geometry.RotatedPoint(angle)
+        rp = geometry.PointRotator(angle)
         for point in [
             (1, 0.2),
             (-1, 0.2),

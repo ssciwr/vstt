@@ -1,7 +1,6 @@
 from psychopy.visual.window import Window
 from psychopy import core
 from motor_task_prototype import task
-import numpy as np
 
 
 def main() -> None:

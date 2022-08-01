@@ -30,7 +30,7 @@ def rotate_point(
     return pivot_point[0] + c * x - s * y, pivot_point[1] + s * x + c * y
 
 
-class RotatedPoint:
+class PointRotator:
     """
     Rotate a point (x,y) by a fixed angle around the origin
     """
