@@ -5,7 +5,10 @@ from typing import Union
 
 import numpy as np
 from psychopy import core
+from psychopy.data import TrialHandlerExt
 from psychopy.gui import DlgFromDict
+from psychopy.gui import fileSaveDlg
+from psychopy.misc import fromFile
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict
@@ -50,6 +53,11 @@ def default_trial() -> MotorTaskTrial:
     }
 
 
+def get_trial_from_psydat(filename: str) -> MotorTaskTrial:
+    psydata = fromFile(filename)
+    return psydata.trialList[0]
+
+
 def get_trial_from_user(
     trial: MotorTaskTrial = None,
 ) -> MotorTaskTrial:
@@ -87,6 +95,15 @@ def get_trial_from_user(
         trial["target_indices"], dtype="int", sep=" "
     )
     return trial
+
+
+def save_trial_to_psydat(trial: TrialHandlerExt) -> None:
+    filename = fileSaveDlg(
+        prompt="Save trial conditions and results as psydat file",
+        allowed="Psydat files (*.psydat)",
+    )
+    if filename is not None:
+        trial.saveAsPickle(filename)
 
 
 def validate_trial(trial: MotorTaskTrial) -> MotorTaskTrial:
