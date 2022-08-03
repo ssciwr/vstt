@@ -2,7 +2,7 @@
 
 Prototype for motor task application
 
-![screenshot](https://raw.githubusercontent.com/ssciwr/motor-task-prototype/main/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/ssciwr/motor-task-prototype/main/misc/screenshot.png)
 
 ## User Installation
 
@@ -21,13 +21,11 @@ Notes
   - This is also normal for a .bat file
   - Click more info -> run anyway
 - What does `UpdatePrototype.bat` do?
-  - Running this will install the prototype (or update an existing installation to the latest available version)
+  - This installs the latest version of the prototype into your Psychopy Python environment using pip
   - It runs this command: `"C:\Program Files\PsychoPy\python.exe" -m pip install https://github.com/ssciwr/motor-task-prototype/releases/download/latest/motor_task_prototype-latest-py3-none-any.whl`
-  - This installs the latest prototype wheel from Github into your Psychopy Python environment using pip
 - What does `RunPrototype.bat` do?
-  - This runs the prototype
-  - It runs this command: `"C:\Program Files\PsychoPy\python.exe" -m motor_task_prototype`
   - This runs the prototype using your Psychopy Python environment
+  - It runs this command: `"C:\Program Files\PsychoPy\python.exe" -m motor_task_prototype`
 - If in doubt you can always open the .bat file in notepad to see what commands it will run
 - If you have installed Psychopy in a non-default location you will need to update the paths
   in these batch files to point to the psychopy-installed python.exe.
