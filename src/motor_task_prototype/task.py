@@ -29,10 +29,10 @@ class MotorTask:
         self.trials = TrialHandlerExt([trial], 1, originPath=-1)
 
     def run(self, win: Window) -> TrialHandlerExt:
+        mouse = Mouse(visible=False)
+        clock = Clock()
+        kb = Keyboard()
         for trial in self.trials:
-            mouse = Mouse(visible=False)
-            clock = Clock()
-            kb = Keyboard()
             targets: ElementArrayStim = mtpvis.make_targets(
                 win,
                 trial["num_targets"],
@@ -94,5 +94,6 @@ class MotorTask:
             self.trials.addData("mouse_positions", np.array(trial_mouse_positions))
         if win.nDroppedFrames > 0:
             print(f"Warning: dropped {win.nDroppedFrames} frames")
+        mouse.setVisible(True)
         win.flip()
         return self.trials
