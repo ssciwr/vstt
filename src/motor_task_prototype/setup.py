@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+import motor_task_prototype as mtp
 import wx
 from motor_task_prototype.trial import get_trial_from_psydat
 from motor_task_prototype.trial import get_trial_from_user
@@ -21,12 +22,13 @@ def setup() -> Optional[UserChoices]:
     app = wx.App()
     dialog = wx.SingleChoiceDialog(
         None,
-        "Available actions:",
-        "Motor Task Prototype",
+        f"Motor Task Prototype {mtp.__version__}\n\nhttps://github.com/ssciwr/motor-task-prototype",
+        f"Motor Task Prototype {mtp.__version__}",
         [
             "Create and run a new trial",
             "Import and run an existing trial",
             "Display existing trial results",
+            "Exit",
         ],
     )
     if dialog.ShowModal() != wx.ID_OK:
@@ -45,4 +47,6 @@ def setup() -> Optional[UserChoices]:
         if filename is None or len(filename) < 1:
             return None
         return UserChoices(False, None, fromFile(filename[0]))
+    elif result == 3:
+        return None
     return None
