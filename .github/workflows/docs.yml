@@ -1,0 +1,29 @@
+name: Build docs and deploy to gh-pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+      - run: choco install pandoc
+      - run: pip install .[docs] --verbose
+      - run: cd docs && make
+      - uses: JamesIves/github-pages-deploy-action@v4.4.0
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        name: Deploy to gh-pages
+        with:
+          branch: gh-pages
+          folder: docs/_build/html
+          single-commit: true
