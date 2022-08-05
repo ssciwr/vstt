@@ -23,7 +23,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: site
-          path: docs/build/_html
+          path: docs/_build/html
   deploy-docs:
     needs: [build-docs]
     runs-on: ubuntu-latest
