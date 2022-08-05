@@ -33,7 +33,14 @@ Issues = "https://github.com/ssciwr/motor-task-prototype/issues"
 
 [project.optional-dependencies]
 tests = ["pytest", "pytest-cov"]
-docs = ["sphinx>=4.5.0", "sphinx_rtd_theme>=1.0.0"]
+docs = [
+  "ipykernel",
+  "matplotlib",
+  "nbsphinx",
+  "pandoc",
+  "sphinx>=4.5.0",
+  "sphinx_rtd_theme>=1.0.0"
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "motor_task_prototype.__version__" }
