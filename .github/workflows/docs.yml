@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
-      - run: choco install pandoc
+      - run: choco install pandoc rsync
       - run: pip install .[docs] --verbose
       - run: cd docs && make
       - uses: JamesIves/github-pages-deploy-action@v4.4.0
