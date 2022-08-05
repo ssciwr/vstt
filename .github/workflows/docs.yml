@@ -10,20 +10,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-docs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
-      - run: choco install pandoc rsync
+      - run: choco install pandoc
       - run: pip install .[docs] --verbose
       - run: cd docs && make
-      - uses: JamesIves/github-pages-deploy-action@v4.4.0
+      - uses: actions/upload-artifact@v3
+        with:
+          name: site
+          path: docs/build/_html
+  deploy-docs:
+    needs: [build-docs]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: site
+      - uses: JamesIves/github-pages-deploy-action@v4
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        name: Deploy to gh-pages
         with:
           branch: gh-pages
-          folder: docs/_build/html
+          folder: site
           single-commit: true
