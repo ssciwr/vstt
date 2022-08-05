@@ -32,9 +32,10 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: site
+          path: dist
       - uses: JamesIves/github-pages-deploy-action@v4
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           branch: gh-pages
-          folder: site
+          folder: dist
           single-commit: true
