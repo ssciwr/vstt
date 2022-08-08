@@ -2,6 +2,9 @@ from typing import List
 from typing import Optional
 
 import numpy as np
+from motor_task_prototype import stat as mtpstat
+from motor_task_prototype.geom import points_on_circle
+from psychopy import core
 from psychopy.clock import Clock
 from psychopy.colors import colors
 from psychopy.data import TrialHandlerExt
@@ -14,10 +17,6 @@ from psychopy.visual.textbox2 import TextBox2
 from psychopy.visual.window import Window
 
 colors.pop("none")
-
-from psychopy import core
-from motor_task_prototype.geom import points_on_circle
-from motor_task_prototype import stat as mtpstat
 
 
 def make_cursor(window: Window) -> ShapeStim:
@@ -116,7 +115,10 @@ def display_results(win: Window, results: TrialHandlerExt) -> None:
         drawables.append(
             TextBox2(
                 win,
-                f"Reaction: {reac:.3f}s\nMovement: {move:.3f}s\nDistance: {dist:.3f}\nRMSE: {rmse:.3f}",
+                f"Reaction: {reac:.3f}s\n"
+                + f"Movement: {move:.3f}s\n"
+                + f"Distance: {dist:.3f}\n"
+                + f"RMSE: {rmse:.3f}",
                 pos=text_pos,
                 color=color,
                 alignment="center",
