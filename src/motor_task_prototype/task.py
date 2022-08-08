@@ -1,5 +1,4 @@
 from typing import List
-from typing import Tuple
 from typing import Union
 
 import numpy as np
@@ -7,9 +6,7 @@ from motor_task_prototype import vis as mtpvis
 from motor_task_prototype.geom import PointRotator
 from motor_task_prototype.trial import MotorTaskTrial
 from motor_task_prototype.trial import validate_trial
-from psychopy import core
 from psychopy.clock import Clock
-from psychopy.data import importConditions
 from psychopy.data import TrialHandlerExt
 from psychopy.event import Mouse
 from psychopy.event import xydist

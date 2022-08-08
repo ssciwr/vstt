@@ -19,11 +19,12 @@ class UserChoices:
 
 
 def setup() -> Optional[UserChoices]:
-    app = wx.App()
+    app = wx.App()  # noqa: F841
+    title = f"Motor Task Prototype {mtp.__version__}"
     dialog = wx.SingleChoiceDialog(
         None,
-        f"Motor Task Prototype {mtp.__version__}\n\nhttps://github.com/ssciwr/motor-task-prototype",
-        f"Motor Task Prototype {mtp.__version__}",
+        f"{title}\n\nhttps://github.com/ssciwr/motor-task-prototype",
+        title,
         [
             "Create and run a new trial",
             "Import and run an existing trial",
