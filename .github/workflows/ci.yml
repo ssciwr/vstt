@@ -15,9 +15,10 @@ concurrency:
 
 jobs:
   ci-pip:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: ["windows-latest"]
         python-version: ["3.7", "3.8", "3.9"]
     steps:
       - uses: actions/checkout@v3
@@ -25,4 +26,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e .[tests] --verbose
-      - run: python -m pytest -v
+      - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v
+      - uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          name: ${{ matrix.os }}-${{ matrix.python-version }}
+          fail_ci_if_error: true
+          verbose: true

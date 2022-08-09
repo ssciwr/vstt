@@ -5,6 +5,7 @@ from motor_task_prototype.trial import save_trial_to_psydat
 from motor_task_prototype.vis import display_results
 
 __all__ = [
+    "__version__",
     "setup",
     "MotorTask",
     "get_trial_from_user",
