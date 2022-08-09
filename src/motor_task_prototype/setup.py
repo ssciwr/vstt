@@ -19,7 +19,8 @@ class UserChoices:
 
 
 def setup() -> Optional[UserChoices]:
-    app = wx.App()  # noqa: F841
+    app = wx.App(False)
+    app.MainLoop()
     title = f"Motor Task Prototype {mtp.__version__}"
     dialog = wx.SingleChoiceDialog(
         None,
@@ -32,22 +33,23 @@ def setup() -> Optional[UserChoices]:
             "Exit",
         ],
     )
-    if dialog.ShowModal() != wx.ID_OK:
-        return None
-    result = dialog.GetSelection()
+    result = dialog.ShowModal()
+    selection = dialog.GetSelection()
     dialog.Destroy()
-    if result == 0:
+    if result != wx.ID_OK:
+        return None
+    if selection == 0:
         return UserChoices(True, get_trial_from_user(), None)
-    elif result == 1:
+    elif selection == 1:
         filename = fileOpenDlg(allowed="Psydat files (*.psydat)")
         if filename is None or len(filename) < 1:
             return None
         return UserChoices(True, get_trial_from_psydat(filename[0]), None)
-    elif result == 2:
+    elif selection == 2:
         filename = fileOpenDlg(allowed="Psydat files (*.psydat)")
         if filename is None or len(filename) < 1:
             return None
         return UserChoices(False, None, fromFile(filename[0]))
-    elif result == 3:
+    elif selection == 3:
         return None
     return None
