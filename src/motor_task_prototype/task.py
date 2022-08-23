@@ -25,7 +25,8 @@ class MotorTask:
         trial = validate_trial(trial)
         self.trials = TrialHandlerExt([trial], 1, originPath=-1)
 
-    def run(self, win: Window) -> TrialHandlerExt:
+    def run(self) -> TrialHandlerExt:
+        win = Window(fullscr=True, units="height")
         mouse = Mouse(visible=False)
         clock = Clock()
         kb = Keyboard()
@@ -92,5 +93,5 @@ class MotorTask:
         if win.nDroppedFrames > 0:
             print(f"Warning: dropped {win.nDroppedFrames} frames")
         mouse.setVisible(True)
-        win.flip()
+        win.close()
         return self.trials

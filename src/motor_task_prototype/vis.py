@@ -76,7 +76,8 @@ def draw_and_flip(
     win.flip()
 
 
-def display_results(win: Window, results: TrialHandlerExt) -> None:
+def display_results(results: TrialHandlerExt) -> None:
+    win = Window(fullscr=True, units="height")
     clock = Clock()
     kb = Keyboard()
     # for now just get the data from the first trial
@@ -128,5 +129,7 @@ def display_results(win: Window, results: TrialHandlerExt) -> None:
     clock.reset()
     while clock.getTime() < 30:
         if kb.getKeys(["escape"]):
+            win.close()
             return
         draw_and_flip(win, drawables)
+    win.close()
