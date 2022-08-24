@@ -89,10 +89,6 @@ def get_trial_from_user(
         core.quit()
     # convert cursor rotation degrees to radians
     trial["cursor_rotation"] = trial["cursor_rotation"] * (2.0 * np.pi / 360.0)
-    # convert string of target indices to a numpy array of ints
-    trial["target_indices"] = np.fromstring(
-        trial["target_indices"], dtype="int", sep=" "
-    )
     return trial
 
 
@@ -106,18 +102,22 @@ def save_trial_to_psydat(trial: TrialHandlerExt) -> None:
 
 
 def validate_trial(trial: MotorTaskTrial) -> MotorTaskTrial:
+    if isinstance(trial["target_indices"], str):
+        # convert string of target indices to a numpy array of ints
+        trial["target_indices"] = np.fromstring(
+            trial["target_indices"], dtype="int", sep=" "
+        )
     if trial["target_order"] == "fixed":
         # clip indices to valid range
         trial["target_indices"] = np.clip(
             trial["target_indices"], 0, trial["num_targets"] - 1
         )
-        return trial
-    # construct clockwise sequence
-    trial["target_indices"] = np.array(range(trial["num_targets"]))
-    if trial["target_order"] == "anti-clockwise":
-        trial["target_indices"] = np.flip(trial["target_indices"])
-    elif trial["target_order"] == "random":
-        rng = np.random.default_rng()
-        rng.shuffle(trial["target_indices"])
-    print(trial["target_indices"])
+    else:
+        # construct clockwise sequence
+        trial["target_indices"] = np.array(range(trial["num_targets"]))
+        if trial["target_order"] == "anti-clockwise":
+            trial["target_indices"] = np.flip(trial["target_indices"])
+        elif trial["target_order"] == "random":
+            rng = np.random.default_rng()
+            rng.shuffle(trial["target_indices"])
     return trial
