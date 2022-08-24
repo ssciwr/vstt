@@ -1,3 +1,4 @@
+import logging
 import sys
 from typing import List
 from typing import Union
@@ -30,6 +31,8 @@ MotorTaskTrial = TypedDict(
         "show_cursor": bool,
         "show_cursor_path": bool,
         "cursor_rotation_degrees": float,
+        "post_trial_delay": float,
+        "post_block_delay": float,
     },
 )
 
@@ -49,12 +52,14 @@ def default_trial() -> MotorTaskTrial:
         "show_cursor": True,
         "show_cursor_path": True,
         "cursor_rotation_degrees": 0.0,
+        "post_trial_delay": 0.0,
+        "post_block_delay": 0.0,
     }
 
 
 def get_trial_from_psydat(filename: str) -> MotorTaskTrial:
     psydata = fromFile(filename)
-    return psydata.trialList[0]
+    return import_trial(psydata.trialList[0])
 
 
 def get_trial_from_user(
@@ -76,6 +81,8 @@ def get_trial_from_user(
         "show_cursor": "Show cursor",
         "show_cursor_path": "Show cursor path",
         "cursor_rotation_degrees": "Cursor rotation (degrees)",
+        "post_trial_delay": "Delay between trials (secs)",
+        "post_block_delay": "Delay after last trial (secs)",
     }
     order_of_targets = [trial["target_order"]]
     for target_order in ["clockwise", "anti-clockwise", "random", "fixed"]:
@@ -99,7 +106,31 @@ def save_trial_to_psydat(trial: TrialHandlerExt) -> None:
         trial.saveAsPickle(filename)
 
 
+def import_trial(trial_dict: dict) -> MotorTaskTrial:
+    # start with a default valid trial
+    trial = default_trial()
+    # import all valid keys from input_trial
+    for key in trial:
+        if key in trial_dict:
+            trial[key] = trial_dict[key]  # type: ignore
+        else:
+            logging.warning(f"Key '{key}' missing from trial")
+    for key in trial_dict:
+        if key not in trial:
+            logging.warning(f"Ignoring unknown key '{key}'")
+    return trial
+
+
 def validate_trial(trial: MotorTaskTrial) -> MotorTaskTrial:
+    # make any negative time durations zero
+    for duration in [
+        "target_duration",
+        "inter_target_duration",
+        "post_trial_delay",
+        "post_block_delay",
+    ]:
+        if trial[duration] < 0:  # type: ignore
+            trial[duration] = 0  # type: ignore
     if isinstance(trial["target_indices"], str):
         # convert string of target indices to a numpy array of ints
         trial["target_indices"] = np.fromstring(
