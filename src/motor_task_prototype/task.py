@@ -42,7 +42,7 @@ class MotorTask:
             cursor = mtpvis.make_cursor(win)
             if trial["show_cursor"]:
                 drawables.append(cursor)
-            point_rotator = PointRotator(trial["cursor_rotation"])
+            point_rotator = PointRotator(trial["cursor_rotation_degrees"])
             cursor_path = ShapeStim(
                 win, vertices=[(0, 0)], lineColor="white", closeShape=False
             )
