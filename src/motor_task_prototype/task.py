@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from typing import Union
 
@@ -103,7 +104,7 @@ class MotorTask:
             while clock.getTime() < post_trial_delay:
                 win.flip()
         if win.nDroppedFrames > 0:
-            print(f"Warning: dropped {win.nDroppedFrames} frames")
+            logging.warning(f"Dropped {win.nDroppedFrames} frames")
         mouse.setVisible(True)
         win.close()
         return self.trial_handler
