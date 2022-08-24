@@ -19,18 +19,21 @@ from psychopy.visual.window import Window
 
 
 class MotorTask:
-    trials: TrialHandlerExt
+    trial_handler: TrialHandlerExt
 
     def __init__(self, trial: MotorTaskTrial):
         trial = validate_trial(trial)
-        self.trials = TrialHandlerExt([trial], 1, originPath=-1)
+        self.trial_handler = TrialHandlerExt(
+            [trial], nReps=1, method="sequential", originPath=-1
+        )
 
     def run(self) -> TrialHandlerExt:
         win = Window(fullscr=True, units="height")
         mouse = Mouse(visible=False)
         clock = Clock()
         kb = Keyboard()
-        for trial in self.trials:
+        trial_counts = np.zeros((len(self.trial_handler.trialList),), dtype=int)
+        for trial in self.trial_handler:
             targets: ElementArrayStim = mtpvis.make_targets(
                 win,
                 trial["num_targets"],
@@ -48,6 +51,10 @@ class MotorTask:
             )
             if trial["show_cursor_path"]:
                 drawables.append(cursor_path)
+            trial_counts[self.trial_handler.thisIndex] += 1
+            post_trial_delay = trial["post_trial_delay"]
+            if trial_counts[self.trial_handler.thisIndex] % trial["weight"] == 0:
+                post_trial_delay = trial["post_block_delay"]
             trial_target_pos = []
             trial_timestamps = []
             trial_mouse_positions = []
@@ -87,11 +94,16 @@ class MotorTask:
                 win.recordFrameIntervals = False
                 trial_timestamps.append(np.array(mouse_times))
                 trial_mouse_positions.append(np.array(mouse_positions))
-            self.trials.addData("target_pos", np.array(trial_target_pos))
-            self.trials.addData("timestamps", np.array(trial_timestamps))
-            self.trials.addData("mouse_positions", np.array(trial_mouse_positions))
+            self.trial_handler.addData("target_pos", np.array(trial_target_pos))
+            self.trial_handler.addData("timestamps", np.array(trial_timestamps))
+            self.trial_handler.addData(
+                "mouse_positions", np.array(trial_mouse_positions)
+            )
+            clock.reset()
+            while clock.getTime() < post_trial_delay:
+                win.flip()
         if win.nDroppedFrames > 0:
             print(f"Warning: dropped {win.nDroppedFrames} frames")
         mouse.setVisible(True)
         win.close()
-        return self.trials
+        return self.trial_handler

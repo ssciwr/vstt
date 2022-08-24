@@ -27,6 +27,9 @@ classifiers = [
 dependencies = ["psychopy", "numpy"]
 dynamic = ["version"]
 
+[project.scripts]
+motor_task_prototype = "motor_task_prototype.__main__:main"
+
 [project.urls]
 Github = "https://github.com/ssciwr/motor-task-prototype"
 Issues = "https://github.com/ssciwr/motor-task-prototype/issues"
