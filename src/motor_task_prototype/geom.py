@@ -2,6 +2,10 @@ from typing import Tuple
 
 import numpy as np
 
+"""
+An array of `n_points` equidistantly spaced angles in radians
+"""
+
 
 def equidistant_angles(n_points: int) -> np.ndarray:
     return np.linspace(0, n_points - 1.0, n_points) * (2.0 * np.pi / n_points)
@@ -19,6 +23,11 @@ def points_on_circle(
     return np.array(points)
 
 
+"""
+Rotate `point` by an angle `angle_radians` around the point `pivot_point`
+"""
+
+
 def rotate_point(
     point: Tuple[float, float],
     angle_radians: float,
@@ -33,11 +42,12 @@ def rotate_point(
 
 class PointRotator:
     """
-    Rotate a point (x,y) by a fixed angle around the origin
+    Rotate a point (x,y) by a fixed angle in degrees around the origin
     """
 
-    def __init__(self, angle_radians: float):
-        self.angle = angle_radians
+    def __init__(self, angle_degrees: float):
+        self.angle_degrees = angle_degrees
+        angle_radians = angle_degrees * np.pi / 180.0
         self._s = np.sin(angle_radians)
         self._c = np.cos(angle_radians)
 

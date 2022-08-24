@@ -29,7 +29,7 @@ MotorTaskTrial = TypedDict(
         "play_sound": bool,
         "show_cursor": bool,
         "show_cursor_path": bool,
-        "cursor_rotation": float,
+        "cursor_rotation_degrees": float,
     },
 )
 
@@ -48,7 +48,7 @@ def default_trial() -> MotorTaskTrial:
         "play_sound": True,
         "show_cursor": True,
         "show_cursor_path": True,
-        "cursor_rotation": 0.0,
+        "cursor_rotation_degrees": 0.0,
     }
 
 
@@ -75,7 +75,7 @@ def get_trial_from_user(
         "play_sound": "Play a sound on target display",
         "show_cursor": "Show cursor",
         "show_cursor_path": "Show cursor path",
-        "cursor_rotation": "Cursor rotation (degrees)",
+        "cursor_rotation_degrees": "Cursor rotation (degrees)",
     }
     order_of_targets = [trial["target_order"]]
     for target_order in ["clockwise", "anti-clockwise", "random", "fixed"]:
@@ -87,8 +87,6 @@ def get_trial_from_user(
     )
     if not dialog.OK:
         core.quit()
-    # convert cursor rotation degrees to radians
-    trial["cursor_rotation"] = trial["cursor_rotation"] * (2.0 * np.pi / 360.0)
     return trial
 
 
