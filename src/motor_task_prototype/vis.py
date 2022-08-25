@@ -48,7 +48,8 @@ def make_targets(
         units="height",
         fieldShape="circle",
         nElements=n_circles + 1,
-        sizes=[2.0 * point_radius] * n_circles + [2.0 * center_point_radius],
+        sizes=[[2.0 * point_radius] * 2] * n_circles
+        + [[2.0 * center_point_radius] * 2],
         xys=points_on_circle(n_circles, radius, include_centre=True),
         elementTex=None,
         elementMask="circle",
