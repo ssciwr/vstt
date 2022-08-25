@@ -1,10 +1,14 @@
+import multiprocessing
+from time import sleep
 from typing import Dict
 from typing import List
 from typing import Tuple
 
 import motor_task_prototype.vis as mtpvis
 import numpy as np
+import pyautogui
 import pytest
+from psychopy.data import TrialHandlerExt
 from psychopy.visual.window import Window
 
 
@@ -82,3 +86,18 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
                 assert np.allclose(targets.colors[i], red)
             else:
                 assert np.allclose(targets.colors[i], grey)
+
+
+def test_display_results(fake_trial: TrialHandlerExt) -> None:
+    # pyglet is not threadsafe so GUI code must run in separate process
+    # (if threading is used instead get a variety of strange errors)
+    process = multiprocessing.Process(
+        target=mtpvis.display_results, name="display_results", args=(fake_trial,)
+    )
+    process.start()
+    # wait for display_results screen to be ready
+    sleep(1)
+    # press escape to exit
+    pyautogui.typewrite(["escape"])
+    sleep(1)
+    process.join()
