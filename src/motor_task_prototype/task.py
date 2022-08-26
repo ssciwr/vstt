@@ -84,6 +84,7 @@ class MotorTask:
                     and clock.getTime() < trial["target_duration"]
                 ):
                     mouse_pos = point_rotator(mouse.getPos())
+                    logging.info(mouse_pos)
                     if trial["show_cursor"]:
                         cursor.setPos(mouse_pos)
                     mouse_times.append(clock.getTime())

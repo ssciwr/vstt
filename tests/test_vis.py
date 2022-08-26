@@ -4,6 +4,7 @@ from typing import Dict
 from typing import List
 from typing import Tuple
 
+import ascii_magic
 import motor_task_prototype.vis as mtpvis
 import numpy as np
 import pyautogui
@@ -96,8 +97,10 @@ def test_display_results(fake_trial: TrialHandlerExt) -> None:
     )
     process.start()
     # wait for display_results screen to be ready
-    sleep(1)
+    sleep(2)
+    ascii_magic.to_terminal(
+        ascii_magic.from_image(pyautogui.screenshot("display_results.png"))
+    )
     # press escape to exit
     pyautogui.typewrite(["escape"])
-    sleep(1)
     process.join()
