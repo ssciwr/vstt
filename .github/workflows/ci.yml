@@ -26,11 +26,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Mesa 3D to get OpenGL support without a GPU
-        shell: cmd
-        run: |
-          curl.exe -L --output mesa.7z --url https://github.com/pal1000/mesa-dist-win/releases/download/22.1.7/mesa3d-22.1.7-release-msvc.7z
-          7z.exe x mesa.7z
-          systemwidedeploy.cmd 1
+        uses: ssciwr/setup-mesa-dist-win@v1
       - run: pip install -e .[tests] --verbose
       - run: pytest -k test_display_results
       - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v
