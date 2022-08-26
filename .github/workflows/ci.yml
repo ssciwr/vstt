@@ -32,6 +32,7 @@ jobs:
           7z.exe x mesa.7z
           systemwidedeploy.cmd 1
       - run: pip install -e .[tests] --verbose
+      - run: pytest -k test_display_results
       - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v
       - uses: codecov/codecov-action@v3
         with:
