@@ -28,9 +28,9 @@ class MotorTask:
             [trial], nReps=1, method="sequential", originPath=-1
         )
 
-    def run(self) -> TrialHandlerExt:
-        win = Window(fullscr=True, units="height")
-        mouse = Mouse(visible=False)
+    def run(self, winType: str = "pyglet") -> TrialHandlerExt:
+        win = Window(fullscr=True, units="height", winType=winType)
+        mouse = Mouse(visible=False, win=win)
         clock = Clock()
         kb = Keyboard()
         trial_counts = np.zeros((len(self.trial_handler.trialList),), dtype=int)

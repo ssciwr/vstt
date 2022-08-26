@@ -77,8 +77,8 @@ def draw_and_flip(
     win.flip()
 
 
-def display_results(results: TrialHandlerExt) -> None:
-    win = Window(fullscr=True, units="height")
+def display_results(results: TrialHandlerExt, winType: str = "pyglet") -> None:
+    win = Window(fullscr=True, units="height", winType=winType)
     clock = Clock()
     kb = Keyboard()
     # for now just get the data from the first trial
