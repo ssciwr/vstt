@@ -1,5 +1,4 @@
 import multiprocessing
-import sys
 from time import sleep
 from typing import Tuple
 
@@ -7,7 +6,6 @@ import ascii_magic
 import motor_task_prototype.task as mtptask
 import numpy as np
 import pyautogui
-import pytest
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.trial import default_trial
 
@@ -32,12 +30,6 @@ def wrap_task(trial: mtptask.MotorTaskTrial, queue: multiprocessing.Queue) -> No
     task = mtptask.MotorTask(trial)
     results = task.run(winType="glfw")
     queue.put(results)
-
-
-pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="GUI interaction tests not yet working on windows CI",
-)
 
 
 def test_task() -> None:
