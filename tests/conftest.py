@@ -27,9 +27,14 @@ def tests_init() -> None:
 
 
 # fixture to create a wxPython Window for testing gui functions
+# GLFW backend used for tests as it works better with Xvfb
 @pytest.fixture()
 def window() -> Window:
-    window = Window(fullscr=False, units="height", size=(800, 600))
+    window = Window(
+        fullscr=True,
+        units="height",
+        winType="glfw",
+    )
     # yield is like return except control flow returns here afterwards
     yield window
     # clean up window

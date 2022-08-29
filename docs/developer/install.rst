@@ -24,7 +24,7 @@ To clone the repo, make an editable installation and run the tests:
     git clone https://github.com/ssciwr/motor-task-prototype.git
     cd motor-task-prototype
     pip install -e .[tests,docs]
-    pytest
+    xvfb-run pytest
 
 To build the docs (in ``docs/_build/html/index.html``)
 

@@ -1,4 +1,5 @@
-import multiprocessing
+import sys
+import threading
 from time import sleep
 from typing import Dict
 from typing import List
@@ -88,16 +89,24 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
                 assert np.allclose(targets.colors[i], grey)
 
 
+pytest.mark.skipif(
+    sys.platform.startswith("win"),
+    reason="GUI interaction tests not yet working on windows CI",
+)
+
+
 def test_display_results(fake_trial: TrialHandlerExt) -> None:
-    # pyglet is not threadsafe so GUI code must run in separate process
-    # (if threading is used instead get a variety of strange errors)
-    process = multiprocessing.Process(
-        target=mtpvis.display_results, name="display_results", args=(fake_trial,)
+    process = threading.Thread(
+        target=mtpvis.display_results,
+        name="display_results",
+        args=(
+            fake_trial,
+            "glfw",
+        ),
     )
     process.start()
     # wait for display_results screen to be ready
     sleep(1)
     # press escape to exit
     pyautogui.typewrite(["escape"])
-    sleep(1)
     process.join()
