@@ -4,7 +4,7 @@ import numpy as np
 
 def test_default_trial() -> None:
     trial = mtptrial.default_trial()
-    assert len(trial) == 15
+    assert len(trial) == 16
     assert len(trial["target_indices"].split(" ")) == trial["num_targets"]
 
 
@@ -23,6 +23,7 @@ def test_import_trial() -> None:
         "play_sound": True,
         "show_cursor": False,
         "show_cursor_path": True,
+        "automove_cursor_to_center": True,
         "cursor_rotation_degrees": 45,
         "post_trial_delay": 0.2,
         "post_block_delay": 2.0,

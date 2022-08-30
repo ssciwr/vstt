@@ -28,6 +28,7 @@ MotorTaskTrial = TypedDict(
         "target_size": float,
         "central_target_size": float,
         "play_sound": bool,
+        "automove_cursor_to_center": bool,
         "show_cursor": bool,
         "show_cursor_path": bool,
         "cursor_rotation_degrees": float,
@@ -51,6 +52,7 @@ def default_trial() -> MotorTaskTrial:
         "play_sound": True,
         "show_cursor": True,
         "show_cursor_path": True,
+        "automove_cursor_to_center": True,
         "cursor_rotation_degrees": 0.0,
         "post_trial_delay": 0.0,
         "post_block_delay": 0.0,
@@ -67,6 +69,7 @@ def get_trial_from_user(
 ) -> MotorTaskTrial:
     if trial is None:
         trial = default_trial()
+    order_of_targets = [trial["target_order"]]
     labels = {
         "weight": "Repetitions",
         "num_targets": "Number of targets",
@@ -80,11 +83,11 @@ def get_trial_from_user(
         "play_sound": "Play a sound on target display",
         "show_cursor": "Show cursor",
         "show_cursor_path": "Show cursor path",
+        "automove_cursor_to_center": "Automatically move cursor to center",
         "cursor_rotation_degrees": "Cursor rotation (degrees)",
         "post_trial_delay": "Delay between trials (secs)",
         "post_block_delay": "Delay after last trial (secs)",
     }
-    order_of_targets = [trial["target_order"]]
     for target_order in ["clockwise", "anti-clockwise", "random", "fixed"]:
         if target_order != order_of_targets[0]:
             order_of_targets.append(target_order)

@@ -50,55 +50,84 @@ class MotorTask:
             cursor_path = ShapeStim(
                 win, vertices=[(0, 0)], lineColor="white", closeShape=False
             )
+            prev_cursor_path = ShapeStim(
+                win, vertices=[(0, 0)], lineColor="white", closeShape=False
+            )
             if trial["show_cursor_path"]:
                 drawables.append(cursor_path)
+                drawables.append(prev_cursor_path)
             trial_counts[self.trial_handler.thisIndex] += 1
             post_trial_delay = trial["post_trial_delay"]
             if trial_counts[self.trial_handler.thisIndex] % trial["weight"] == 0:
                 post_trial_delay = trial["post_block_delay"]
             trial_target_pos = []
             trial_timestamps = []
+            trial_timestamps_back = []
             trial_mouse_positions = []
-            for target_index in trial["target_indices"]:
-                mtpvis.update_target_colors(targets, None)
-                cursor_path.vertices = [(0, 0)]
-                cursor.setPos((0.0, 0.0))
-                clock.reset()
-                while clock.getTime() < trial["inter_target_duration"]:
-                    mtpvis.draw_and_flip(win, drawables, kb)
-                mtpvis.update_target_colors(targets, target_index)
-                if trial["play_sound"]:
-                    Sound("A", secs=0.3, blockSize=512).play()
-                mouse_pos = (0.0, 0.0)
-                trial_target_pos.append(targets.xys[target_index])
-                dist = xydist(mouse_pos, targets.xys[target_index])
-                mouse_times = [0]
-                mouse_positions = [mouse_pos]
-                mouse.setPos(mouse_pos)
-                mtpvis.draw_and_flip(win, drawables, kb)
-                clock.reset()
-                mouse.setPos(mouse_pos)
-                win.recordFrameIntervals = True
-                while (
-                    dist > trial["target_size"]
-                    and clock.getTime() < trial["target_duration"]
-                ):
-                    mouse_pos = point_rotator(mouse.getPos())
-                    if trial["show_cursor"]:
-                        cursor.setPos(mouse_pos)
-                    mouse_times.append(clock.getTime())
-                    mouse_positions.append(mouse_pos)
-                    if trial["show_cursor_path"]:
-                        cursor_path.vertices = mouse_positions
+            trial_mouse_positions_back = []
+            mouse_pos = (0.0, 0.0)
+            for index in trial["target_indices"]:
+                indices = [index]
+                if not trial["automove_cursor_to_center"]:
+                    indices.append(trial["num_targets"])
+                for target_index in indices:
+                    mtpvis.update_target_colors(targets, None)
+                    if target_index != trial["num_targets"]:
+                        cursor_path.vertices = [(0, 0)]
+                        prev_cursor_path.vertices = [(0, 0)]
+                        cursor.setPos((0.0, 0.0))
+                        clock.reset()
+                        while clock.getTime() < trial["inter_target_duration"]:
+                            mtpvis.draw_and_flip(win, drawables, kb)
+                        mouse.setPos((0.0, 0.0))
+                        mouse_pos = (0.0, 0.0)
+                    else:
+                        prev_cursor_path.vertices = cursor_path.vertices
+                        cursor_path.vertices = [prev_cursor_path.vertices[-1]]
+                    mtpvis.update_target_colors(targets, target_index)
+                    if trial["play_sound"]:
+                        Sound("A", secs=0.3, blockSize=512).play()
+                    if target_index != trial["num_targets"]:
+                        trial_target_pos.append(targets.xys[target_index])
                     dist = xydist(mouse_pos, targets.xys[target_index])
+                    mouse_times = [0]
+                    mouse_positions = [mouse_pos]
                     mtpvis.draw_and_flip(win, drawables, kb)
-                win.recordFrameIntervals = False
-                trial_timestamps.append(np.array(mouse_times))
-                trial_mouse_positions.append(np.array(mouse_positions))
+                    clock.reset()
+                    win.recordFrameIntervals = True
+                    target_size = trial["target_size"]
+                    if target_index == trial["num_targets"]:
+                        target_size = trial["central_target_size"]
+                    while (
+                        dist > target_size
+                        and clock.getTime() < trial["target_duration"]
+                    ):
+                        mouse_pos = point_rotator(mouse.getPos())
+                        if trial["show_cursor"]:
+                            cursor.setPos(mouse_pos)
+                        mouse_times.append(clock.getTime())
+                        mouse_positions.append(mouse_pos)
+                        if trial["show_cursor_path"]:
+                            cursor_path.vertices = mouse_positions
+                        dist = xydist(mouse_pos, targets.xys[target_index])
+                        mtpvis.draw_and_flip(win, drawables, kb)
+                    win.recordFrameIntervals = False
+                    if target_index == trial["num_targets"]:
+                        trial_timestamps_back.append(np.array(mouse_times))
+                        trial_mouse_positions_back.append(np.array(mouse_positions))
+                    else:
+                        trial_timestamps.append(np.array(mouse_times))
+                        trial_mouse_positions.append(np.array(mouse_positions))
             self.trial_handler.addData("target_pos", np.array(trial_target_pos))
             self.trial_handler.addData("timestamps", np.array(trial_timestamps))
             self.trial_handler.addData(
                 "mouse_positions", np.array(trial_mouse_positions)
+            )
+            self.trial_handler.addData(
+                "timestamps_back", np.array(trial_timestamps_back)
+            )
+            self.trial_handler.addData(
+                "mouse_positions_back", np.array(trial_mouse_positions_back)
             )
             clock.reset()
             while clock.getTime() < post_trial_delay:

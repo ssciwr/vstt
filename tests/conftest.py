@@ -43,7 +43,9 @@ def window() -> Window:
 
 @pytest.fixture
 def fake_trial() -> TrialHandlerExt:
-    th = TrialHandlerExt([default_trial()], nReps=1, method="sequential", originPath=-1)
+    trial = default_trial()
+    trial["automove_cursor_to_center"] = False
+    th = TrialHandlerExt([trial], nReps=1, method="sequential", originPath=-1)
     for trial in th:
         timestamps = []
         mouse_positions = []
@@ -65,4 +67,6 @@ def fake_trial() -> TrialHandlerExt:
         th.addData("target_pos", np.array(target_pos))
         th.addData("timestamps", np.array(timestamps))
         th.addData("mouse_positions", np.array(mouse_positions))
+        th.addData("timestamps_back", np.array(timestamps))
+        th.addData("mouse_positions_back", np.flip(np.array(mouse_positions)))
     return th

@@ -53,10 +53,10 @@ def test_make_targets(
     window: Window, args: Dict, xys: List[Tuple[float, float]]
 ) -> None:
     targets = mtpvis.make_targets(window, **args)
-    nElements = args["n_circles"] + 1
-    assert targets.nElements == nElements
+    n_elem = args["n_circles"] + 1
+    assert targets.nElements == n_elem
     # shape of sizes is x,y pair for each element
-    assert targets.sizes.shape == (nElements, 2)
+    assert targets.sizes.shape == (n_elem, 2)
     # size is circumference of circle in both x and y directions
     point_size = 2 * args["point_radius"]
     for size in targets.sizes[0:-1]:
