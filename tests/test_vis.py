@@ -1,4 +1,3 @@
-import sys
 import threading
 from time import sleep
 from typing import Dict
@@ -87,12 +86,6 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
                 assert np.allclose(targets.colors[i], red)
             else:
                 assert np.allclose(targets.colors[i], grey)
-
-
-pytest.mark.skipif(
-    sys.platform.startswith("win"),
-    reason="GUI interaction tests not yet working on windows CI",
-)
 
 
 def test_display_results(fake_trial: TrialHandlerExt) -> None:

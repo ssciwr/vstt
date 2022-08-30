@@ -4,7 +4,7 @@ Installation
 Windows with standalone Psychopy (recommended)
 ----------------------------------------------
 
-* Install `StandalonePsychoPy <https://github.com/psychopy/psychopy/releases/download/2022.2.2/StandalonePsychoPy-2022.2.2-win64.exe>`_
+* Install `StandalonePsychoPy <https://github.com/psychopy/psychopy/releases/download/2022.2.4/StandalonePsychoPy-2022.2.4-win64.exe>`_
 * Download `UpdatePrototype.bat <https://github.com/ssciwr/motor-task-prototype/releases/download/latest/UpdatePrototype.bat>`_ and double-click on it
 * Download `RunPrototype.bat <https://github.com/ssciwr/motor-task-prototype/releases/download/latest/RunPrototype.bat>`_ and double-click on it
 
