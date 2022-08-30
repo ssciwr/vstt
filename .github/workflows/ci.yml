@@ -14,51 +14,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  windows:
-    runs-on: windows-latest
+  ci:
+    runs-on: ${{ matrix.os }}
+    name: "${{ matrix.os }} :: Python ${{ matrix.python-version }}"
     strategy:
       matrix:
+        os: ["ubuntu-20.04", "windows-latest"]
         python-version: ["3.8", "3.9"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install Mesa 3D to get OpenGL support without a GPU
+      - name: Install Mesa 3D to get OpenGL support on Windows without a GPU
         uses: ssciwr/setup-mesa-dist-win@v1
+      - name: Linux setup
+        if: runner.os == 'Linux'
+        run: |
+          # various psychopy system dependencies
+          sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot
+          # install pre-built ubuntu/gtk3 wxPython wheel
+          pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }}/ wxPython
+          # enable colours in logs
+          echo "FORCE_COLOR=1" >> $GITHUB_ENV
+          echo "TERM=xterm-256color" >> $GITHUB_ENV
+          # psychopy requires that the python executable has permission to set its priority level
+          sudo setcap cap_sys_nice+ep `python -c "import os; import sys; print(os.path.realpath(sys.executable))"`
+          # start an Xvfb server for GUI tests
+          nohup Xvfb :99 -screen 0 1024x768x24 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
       - run: pip install -e .[tests] --verbose
-      - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v
+      - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s
       - uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
-          name: windows-${{ matrix.python-version }}
-          fail_ci_if_error: true
-          verbose: true
-  ubuntu:
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9"]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      # various psychopy system dependencies
-      - run: sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot
-      # get wxPython wheel
-      - run: pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-20.04/ wxPython
-      # enable colours in logs
-      - run: echo "FORCE_COLOR=1" >> $GITHUB_ENV
-      - run: echo "TERM=xterm-256color" >> $GITHUB_ENV
-      # psychopy requires that the python executable has permission to set its priority level
-      - run: sudo setcap cap_sys_nice+ep `python -c "import os; import sys; print(os.path.realpath(sys.executable))"`
-      - run: pip install -e .[tests] --verbose
-      # run tests using Xvfb to have a display server
-      - run: xvfb-run -a --server-args="-screen 0 1024x768x24" python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s
-      - uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          name: ubuntu-${{ matrix.python-version }}
+          name: ${{ matrix.os }}-${{ matrix.python-version }}
           fail_ci_if_error: true
           verbose: true
