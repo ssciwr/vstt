@@ -86,7 +86,28 @@ def display_results(results: TrialHandlerExt, winType: str = "pyglet") -> None:
     trial_target_pos = results.data["target_pos"][0][0]
     trial_mouse_positions = results.data["mouse_positions"][0][0]
     trial_timestamps = results.data["timestamps"][0][0]
+    trial_mouse_positions_back = results.data["mouse_positions_back"][0][0]
     drawables: List[BaseVisualStim] = []
+    if not conditions["automove_cursor_to_center"]:
+        drawables.append(
+            Circle(
+                win,
+                radius=conditions["central_target_size"],
+                pos=(0.0, 0.0),
+                fillColor=(0.1, 0.1, 0.1),
+            )
+        )
+        for color, mouse_positions_back in zip(colors, trial_mouse_positions_back):
+            drawables.append(
+                ShapeStim(
+                    win,
+                    vertices=mouse_positions_back,
+                    lineColor=color,
+                    closeShape=False,
+                    lineWidth=3,
+                )
+            )
+
     for color, target_pos, mouse_positions, timestamps in zip(
         colors, trial_target_pos, trial_mouse_positions, trial_timestamps
     ):
