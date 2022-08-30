@@ -4,7 +4,7 @@ import numpy as np
 
 def test_default_trial() -> None:
     trial = mtptrial.default_trial()
-    assert len(trial) == 16
+    assert len(trial) == 18
     assert len(trial["target_indices"].split(" ")) == trial["num_targets"]
 
 
@@ -26,14 +26,21 @@ def test_import_trial() -> None:
         "automove_cursor_to_center": True,
         "cursor_rotation_degrees": 45,
         "post_trial_delay": 0.2,
+        "post_trial_display_results": True,
         "post_block_delay": 2.0,
+        "post_block_display_results": False,
     }
     # all valid keys are imported
     trial = mtptrial.import_trial(trial_dict)
     for key in trial:
         assert trial[key] == trial_dict[key]  # type: ignore
     # if any keys are missing, default values are used instead
-    missing_keys = ["weight", "cursor_rotation_degrees", "post_trial_delay"]
+    missing_keys = [
+        "weight",
+        "cursor_rotation_degrees",
+        "post_trial_delay",
+        "post_block_display_results",
+    ]
     for key in missing_keys:
         trial_dict.pop(key)
     # unknown keys are ignored
@@ -68,7 +75,6 @@ def test_validate_trial_durations() -> None:
     assert vtrial["target_duration"] == 0
     assert vtrial["inter_target_duration"] == 0
     assert vtrial["post_trial_delay"] == 0
-    assert vtrial["post_block_delay"] == 0
     assert vtrial["post_block_delay"] == 0
 
 
