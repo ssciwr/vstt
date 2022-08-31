@@ -19,7 +19,7 @@ jobs:
     name: "${{ matrix.os }} :: Python ${{ matrix.python-version }}"
     strategy:
       matrix:
-        os: ["ubuntu-20.04", "windows-latest"]
+        os: ["ubuntu-22.04", "windows-latest"]
         python-version: ["3.8", "3.9"]
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           # various psychopy system dependencies
-          sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot
+          sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot libnotify-dev pandoc
           # install pre-built ubuntu/gtk3 wxPython wheel
           pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }}/ wxPython
           # enable colours in logs
@@ -43,8 +43,18 @@ jobs:
           # start an Xvfb server for GUI tests
           nohup Xvfb :99 -screen 0 1024x768x24 &
           echo "DISPLAY=:99" >> $GITHUB_ENV
-      - run: pip install -e .[tests] --verbose
+      - run: pip install -e .[tests,docs] --verbose
       - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s
+      - name: Build documentation
+        if: runner.os == 'Linux'
+        run: cd docs && make && touch _build/html/.nojekyll
+      - name: Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && runner.os == 'Linux' && matrix.python-version == '3.8'
+        with:
+          branch: gh-pages
+          folder: docs/_build/html
+          single-commit: true
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

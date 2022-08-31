@@ -28,8 +28,8 @@ class MotorTask:
             [trial], nReps=1, method="sequential", originPath=-1
         )
 
-    def run(self, winType: str = "pyglet") -> TrialHandlerExt:
-        win = Window(fullscr=True, units="height", winType=winType)
+    def run(self, win_type: str = "pyglet") -> TrialHandlerExt:
+        win = Window(fullscr=True, units="height", winType=win_type)
         mouse = Mouse(visible=False, win=win)
         clock = Clock()
         kb = Keyboard()

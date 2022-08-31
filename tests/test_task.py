@@ -37,7 +37,7 @@ def pos_to_pixels(pos: Tuple[float, float]) -> Tuple[float, float]:
 
 def wrap_task(trial: mtptask.MotorTaskTrial, queue: multiprocessing.Queue) -> None:
     task = mtptask.MotorTask(trial)
-    results = task.run(winType="glfw")
+    results = task.run(win_type="glfw")
     queue.put(results)
 
 
