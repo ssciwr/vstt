@@ -33,7 +33,9 @@ MotorTaskTrial = TypedDict(
         "show_cursor_path": bool,
         "cursor_rotation_degrees": float,
         "post_trial_delay": float,
+        "post_trial_display_results": bool,
         "post_block_delay": float,
+        "post_block_display_results": bool,
     },
 )
 
@@ -44,8 +46,8 @@ def default_trial() -> MotorTaskTrial:
         "num_targets": 8,
         "target_order": "clockwise",
         "target_indices": "0 1 2 3 4 5 6 7",
-        "target_duration": 5,
-        "inter_target_duration": 1,
+        "target_duration": 5.0,
+        "inter_target_duration": 1.0,
         "target_distance": 0.4,
         "target_size": 0.04,
         "central_target_size": 0.02,
@@ -55,7 +57,9 @@ def default_trial() -> MotorTaskTrial:
         "automove_cursor_to_center": True,
         "cursor_rotation_degrees": 0.0,
         "post_trial_delay": 0.0,
+        "post_trial_display_results": False,
         "post_block_delay": 0.0,
+        "post_block_display_results": True,
     }
 
 
@@ -86,7 +90,9 @@ def get_trial_from_user(
         "automove_cursor_to_center": "Automatically move cursor to center",
         "cursor_rotation_degrees": "Cursor rotation (degrees)",
         "post_trial_delay": "Delay between trials (secs)",
+        "post_trial_display_results": "Display results after each trial",
         "post_block_delay": "Delay after last trial (secs)",
+        "post_block_display_results": "Display results after this block",
     }
     for target_order in ["clockwise", "anti-clockwise", "random", "fixed"]:
         if target_order != order_of_targets[0]:
@@ -132,8 +138,8 @@ def validate_trial(trial: MotorTaskTrial) -> MotorTaskTrial:
         "post_trial_delay",
         "post_block_delay",
     ]:
-        if trial[duration] < 0:  # type: ignore
-            trial[duration] = 0  # type: ignore
+        if trial[duration] < 0.0:  # type: ignore
+            trial[duration] = 0.0  # type: ignore
     if isinstance(trial["target_indices"], str):
         # convert string of target indices to a numpy array of ints
         trial["target_indices"] = np.fromstring(

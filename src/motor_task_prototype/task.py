@@ -19,21 +19,46 @@ from psychopy.visual.shape import ShapeStim
 from psychopy.visual.window import Window
 
 
+def new_experiment_from_trialhandler(experiment: TrialHandlerExt) -> TrialHandlerExt:
+    for trial in experiment.trialList:
+        validate_trial(trial)
+    return TrialHandlerExt(
+        experiment.trialList,
+        nReps=1,
+        method=experiment.method,
+        originPath=-1,
+        extraInfo=experiment.extraInfo,
+    )
+
+
+def new_experiment_from_dicts(
+    trials: List[MotorTaskTrial], display_options: mtpvis.MotorTaskDisplayOptions
+) -> TrialHandlerExt:
+    for trial in trials:
+        validate_trial(trial)
+    return TrialHandlerExt(
+        trials,
+        nReps=1,
+        method="sequential",
+        originPath=-1,
+        extraInfo={"display_options": display_options},
+    )
+
+
 class MotorTask:
     trial_handler: TrialHandlerExt
 
-    def __init__(self, trial: MotorTaskTrial):
-        trial = validate_trial(trial)
-        self.trial_handler = TrialHandlerExt(
-            [trial], nReps=1, method="sequential", originPath=-1
-        )
+    def __init__(self, experiment: TrialHandlerExt):
+        self.trial_handler = experiment
 
     def run(self, win_type: str = "pyglet") -> TrialHandlerExt:
         win = Window(fullscr=True, units="height", winType=win_type)
         mouse = Mouse(visible=False, win=win)
         clock = Clock()
         kb = Keyboard()
-        trial_counts = np.zeros((len(self.trial_handler.trialList),), dtype=int)
+        condition_trial_indices: List[List[int]] = [[]] * len(
+            self.trial_handler.trialList
+        )
         for trial in self.trial_handler:
             targets: ElementArrayStim = mtpvis.make_targets(
                 win,
@@ -56,15 +81,21 @@ class MotorTask:
             if trial["show_cursor_path"]:
                 drawables.append(cursor_path)
                 drawables.append(prev_cursor_path)
-            trial_counts[self.trial_handler.thisIndex] += 1
+            condition_trial_indices[self.trial_handler.thisIndex].append(
+                self.trial_handler.thisTrialN
+            )
+            is_final_trial_of_block = (
+                len(condition_trial_indices[self.trial_handler.thisIndex])
+                == trial["weight"]
+            )
             post_trial_delay = trial["post_trial_delay"]
-            if trial_counts[self.trial_handler.thisIndex] % trial["weight"] == 0:
+            if is_final_trial_of_block:
                 post_trial_delay = trial["post_block_delay"]
             trial_target_pos = []
-            trial_timestamps = []
-            trial_timestamps_back = []
-            trial_mouse_positions = []
-            trial_mouse_positions_back = []
+            trial_to_target_timestamps = []
+            trial_to_center_timestamps = []
+            trial_to_target_mouse_positions = []
+            trial_to_center_mouse_positions = []
             mouse_pos = (0.0, 0.0)
             for index in trial["target_indices"]:
                 indices = [index]
@@ -75,7 +106,9 @@ class MotorTask:
                     if target_index != trial["num_targets"]:
                         cursor_path.vertices = [(0, 0)]
                         prev_cursor_path.vertices = [(0, 0)]
+                        mouse.setPos((0.0, 0.0))
                         cursor.setPos((0.0, 0.0))
+                        mtpvis.draw_and_flip(win, drawables, kb)
                         clock.reset()
                         while clock.getTime() < trial["inter_target_duration"]:
                             mtpvis.draw_and_flip(win, drawables, kb)
@@ -113,25 +146,56 @@ class MotorTask:
                         mtpvis.draw_and_flip(win, drawables, kb)
                     win.recordFrameIntervals = False
                     if target_index == trial["num_targets"]:
-                        trial_timestamps_back.append(np.array(mouse_times))
-                        trial_mouse_positions_back.append(np.array(mouse_positions))
+                        trial_to_center_timestamps.append(np.array(mouse_times))
+                        trial_to_center_mouse_positions.append(
+                            np.array(mouse_positions)
+                        )
                     else:
-                        trial_timestamps.append(np.array(mouse_times))
-                        trial_mouse_positions.append(np.array(mouse_positions))
+                        trial_to_target_timestamps.append(np.array(mouse_times))
+                        trial_to_target_mouse_positions.append(
+                            np.array(mouse_positions)
+                        )
             self.trial_handler.addData("target_pos", np.array(trial_target_pos))
-            self.trial_handler.addData("timestamps", np.array(trial_timestamps))
             self.trial_handler.addData(
-                "mouse_positions", np.array(trial_mouse_positions)
+                "to_target_timestamps", np.array(trial_to_target_timestamps)
             )
             self.trial_handler.addData(
-                "timestamps_back", np.array(trial_timestamps_back)
+                "to_target_mouse_positions", np.array(trial_to_target_mouse_positions)
             )
             self.trial_handler.addData(
-                "mouse_positions_back", np.array(trial_mouse_positions_back)
+                "to_center_timestamps", np.array(trial_to_center_timestamps)
+            )
+            self.trial_handler.addData(
+                "to_center_mouse_positions", np.array(trial_to_center_mouse_positions)
             )
             clock.reset()
             while clock.getTime() < post_trial_delay:
                 win.flip()
+            n_trials_currently_in_block = len(
+                condition_trial_indices[self.trial_handler.thisIndex]
+            )
+            display_trial_results = trial["post_trial_display_results"] or (
+                is_final_trial_of_block
+                and trial["post_block_display_results"]
+                and n_trials_currently_in_block == 1
+            )
+            display_block_results = (
+                is_final_trial_of_block
+                and trial["post_block_display_results"]
+                and n_trials_currently_in_block > 1
+            )
+            if display_trial_results:
+                mtpvis.display_results(
+                    self.trial_handler,
+                    [self.trial_handler.thisIndex],
+                    win,
+                )
+            if display_block_results:
+                mtpvis.display_results(
+                    self.trial_handler,
+                    condition_trial_indices[self.trial_handler.thisIndex],
+                    win,
+                )
         if win.nDroppedFrames > 0:
             logging.warning(f"Dropped {win.nDroppedFrames} frames")
         mouse.setVisible(True)

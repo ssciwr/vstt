@@ -2,7 +2,82 @@ from typing import List
 from typing import Tuple
 
 import numpy as np
+from psychopy.data import TrialHandlerExt
 from psychopy.event import xydist
+
+
+class MotorTaskStats:
+    # 2d arrays of [trial_index][target_index]
+    to_target_reaction_times: np.ndarray
+    to_center_reaction_times: np.ndarray
+    to_target_times: np.ndarray
+    to_center_times: np.ndarray
+    to_target_distances: np.ndarray
+    to_center_distances: np.ndarray
+    to_target_rmses: np.ndarray
+    to_center_rmses: np.ndarray
+
+    def __init__(self, results: TrialHandlerExt, trials: List[int]):
+        all_to_target_reaction_times = []
+        all_to_target_times = []
+        all_to_target_distances = []
+        all_to_target_rmses = []
+        all_to_center_reaction_times = []
+        all_to_center_times = []
+        all_to_center_distances = []
+        all_to_center_rmses = []
+        # for now assume the experiment is only repeated once
+        i_repeat = 0
+        for i_trial in trials:
+            to_target_reaction_times = []
+            to_target_times = []
+            to_target_distances = []
+            to_target_rmses = []
+            targets = results.data["target_pos"][i_trial][i_repeat]
+            for to_target_timestamps, to_target_mouse_positions, target_pos in zip(
+                results.data["to_target_timestamps"][i_trial][i_repeat],
+                results.data["to_target_mouse_positions"][i_trial][i_repeat],
+                targets,
+            ):
+                to_target_reaction_time, to_target_time = reaction_movement_times(
+                    to_target_timestamps, to_target_mouse_positions
+                )
+                to_target_reaction_times.append(to_target_reaction_time)
+                to_target_times.append(to_target_time)
+                to_target_distances.append(distance(to_target_mouse_positions))
+                to_target_rmses.append(rmse(to_target_mouse_positions, target_pos))
+            all_to_target_reaction_times.append(to_target_reaction_times)
+            all_to_target_times.append(to_target_times)
+            all_to_target_distances.append(to_target_distances)
+            all_to_target_rmses.append(to_target_rmses)
+            to_center_reaction_times = []
+            to_center_times = []
+            to_center_distances = []
+            to_center_rmses = []
+            central_target = (0.0, 0.0)
+            for to_center_timestamps, to_center_mouse_positions in zip(
+                results.data["to_center_timestamps"][i_trial][i_repeat],
+                results.data["to_center_mouse_positions"][i_trial][i_repeat],
+            ):
+                to_center_reaction_time, to_center_time = reaction_movement_times(
+                    to_center_timestamps, to_center_mouse_positions
+                )
+                to_center_reaction_times.append(to_center_reaction_time)
+                to_center_times.append(to_center_time)
+                to_center_distances.append(distance(to_center_mouse_positions))
+                to_center_rmses.append(rmse(to_center_mouse_positions, central_target))
+            all_to_center_reaction_times.append(to_center_reaction_times)
+            all_to_center_times.append(to_center_times)
+            all_to_center_distances.append(to_center_distances)
+            all_to_center_rmses.append(to_center_rmses)
+        self.to_target_reaction_times = np.array(all_to_target_reaction_times)
+        self.to_target_times = np.array(all_to_target_times)
+        self.to_target_distances = np.array(all_to_target_distances)
+        self.to_target_rmses = np.array(all_to_target_rmses)
+        self.to_center_reaction_times = np.array(all_to_center_reaction_times)
+        self.to_center_times = np.array(all_to_center_times)
+        self.to_center_distances = np.array(all_to_center_distances)
+        self.to_center_rmses = np.array(all_to_center_rmses)
 
 
 def reaction_movement_times(
