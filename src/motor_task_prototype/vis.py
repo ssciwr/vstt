@@ -68,8 +68,26 @@ def get_display_options_from_user(
 ) -> MotorTaskDisplayOptions:
     if display_options is None:
         display_options = default_display_options()
+    labels = {
+        "to_target_paths": "Display cursor paths to target",
+        "to_center_paths": "Display cursor paths back to center",
+        "targets": "Display targets",
+        "central_target": "Display central target",
+        "to_target_reaction_time": "Statistic: reaction time to target",
+        "to_center_reaction_time": "Statistic: reaction time to center",
+        "to_target_time": "Statistic: movement time to target",
+        "to_center_time": "Statistic: movement time to center",
+        "to_target_distance": "Statistic: movement distance to target",
+        "to_center_distance": "Statistic: movement distance to center",
+        "to_target_rmse": "Statistic: RMSE movement to target",
+        "to_center_rmse": "Statistic: RMSE movement to center",
+        "averages": "Also show statistics averaged over all targets",
+    }
     dialog = DlgFromDict(
-        display_options, title="Motor task display options", sortKeys=False
+        display_options,
+        title="Motor task display options",
+        labels=labels,
+        sortKeys=False,
     )
     if not dialog.OK:
         core.quit()
