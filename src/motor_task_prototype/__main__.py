@@ -13,7 +13,7 @@ def main() -> None:
         if user_choices.run_task:
             motor_task = mtp.MotorTask(user_choices.experiment)
             results = motor_task.run()
-            mtp.save_trial_to_psydat(results)
+            mtp.save_experiment(results)
         else:
             mtp.display_results(user_choices.experiment)
         core.quit()

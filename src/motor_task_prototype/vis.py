@@ -1,3 +1,4 @@
+import copy
 import sys
 from typing import List
 from typing import Optional
@@ -64,9 +65,11 @@ def default_display_options() -> MotorTaskDisplayOptions:
 
 
 def get_display_options_from_user(
-    display_options: MotorTaskDisplayOptions = None,
+    initial_display_options: MotorTaskDisplayOptions = None,
 ) -> MotorTaskDisplayOptions:
-    if display_options is None:
+    if initial_display_options:
+        display_options = copy.deepcopy(initial_display_options)
+    else:
         display_options = default_display_options()
     labels = {
         "to_target_paths": "Display cursor paths to target",
@@ -295,7 +298,7 @@ def display_results(
     # paths
     for i_trial in trial_indices:
         assert (
-            results.sequenceIndices[trial_indices[i_trial]][i_repeat] == i_condition
+            results.sequenceIndices[i_trial][i_repeat] == i_condition
         ), "Trials to display should all use the same conditions"
         trial_mouse_positions = results.data["to_target_mouse_positions"][i_trial][
             i_repeat

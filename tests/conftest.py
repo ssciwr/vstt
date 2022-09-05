@@ -1,3 +1,4 @@
+import copy
 from sys import platform
 from typing import List
 from typing import Tuple
@@ -61,22 +62,33 @@ def make_timestamps(n_min: int = 8, n_max: int = 20) -> np.ndarray:
 
 @pytest.fixture
 def experiment_no_results() -> TrialHandlerExt:
-    trial = default_trial()
-    # disable sounds due to issues with sounds within tests on linux
-    trial["play_sound"] = False
-    trial["play_sound"] = False
-    trial["inter_target_duration"] = 0.0
+    trial0 = default_trial()
+    trial0["play_sound"] = False
+    trial0["inter_target_duration"] = 0.0
+    trial1 = copy.deepcopy(trial0)
+    trial1["weight"] = 2
+    trial1["num_targets"] = 4
+    print([trial0, trial1])
     display_options = default_display_options()
-    return new_experiment_from_dicts([trial], display_options)
+    return new_experiment_from_dicts([trial0, trial1], display_options)
 
 
 @pytest.fixture
 def experiment_with_results() -> TrialHandlerExt:
-    trial = default_trial()
-    trial["weight"] = 3
-    trial["automove_cursor_to_center"] = False
+    # trial without auto-move to center, 2 reps, 8 targets
+    trial0 = default_trial()
+    # disable sounds due to issues with sounds within tests on linux
+    trial0["play_sound"] = False
+    trial0["weight"] = 3
+    trial0["automove_cursor_to_center"] = False
+    # trial with automove to center, 1 rep, 4 targets
+    trial1 = default_trial()
+    trial0["play_sound"] = False
+    trial1["weight"] = 1
+    trial1["num_targets"] = 4
+    trial1["automove_cursor_to_center"] = True
     display_options = default_display_options()
-    exp = new_experiment_from_dicts([trial], display_options)
+    exp = new_experiment_from_dicts([trial0, trial1], display_options)
     for trial in exp:
         to_target_timestamps = []
         to_center_timestamps = []
@@ -97,6 +109,9 @@ def experiment_with_results() -> TrialHandlerExt:
         exp.addData("target_pos", np.array(target_pos))
         exp.addData("to_target_timestamps", np.array(to_target_timestamps))
         exp.addData("to_target_mouse_positions", np.array(to_target_mouse_positions))
-        exp.addData("to_center_timestamps", np.array(to_center_timestamps))
-        exp.addData("to_center_mouse_positions", np.array(to_center_mouse_positions))
+        if not trial["automove_cursor_to_center"]:
+            exp.addData("to_center_timestamps", np.array(to_center_timestamps))
+            exp.addData(
+                "to_center_mouse_positions", np.array(to_center_mouse_positions)
+            )
     return exp
