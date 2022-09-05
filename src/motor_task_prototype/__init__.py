@@ -13,4 +13,4 @@ __all__ = [
     "display_results",
 ]
 
-__version__ = "0.0.10"
+__version__ = "0.0.11"
