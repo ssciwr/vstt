@@ -11,6 +11,7 @@ from psychopy.clock import Clock
 from psychopy.data import TrialHandlerExt
 from psychopy.event import Mouse
 from psychopy.event import xydist
+from psychopy.gui import fileSaveDlg
 from psychopy.hardware.keyboard import Keyboard
 from psychopy.sound import Sound
 from psychopy.visual.basevisual import BaseVisualStim
@@ -45,6 +46,15 @@ def new_experiment_from_dicts(
     )
 
 
+def save_experiment(experiment: TrialHandlerExt) -> None:
+    filename = fileSaveDlg(
+        prompt="Save trial conditions and results as psydat file",
+        allowed="Psydat files (*.psydat)",
+    )
+    if filename is not None:
+        experiment.saveAsPickle(filename)
+
+
 class MotorTask:
     trial_handler: TrialHandlerExt
 
@@ -56,9 +66,9 @@ class MotorTask:
         mouse = Mouse(visible=False, win=win)
         clock = Clock()
         kb = Keyboard()
-        condition_trial_indices: List[List[int]] = [[]] * len(
-            self.trial_handler.trialList
-        )
+        condition_trial_indices: List[List[int]] = [
+            [] for _ in self.trial_handler.trialList
+        ]
         for trial in self.trial_handler:
             targets: ElementArrayStim = mtpvis.make_targets(
                 win,

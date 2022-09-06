@@ -2,6 +2,32 @@ import motor_task_prototype.trial as mtptrial
 import numpy as np
 
 
+def test_describe_trial() -> None:
+    trial = mtptrial.default_trial()
+    assert mtptrial.describe_trial(trial) == "1 repeat of 8 clockwise targets"
+    trial["weight"] = 3
+    trial["num_targets"] = 1
+    trial["target_order"] = "fixed"
+    assert mtptrial.describe_trial(trial) == "3 repeats of 1 fixed target"
+    trial["weight"] = 2
+    trial["num_targets"] = 5
+    trial["target_order"] = "random"
+    assert mtptrial.describe_trial(trial) == "2 repeats of 5 random targets"
+
+
+def test_describe_trials() -> None:
+    trials = [mtptrial.default_trial()]
+    trial = mtptrial.default_trial()
+    trial["weight"] = 3
+    trial["num_targets"] = 1
+    trial["target_order"] = "fixed"
+    trials.append(trial)
+    assert (
+        mtptrial.describe_trials(trials)
+        == "  - 1 repeat of 8 clockwise targets\n  - 3 repeats of 1 fixed target"
+    )
+
+
 def test_default_trial() -> None:
     trial = mtptrial.default_trial()
     assert len(trial) == 18

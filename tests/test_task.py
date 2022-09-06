@@ -55,7 +55,7 @@ def move_mouse_to_target(
 
 
 def do_task(
-    experiment: TrialHandlerExt, target_pixels: List[Tuple[float, float]]
+    experiment: TrialHandlerExt, target_pixels: List[List[Tuple[float, float]]]
 ) -> TrialHandlerExt:
     queue: multiprocessing.Queue = multiprocessing.Queue()
     process = multiprocessing.Process(
@@ -67,28 +67,35 @@ def do_task(
         ),
     )
     process.start()
-    for target_pixel in target_pixels:
-        move_mouse_to_target(target_pixel)
-    if experiment.trialList[0]["post_block_display_results"]:
-        # ascii image of screen for debugging logs
-        ascii_screenshot()
-        # press escape to exit results display
-        pyautogui.typewrite(["escape"])
+    for target_pixels_block, trial in zip(target_pixels, experiment.trialList):
+        for rep in range(trial["weight"]):
+            for target_pixel in target_pixels_block:
+                move_mouse_to_target(target_pixel)
+        if trial["post_block_display_results"]:
+            # ascii image of screen for debugging logs
+            sleep(0.5)
+            ascii_screenshot()
+            # press escape to exit results display
+            pyautogui.typewrite(["escape"])
     results = queue.get()
     process.join()
     return results
 
 
 def test_task(experiment_no_results: TrialHandlerExt) -> None:
-    experiment_no_results.trialList[0]["automove_cursor_to_center"] = True
-    target_pixels = [
-        pos_to_pixels(pos)
-        for pos in points_on_circle(
-            experiment_no_results.trialList[0]["num_targets"],
-            experiment_no_results.trialList[0]["target_distance"],
-            include_centre=False,
+    target_pixels = []
+    for trial in experiment_no_results.trialList:
+        trial["automove_cursor_to_center"] = True
+        target_pixels.append(
+            [
+                pos_to_pixels(pos)
+                for pos in points_on_circle(
+                    trial["num_targets"],
+                    trial["target_distance"],
+                    include_centre=False,
+                )
+            ]
         )
-    ]
     results = do_task(experiment_no_results, target_pixels)
     # check that we hit all the targets without timing out
     for timestamps in results.data["to_target_timestamps"][0][0]:
@@ -98,16 +105,19 @@ def test_task(experiment_no_results: TrialHandlerExt) -> None:
 
 
 def test_task_no_automove_to_center(experiment_no_results: TrialHandlerExt) -> None:
-    experiment_no_results.trialList[0]["automove_cursor_to_center"] = False
     target_pixels = []
-    for pos in points_on_circle(
-        experiment_no_results.trialList[0]["num_targets"],
-        experiment_no_results.trialList[0]["target_distance"],
-        include_centre=False,
-    ):
-        # after moving to each target need to return mouse to central target
-        target_pixels.append(pos_to_pixels(pos))
-        target_pixels.append(pos_to_pixels((0, 0)))
+    for trial in experiment_no_results.trialList:
+        trial["automove_cursor_to_center"] = False
+        tp = []
+        for pos in points_on_circle(
+            trial["num_targets"],
+            trial["target_distance"],
+            include_centre=False,
+        ):
+            # after moving to each target need to return mouse to central target
+            tp.append(pos_to_pixels(pos))
+            tp.append(pos_to_pixels((0, 0)))
+        target_pixels.append(tp)
     results = do_task(experiment_no_results, target_pixels)
     # check that we hit all the targets
     for to_target_timestamps, to_center_timestamps in zip(

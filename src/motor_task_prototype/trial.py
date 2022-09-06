@@ -1,3 +1,4 @@
+import copy
 import logging
 import sys
 from typing import List
@@ -5,10 +6,7 @@ from typing import Union
 
 import numpy as np
 from psychopy import core
-from psychopy.data import TrialHandlerExt
 from psychopy.gui import DlgFromDict
-from psychopy.gui import fileSaveDlg
-from psychopy.misc import fromFile
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict
@@ -40,6 +38,16 @@ MotorTaskTrial = TypedDict(
 )
 
 
+def describe_trial(trial: MotorTaskTrial) -> str:
+    repeats = f"{trial['weight']} repeat{'s' if trial['weight'] > 1 else ''}"
+    targets = f"target{'s' if trial['num_targets'] > 1 else ''}"
+    return f"{repeats} of {trial['num_targets']} {trial['target_order']} {targets}"
+
+
+def describe_trials(trials: List[MotorTaskTrial]) -> str:
+    return "\n".join(["  - " + describe_trial(trial) for trial in trials])
+
+
 def default_trial() -> MotorTaskTrial:
     return {
         "weight": 1,
@@ -63,15 +71,12 @@ def default_trial() -> MotorTaskTrial:
     }
 
 
-def get_trial_from_psydat(filename: str) -> MotorTaskTrial:
-    psydata = fromFile(filename)
-    return import_trial(psydata.trialList[0])
-
-
 def get_trial_from_user(
-    trial: MotorTaskTrial = None,
+    initial_trial: MotorTaskTrial = None,
 ) -> MotorTaskTrial:
-    if trial is None:
+    if initial_trial:
+        trial = copy.deepcopy(initial_trial)
+    else:
         trial = default_trial()
     order_of_targets = [trial["target_order"]]
     labels = {
@@ -104,15 +109,6 @@ def get_trial_from_user(
     if not dialog.OK:
         core.quit()
     return trial
-
-
-def save_trial_to_psydat(trial: TrialHandlerExt) -> None:
-    filename = fileSaveDlg(
-        prompt="Save trial conditions and results as psydat file",
-        allowed="Psydat files (*.psydat)",
-    )
-    if filename is not None:
-        trial.saveAsPickle(filename)
 
 
 def import_trial(trial_dict: dict) -> MotorTaskTrial:
