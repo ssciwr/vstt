@@ -1,5 +1,6 @@
 import copy
-from sys import platform
+import os
+import sys
 from typing import List
 from typing import Tuple
 
@@ -7,11 +8,14 @@ import numpy as np
 import pyautogui
 import pytest
 from motor_task_prototype.geom import points_on_circle
+from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.task import new_experiment_from_dicts
 from motor_task_prototype.trial import default_trial
 from motor_task_prototype.vis import default_display_options
 from psychopy.data import TrialHandlerExt
 from psychopy.visual.window import Window
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -20,7 +24,7 @@ from psychopy.visual.window import Window
 # so this fixture runs once before any tests
 def tests_init() -> None:
     # work around for PsychHID-WARNING about X11 not being initialized on linux
-    if platform == "linux":
+    if sys.platform == "linux":
         import ctypes
 
         xlib = ctypes.cdll.LoadLibrary("libX11.so")
@@ -33,7 +37,7 @@ def tests_init() -> None:
 
 # fixture to create a wxPython Window for testing gui functions
 # GLFW backend used for tests as it works better with Xvfb
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def window() -> Window:
     window = Window(
         fullscr=True,
@@ -64,13 +68,16 @@ def make_timestamps(n_min: int = 8, n_max: int = 20) -> np.ndarray:
 def experiment_no_results() -> TrialHandlerExt:
     trial0 = default_trial()
     trial0["play_sound"] = False
+    trial0["target_duration"] = 30.0
     trial0["inter_target_duration"] = 0.0
+    trial0["post_block_display_results"] = False
     trial1 = copy.deepcopy(trial0)
     trial1["weight"] = 2
     trial1["num_targets"] = 4
-    print([trial0, trial1])
+    trial1["post_block_display_results"] = False
     display_options = default_display_options()
-    return new_experiment_from_dicts([trial0, trial1], display_options)
+    metadata = default_metadata()
+    return new_experiment_from_dicts([trial0, trial1], display_options, metadata)
 
 
 @pytest.fixture
@@ -88,7 +95,8 @@ def experiment_with_results() -> TrialHandlerExt:
     trial1["num_targets"] = 4
     trial1["automove_cursor_to_center"] = True
     display_options = default_display_options()
-    exp = new_experiment_from_dicts([trial0, trial1], display_options)
+    metadata = default_metadata()
+    exp = new_experiment_from_dicts([trial0, trial1], display_options, metadata)
     for trial in exp:
         to_target_timestamps = []
         to_center_timestamps = []

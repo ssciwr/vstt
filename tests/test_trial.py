@@ -34,6 +34,13 @@ def test_default_trial() -> None:
     assert len(trial["target_indices"].split(" ")) == trial["num_targets"]
 
 
+def test_trial_labels() -> None:
+    trial = mtptrial.default_trial()
+    labels = mtptrial.trial_labels()
+    assert len(trial) == len(labels)
+    assert trial.keys() == labels.keys()
+
+
 def test_import_trial() -> None:
     default_trial = mtptrial.default_trial()
     trial_dict = {
