@@ -1,17 +1,15 @@
-import copy
-import sys
-from typing import Dict
 from typing import List
 from typing import Optional
 
 import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.stat as mtpstat
 import numpy as np
+from motor_task_prototype.display import default_display_options
 from motor_task_prototype.geom import points_on_circle
+from motor_task_prototype.types import MotorTaskDisplayOptions
 from psychopy import core
 from psychopy.colors import colors
 from psychopy.data import TrialHandlerExt
-from psychopy.gui import DlgFromDict
 from psychopy.hardware.keyboard import Keyboard
 from psychopy.visual.basevisual import BaseVisualStim
 from psychopy.visual.circle import Circle
@@ -20,85 +18,7 @@ from psychopy.visual.shape import ShapeStim
 from psychopy.visual.textbox2 import TextBox2
 from psychopy.visual.window import Window
 
-if sys.version_info >= (3, 8):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
-
 colors.pop("none")
-
-MotorTaskDisplayOptions = TypedDict(
-    "MotorTaskDisplayOptions",
-    {
-        "to_target_paths": bool,
-        "to_center_paths": bool,
-        "targets": bool,
-        "central_target": bool,
-        "to_target_reaction_time": bool,
-        "to_center_reaction_time": bool,
-        "to_target_time": bool,
-        "to_center_time": bool,
-        "to_target_distance": bool,
-        "to_center_distance": bool,
-        "to_target_rmse": bool,
-        "to_center_rmse": bool,
-        "averages": bool,
-    },
-)
-
-
-def default_display_options() -> MotorTaskDisplayOptions:
-    return {
-        "to_target_paths": True,
-        "to_center_paths": False,
-        "targets": True,
-        "central_target": True,
-        "to_target_reaction_time": True,
-        "to_center_reaction_time": False,
-        "to_target_time": True,
-        "to_center_time": False,
-        "to_target_distance": True,
-        "to_center_distance": False,
-        "to_target_rmse": True,
-        "to_center_rmse": False,
-        "averages": True,
-    }
-
-
-def display_options_labels() -> Dict:
-    return {
-        "to_target_paths": "Display cursor paths to target",
-        "to_center_paths": "Display cursor paths back to center",
-        "targets": "Display targets",
-        "central_target": "Display central target",
-        "to_target_reaction_time": "Statistic: reaction time to target",
-        "to_center_reaction_time": "Statistic: reaction time to center",
-        "to_target_time": "Statistic: movement time to target",
-        "to_center_time": "Statistic: movement time to center",
-        "to_target_distance": "Statistic: movement distance to target",
-        "to_center_distance": "Statistic: movement distance to center",
-        "to_target_rmse": "Statistic: RMSE movement to target",
-        "to_center_rmse": "Statistic: RMSE movement to center",
-        "averages": "Also show statistics averaged over all targets",
-    }
-
-
-def get_display_options_from_user(
-    initial_display_options: Optional[MotorTaskDisplayOptions] = None,
-) -> MotorTaskDisplayOptions:
-    if initial_display_options:
-        display_options = copy.deepcopy(initial_display_options)
-    else:
-        display_options = default_display_options()
-    dialog = DlgFromDict(
-        display_options,
-        title="Motor task display options",
-        labels=display_options_labels(),
-        sortKeys=False,
-    )
-    if not dialog.OK:
-        core.quit()
-    return display_options
 
 
 def make_cursor(window: Window) -> ShapeStim:

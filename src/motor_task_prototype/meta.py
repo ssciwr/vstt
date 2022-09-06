@@ -1,30 +1,11 @@
 import copy
-import sys
 from typing import Dict
 from typing import Optional
 
+import motor_task_prototype.common as mtpcommon
+from motor_task_prototype.types import MotorTaskMetadata
 from psychopy import core
 from psychopy.gui import DlgFromDict
-
-if sys.version_info >= (3, 8):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
-
-MotorTaskMetadata = TypedDict(
-    "MotorTaskMetadata",
-    {
-        "name": str,
-        "subject": str,
-        "date": str,
-        "author": str,
-        "display_title": str,
-        "display_text1": str,
-        "display_text2": str,
-        "display_text3": str,
-        "display_text4": str,
-    },
-)
 
 
 def default_metadata() -> MotorTaskMetadata:
@@ -71,3 +52,7 @@ def get_metadata_from_user(
     if not dialog.OK:
         core.quit()
     return metadata
+
+
+def import_metadata(metadata_dict: dict) -> MotorTaskMetadata:
+    return mtpcommon.import_typed_dict(metadata_dict, default_metadata())

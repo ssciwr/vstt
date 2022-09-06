@@ -1,43 +1,13 @@
 import copy
-import logging
-import sys
 from typing import Dict
 from typing import List
 from typing import Optional
-from typing import Union
 
+import motor_task_prototype.common as mtpcommon
 import numpy as np
+from motor_task_prototype.types import MotorTaskTrial
 from psychopy import core
 from psychopy.gui import DlgFromDict
-
-if sys.version_info >= (3, 8):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
-
-MotorTaskTrial = TypedDict(
-    "MotorTaskTrial",
-    {
-        "weight": int,
-        "num_targets": int,
-        "target_order": Union[str, List],
-        "target_indices": Union[np.ndarray, str],
-        "target_duration": float,
-        "inter_target_duration": float,
-        "target_distance": float,
-        "target_size": float,
-        "central_target_size": float,
-        "play_sound": bool,
-        "automove_cursor_to_center": bool,
-        "show_cursor": bool,
-        "show_cursor_path": bool,
-        "cursor_rotation_degrees": float,
-        "post_trial_delay": float,
-        "post_trial_display_results": bool,
-        "post_block_delay": float,
-        "post_block_display_results": bool,
-    },
-)
 
 
 def describe_trial(trial: MotorTaskTrial) -> str:
@@ -117,18 +87,7 @@ def get_trial_from_user(
 
 
 def import_trial(trial_dict: dict) -> MotorTaskTrial:
-    # start with a default valid trial
-    trial = default_trial()
-    # import all valid keys from input_trial
-    for key in trial:
-        if key in trial_dict:
-            trial[key] = trial_dict[key]  # type: ignore
-        else:
-            logging.warning(f"Key '{key}' missing from trial")
-    for key in trial_dict:
-        if key not in trial:
-            logging.warning(f"Ignoring unknown key '{key}'")
-    return trial
+    return mtpcommon.import_typed_dict(trial_dict, default_trial())
 
 
 def validate_trial(trial: MotorTaskTrial) -> MotorTaskTrial:

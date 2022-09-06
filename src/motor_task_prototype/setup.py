@@ -4,13 +4,13 @@ from typing import Optional
 
 import motor_task_prototype as mtp
 import wx
+from motor_task_prototype.display import get_display_options_from_user
 from motor_task_prototype.meta import get_metadata_from_user
 from motor_task_prototype.task import new_experiment_from_dicts
 from motor_task_prototype.task import new_experiment_from_trialhandler
 from motor_task_prototype.trial import describe_trials
 from motor_task_prototype.trial import get_trial_from_user
 from motor_task_prototype.trial import MotorTaskTrial
-from motor_task_prototype.vis import get_display_options_from_user
 from psychopy.data import TrialHandlerExt
 from psychopy.gui import fileOpenDlg
 from psychopy.misc import fromFile
