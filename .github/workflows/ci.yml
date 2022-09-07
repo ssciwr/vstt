@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-22.04", "windows-latest"]
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.10"] #["3.8", "3.9", "3.10"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -34,6 +34,8 @@ jobs:
         run: |
           # various psychopy & qt system dependencies
           sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot libnotify-dev pandoc libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-xfixes0 libxcb-xinerama0 libxcb-xinput0 libxcb-xkb1 libxcb1 libxkbcommon-x11-0 libxkbcommon0 libxrender1
+          # workaround for Xlib.error.XauthError: ~/.Xauthority: [Errno 2] No such file or directory: '/home/runner/.Xauthority'
+          touch ~/.Xauthority
           # install pre-built ubuntu/gtk3 wxPython wheel
           pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }}/ wxPython
           # enable colours in logs
@@ -46,6 +48,8 @@ jobs:
           echo "DISPLAY=:99" >> $GITHUB_ENV
           # see Qt debug output when loading plugins
           echo "QT_DEBUG_PLUGINS=1" >> $GITHUB_ENV
+      - name: Install psychopy from main branch instead of release
+        run: pip install git+https://github.com/psychopy/psychopy.git
       - run: pip install -e .[tests,docs] --verbose
       - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s -x
       - uses: actions/upload-artifact@v3
