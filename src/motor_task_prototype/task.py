@@ -1,10 +1,12 @@
 import logging
 from typing import List
+from typing import Optional
 from typing import Union
 
 import numpy as np
 from motor_task_prototype import vis as mtpvis
 from motor_task_prototype.geom import PointRotator
+from motor_task_prototype.meta import MotorTaskMetadata
 from motor_task_prototype.trial import MotorTaskTrial
 from motor_task_prototype.trial import validate_trial
 from psychopy.clock import Clock
@@ -33,7 +35,9 @@ def new_experiment_from_trialhandler(experiment: TrialHandlerExt) -> TrialHandle
 
 
 def new_experiment_from_dicts(
-    trials: List[MotorTaskTrial], display_options: mtpvis.MotorTaskDisplayOptions
+    trials: List[MotorTaskTrial],
+    display_options: mtpvis.MotorTaskDisplayOptions,
+    metadata: MotorTaskMetadata,
 ) -> TrialHandlerExt:
     for trial in trials:
         validate_trial(trial)
@@ -42,7 +46,7 @@ def new_experiment_from_dicts(
         nReps=1,
         method="sequential",
         originPath=-1,
-        extraInfo={"display_options": display_options},
+        extraInfo={"display_options": display_options, "metadata": metadata},
     )
 
 
@@ -61,11 +65,17 @@ class MotorTask:
     def __init__(self, experiment: TrialHandlerExt):
         self.trial_handler = experiment
 
-    def run(self, win_type: str = "pyglet") -> TrialHandlerExt:
-        win = Window(fullscr=True, units="height", winType=win_type)
+    def run(
+        self, win: Optional[Window] = None, win_type: str = "pyglet"
+    ) -> TrialHandlerExt:
+        close_window_when_done = False
+        if win is None:
+            win = Window(fullscr=True, units="height", winType=win_type)
+            close_window_when_done = True
         mouse = Mouse(visible=False, win=win)
         clock = Clock()
         kb = Keyboard()
+        mtpvis.splash_screen(self.trial_handler.extraInfo["metadata"], win)
         condition_trial_indices: List[List[int]] = [
             [] for _ in self.trial_handler.trialList
         ]
@@ -208,6 +218,7 @@ class MotorTask:
                 )
         if win.nDroppedFrames > 0:
             logging.warning(f"Dropped {win.nDroppedFrames} frames")
-        mouse.setVisible(True)
-        win.close()
+        if close_window_when_done:
+            win.close()
+        win.flip()
         return self.trial_handler

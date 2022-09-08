@@ -1,7 +1,9 @@
 import copy
 import logging
 import sys
+from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Union
 
 import numpy as np
@@ -71,15 +73,8 @@ def default_trial() -> MotorTaskTrial:
     }
 
 
-def get_trial_from_user(
-    initial_trial: MotorTaskTrial = None,
-) -> MotorTaskTrial:
-    if initial_trial:
-        trial = copy.deepcopy(initial_trial)
-    else:
-        trial = default_trial()
-    order_of_targets = [trial["target_order"]]
-    labels = {
+def trial_labels() -> Dict:
+    return {
         "weight": "Repetitions",
         "num_targets": "Number of targets",
         "target_order": "Target order",
@@ -99,12 +94,22 @@ def get_trial_from_user(
         "post_block_delay": "Delay after last trial (secs)",
         "post_block_display_results": "Display results after this block",
     }
+
+
+def get_trial_from_user(
+    initial_trial: Optional[MotorTaskTrial] = None,
+) -> MotorTaskTrial:
+    if initial_trial:
+        trial = copy.deepcopy(initial_trial)
+    else:
+        trial = default_trial()
+    order_of_targets = [trial["target_order"]]
     for target_order in ["clockwise", "anti-clockwise", "random", "fixed"]:
         if target_order != order_of_targets[0]:
             order_of_targets.append(target_order)
     trial["target_order"] = order_of_targets
     dialog = DlgFromDict(
-        trial, title="Motor task settings", labels=labels, sortKeys=False
+        trial, title="Motor task settings", labels=trial_labels(), sortKeys=False
     )
     if not dialog.OK:
         core.quit()

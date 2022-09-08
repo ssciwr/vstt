@@ -36,7 +36,7 @@ Issues = "https://github.com/ssciwr/motor-task-prototype/issues"
 Documentation = "https://ssciwr.github.io/motor-task-prototype/"
 
 [project.optional-dependencies]
-tests = ["pytest", "pytest-cov", "pyautogui", "ascii-magic"]
+tests = ["pytest", "pytest-cov", "pyautogui", "ascii-magic", "keyboard"]
 docs = [
   "ipykernel",
   "matplotlib",

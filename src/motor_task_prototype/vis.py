@@ -1,13 +1,14 @@
 import copy
 import sys
+from typing import Dict
 from typing import List
 from typing import Optional
 
+import motor_task_prototype.meta as mtpmeta
+import motor_task_prototype.stat as mtpstat
 import numpy as np
-from motor_task_prototype import stat as mtpstat
 from motor_task_prototype.geom import points_on_circle
 from psychopy import core
-from psychopy.clock import Clock
 from psychopy.colors import colors
 from psychopy.data import TrialHandlerExt
 from psychopy.gui import DlgFromDict
@@ -64,14 +65,8 @@ def default_display_options() -> MotorTaskDisplayOptions:
     }
 
 
-def get_display_options_from_user(
-    initial_display_options: MotorTaskDisplayOptions = None,
-) -> MotorTaskDisplayOptions:
-    if initial_display_options:
-        display_options = copy.deepcopy(initial_display_options)
-    else:
-        display_options = default_display_options()
-    labels = {
+def display_options_labels() -> Dict:
+    return {
         "to_target_paths": "Display cursor paths to target",
         "to_center_paths": "Display cursor paths back to center",
         "targets": "Display targets",
@@ -86,10 +81,19 @@ def get_display_options_from_user(
         "to_center_rmse": "Statistic: RMSE movement to center",
         "averages": "Also show statistics averaged over all targets",
     }
+
+
+def get_display_options_from_user(
+    initial_display_options: Optional[MotorTaskDisplayOptions] = None,
+) -> MotorTaskDisplayOptions:
+    if initial_display_options:
+        display_options = copy.deepcopy(initial_display_options)
+    else:
+        display_options = default_display_options()
     dialog = DlgFromDict(
         display_options,
         title="Motor task display options",
-        labels=labels,
+        labels=display_options_labels(),
         sortKeys=False,
     )
     if not dialog.OK:
@@ -134,7 +138,9 @@ def make_targets(
     )
 
 
-def update_target_colors(targets: ElementArrayStim, index: int = None) -> None:
+def update_target_colors(
+    targets: ElementArrayStim, index: Optional[int] = None
+) -> None:
     # make all targets grey
     c = np.array([[0.1, 0.1, 0.1]] * targets.nElements)
     if index is not None:
@@ -147,15 +153,22 @@ def update_target_colors(targets: ElementArrayStim, index: int = None) -> None:
 
 def draw_and_flip(
     win: Window, drawables: List[BaseVisualStim], kb: Optional[Keyboard] = None
-) -> None:
+) -> bool:
+    should_continue = True
     for drawable in drawables:
         drawable.draw()
-    if kb is not None and kb.getKeys(["escape"]):
-        core.quit()
+    if kb is not None:
+        if kb.getKeys(["escape"]):
+            core.quit()
+        if kb.getKeys(["return"]):
+            should_continue = False
     win.flip()
+    return should_continue
 
 
-def make_txt(name: str, units: str, stat: np.ndarray, index: int = None) -> str:
+def make_txt(
+    name: str, units: str, stat: np.ndarray, index: Optional[int] = None
+) -> str:
     if index is None:
         av = np.mean(stat)
     else:
@@ -166,7 +179,7 @@ def make_txt(name: str, units: str, stat: np.ndarray, index: int = None) -> str:
 def make_stats_txt(
     display_options: MotorTaskDisplayOptions,
     stats: mtpstat.MotorTaskStats,
-    i_target: int = None,
+    i_target: Optional[int] = None,
 ) -> str:
     txt_stats = ""
     if display_options["to_target_reaction_time"]:
@@ -196,8 +209,8 @@ def make_stats_txt(
 
 def display_results(
     results: TrialHandlerExt,
-    trial_indices: List[int] = None,
-    win: Window = None,
+    trial_indices: Optional[List[int]] = None,
+    win: Optional[Window] = None,
     win_type: str = "pyglet",
 ) -> None:
     close_window_when_done = False
@@ -223,7 +236,6 @@ def display_results(
                 trial_indices.append(index)
             index += 1
     win.flip()
-    clock = Clock()
     kb = Keyboard()
     drawables: List[BaseVisualStim] = []
     assert len(trial_indices) >= 1, "At least one trial is needed to be displayed"
@@ -337,18 +349,73 @@ def display_results(
         TextBox2(
             win,
             "Press press Enter when you are ready to continue...",
-            pos=(0, -0.48),
+            pos=(0, -0.47),
             color="navy",
             alignment="center",
             letterHeight=0.03,
         )
     )
-    clock.reset()
-    while clock.getTime() < 30:
-        if kb.getKeys(["escape", "return"]):
+    while True:
+        if not draw_and_flip(win, drawables, kb):
             if close_window_when_done:
                 win.close()
             return
-        draw_and_flip(win, drawables)
-    if close_window_when_done:
-        win.close()
+
+
+def splash_screen(
+    metadata: mtpmeta.MotorTaskMetadata,
+    win: Optional[Window] = None,
+    win_type: str = "pyglet",
+) -> None:
+    close_window_when_done = False
+    if win is None:
+        win = Window(fullscr=True, units="height", winType=win_type)
+        close_window_when_done = True
+    kb = Keyboard()
+    drawables: List[BaseVisualStim] = []
+    drawables.append(
+        TextBox2(
+            win,
+            "Press press Enter when you are ready to continue...",
+            pos=(0, -0.40),
+            color="navy",
+            alignment="center",
+            letterHeight=0.03,
+        )
+    )
+    drawables.append(
+        TextBox2(
+            win,
+            metadata["display_title"],
+            pos=(0, 0.40),
+            size=(1, None),
+            color="black",
+            bold=True,
+            alignment="center",
+            letterHeight=0.06,
+        )
+    )
+    main_text = "\n\n".join(
+        [
+            metadata["display_text1"],
+            metadata["display_text2"],
+            metadata["display_text3"],
+            metadata["display_text4"],
+        ]
+    )
+    drawables.append(
+        TextBox2(
+            win,
+            main_text,
+            size=(1, None),
+            pos=(0, 0),
+            color="black",
+            alignment="left",
+            letterHeight=0.03,
+        )
+    )
+    while True:
+        if not draw_and_flip(win, drawables, kb):
+            if close_window_when_done:
+                win.close()
+            return

@@ -1,15 +1,21 @@
-import threading
-from time import sleep
 from typing import Dict
 from typing import List
 from typing import Tuple
 
+import gui_test_utils as gtu
+import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.vis as mtpvis
 import numpy as np
-import pyautogui
 import pytest
 from psychopy.data import TrialHandlerExt
 from psychopy.visual.window import Window
+
+
+def test_display_options_labels() -> None:
+    display_options = mtpvis.default_display_options()
+    labels = mtpvis.display_options_labels()
+    assert len(display_options) == len(labels)
+    assert display_options.keys() == labels.keys()
 
 
 def test_make_cursor(window: Window) -> None:
@@ -88,52 +94,22 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
                 assert np.allclose(targets.colors[i], grey)
 
 
-def rms_diff(a: np.ndarray, b: np.ndarray) -> float:
-    return np.sqrt(np.mean(np.square(a - b)))
-
-
-def get_display_screenshot_when_ready(
-    screenshot_before: np.ndarray,
-    min_rms_diff: float = 0.1,
-    delay_between_screenshots: float = 0.1,
-) -> np.ndarray:
-    s0 = np.asarray(screenshot_before)
-    sleep(delay_between_screenshots)
-    s = np.asarray(pyautogui.screenshot())
-    # wait until
-    #   - screen differs significantly from original screenshot
-    #   - is not all black (xvfb initial screen)
-    #   - is not all grey (psychopy initial screen)
-    while rms_diff(s, s0) < min_rms_diff or np.mean(s) in [0.0, 128.0]:
-        sleep(delay_between_screenshots)
-        s = np.asarray(pyautogui.screenshot())
-    return s
-
-
-def show_display(
-    experiment: TrialHandlerExt,
-    trial_indices: List[int],
-) -> np.ndarray:
-    # GLFW backend used for tests as it works better with Xvfb
-    process = threading.Thread(
-        target=mtpvis.display_results,
-        name="display_results",
-        args=(experiment, trial_indices, None, "glfw"),
+def test_splash_screen_defaults(window: Window) -> None:
+    metadata = mtpmeta.default_metadata()
+    screenshot = gtu.call_target_and_get_screenshot(
+        mtpvis.splash_screen, (metadata, window)
     )
-    screenshot_before = pyautogui.screenshot()
-    process.start()
-    screenshot = get_display_screenshot_when_ready(screenshot_before)
-    # press escape to exit
-    pyautogui.typewrite(["escape"])
-    process.join()
-    return screenshot
+    # most pixels grey except for black main text and blue continue text
+    assert 0.900 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
+    # some black pixels
+    assert 0.000 < gtu.pixel_color_fraction(screenshot, (0, 0, 0)) < 0.100
+    # no white pixels
+    assert gtu.pixel_color_fraction(screenshot, (255, 255, 255)) == 0.000
 
 
-def pixel_color_fraction(img: np.ndarray, color: Tuple[int, int, int]) -> float:
-    return np.count_nonzero((img == np.array(color)).all(axis=2)) / (img.size / 3)
-
-
-def test_display_results_nothing(experiment_with_results: TrialHandlerExt) -> None:
+def test_display_results_nothing(
+    experiment_with_results: TrialHandlerExt, window: Window
+) -> None:
     experiment_with_results.extraInfo["display_options"] = {
         "to_target_paths": False,
         "to_center_paths": False,
@@ -150,14 +126,18 @@ def test_display_results_nothing(experiment_with_results: TrialHandlerExt) -> No
         "averages": False,
     }
     trial_indices = [0, 1, 2]
-    screenshot = show_display(experiment_with_results, trial_indices)
+    screenshot = gtu.call_target_and_get_screenshot(
+        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+    )
     # all pixels grey except for blue continue text
-    assert 0.990 < pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
+    assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
     # no off-white pixels
-    assert pixel_color_fraction(screenshot, (240, 248, 255)) == 0.000
+    assert gtu.pixel_color_fraction(screenshot, (240, 248, 255)) == 0.000
 
 
-def test_display_results_everything(experiment_with_results: TrialHandlerExt) -> None:
+def test_display_results_everything(
+    experiment_with_results: TrialHandlerExt, window: Window
+) -> None:
     experiment_with_results.extraInfo["display_options"] = {
         "to_target_paths": True,
         "to_center_paths": True,
@@ -174,8 +154,10 @@ def test_display_results_everything(experiment_with_results: TrialHandlerExt) ->
         "averages": True,
     }
     trial_indices = [0, 1, 2]
-    screenshot = show_display(experiment_with_results, trial_indices)
+    screenshot = gtu.call_target_and_get_screenshot(
+        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+    )
     # less grey: lots of other colors for targets, paths and stats
-    assert 0.750 < pixel_color_fraction(screenshot, (128, 128, 128)) < 0.950
+    assert 0.750 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.950
     # some off-white pixels for one of the targets
-    assert 0.002 < pixel_color_fraction(screenshot, (240, 248, 255)) < 0.100
+    assert 0.002 < gtu.pixel_color_fraction(screenshot, (240, 248, 255)) < 0.100
