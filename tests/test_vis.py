@@ -11,13 +11,6 @@ from psychopy.data import TrialHandlerExt
 from psychopy.visual.window import Window
 
 
-def test_display_options_labels() -> None:
-    display_options = mtpvis.default_display_options()
-    labels = mtpvis.display_options_labels()
-    assert len(display_options) == len(labels)
-    assert display_options.keys() == labels.keys()
-
-
 def test_make_cursor(window: Window) -> None:
     cursor = mtpvis.make_cursor(window)
     assert np.allclose(cursor.pos, [0, 0])
