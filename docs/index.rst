@@ -6,6 +6,9 @@ motor-task-prototype
    :caption: Getting started
 
    quickstart/install
+   quickstart/create-experiment
+   quickstart/run-experiment
+   quickstart/display-results
 
 .. toctree::
    :maxdepth: 2

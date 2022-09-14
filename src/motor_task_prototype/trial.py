@@ -79,7 +79,7 @@ def get_trial_from_user(
             order_of_targets.append(target_order)
     trial["target_order"] = order_of_targets
     dialog = DlgFromDict(
-        trial, title="Motor task settings", labels=trial_labels(), sortKeys=False
+        trial, title="Trial settings", labels=trial_labels(), sortKeys=False
     )
     if not dialog.OK:
         core.quit()

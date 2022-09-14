@@ -53,7 +53,7 @@ def setup() -> Optional[UserChoices]:
     title = f"Motor Task Prototype {mtp.__version__}"
     dialog = wx.SingleChoiceDialog(
         None,
-        f"{title}\n\nhttps://github.com/ssciwr/motor-task-prototype",
+        f"{title}\n\nhttps://ssciwr.github.io/motor-task-prototype/",
         title,
         [
             "Create and run a new experiment",
