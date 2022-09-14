@@ -65,7 +65,7 @@ def get_screenshot_when_ready(
     s0 = np.asarray(screenshot_before)
     sleep(delay_between_screenshots)
     img = pyautogui.screenshot()
-    s = np.asarray(img)
+    s1 = np.asarray(img)
     # wait until
     #   - screen differs significantly from original screenshot
     #   - is not all black (xvfb initial screen)
@@ -73,19 +73,38 @@ def get_screenshot_when_ready(
     black = 0.0
     grey = 128.0
     attempts = 0
-    while rms_diff(s, s0) < min_rms_diff or np.mean(s) in [black, grey]:
+    while rms_diff(s1, s0) < min_rms_diff or np.mean(s1) in [black, grey]:
         sleep(delay_between_screenshots)
         img = pyautogui.screenshot()
-        s = np.asarray(img)
+        s1 = np.asarray(img)
         attempts += 1
         if attempts > 10:
             print("Stuck waiting for screen to be ready", flush=True)
-            print(f"Mean pixel: {np.mean(s)}", flush=True)
+            print(f"Mean pixel: {np.mean(s1)}", flush=True)
             ascii_screenshot()
     print(f"\n{ascii_magic.from_image(img)}\n", flush=True)
-    screenshot_queue.put(s)
+    screenshot_queue.put(s1)
     # press enter to close screen
     press_enter()
+    sleep(delay_between_screenshots)
+    # wait for enter key press to take effect
+    attempts = 0
+    while screenshot_pixel_color_fraction((128, 128, 128)) != 1:
+        sleep(delay_between_screenshots)
+        attempts += 1
+        if attempts > 10:
+            # sometimes (on windows CI) the enter key event seems to get lost
+            # and the screen never closes - in this case we try pressing it again
+            # but with a long pause after each enter press
+            # to try to avoid it arriving during the next test
+            print("Stuck waiting for screen to close: pressing Enter again", flush=True)
+            print(
+                f"Mean pixel: {np.mean(np.asarray(pyautogui.screenshot()))}", flush=True
+            )
+            ascii_screenshot()
+            press_enter()
+            delay_after_repeat_enter_press = 15
+            sleep(delay_after_repeat_enter_press)
     return
 
 
@@ -100,6 +119,8 @@ def call_target_and_get_screenshot(target: Callable, args: Tuple) -> np.ndarray:
     )
     screenshot_thread.start()
     target(*args)
+    # flip window when finished to make screen all-grey
+    args[-1].flip()
     screenshot_thread.join()
     return screenshot_queue.get()
 
