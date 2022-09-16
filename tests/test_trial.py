@@ -31,6 +31,7 @@ def test_describe_trials() -> None:
 def test_default_trial() -> None:
     trial = mtptrial.default_trial()
     assert len(trial) == 18
+    assert isinstance(trial["target_indices"], str)
     assert len(trial["target_indices"].split(" ")) == trial["num_targets"]
 
 
