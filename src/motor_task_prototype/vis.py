@@ -276,6 +276,7 @@ def display_results(
             letterHeight=0.03,
         )
     )
+    kb.clearEvents()
     while True:
         if not draw_and_flip(win, drawables, kb):
             if close_window_when_done:
@@ -335,6 +336,7 @@ def splash_screen(
             letterHeight=0.03,
         )
     )
+    kb.clearEvents()
     while True:
         if not draw_and_flip(win, drawables, kb):
             if close_window_when_done:
