@@ -220,5 +220,4 @@ class MotorTask:
             logging.warning(f"Dropped {win.nDroppedFrames} frames")
         if close_window_when_done:
             win.close()
-        win.flip()
         return self.trial_handler
