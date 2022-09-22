@@ -14,8 +14,10 @@ def main() -> None:
             motor_task = mtp.MotorTask(user_choices.experiment)
             results = motor_task.run()
             mtp.save_experiment(results)
-        else:
-            mtp.display_results(user_choices.experiment)
+        elif user_choices.display_trial_indices is not None:
+            mtp.display_results(
+                user_choices.experiment, user_choices.display_trial_indices
+            )
         core.quit()
 
 
