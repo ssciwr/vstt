@@ -18,9 +18,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: "${{ matrix.os }} :: Python ${{ matrix.python-version }}"
     strategy:
+      fail-fast: false
       matrix:
         os: ["ubuntu-22.04", "windows-latest"]
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.8"] #, "3.9"]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -31,10 +32,10 @@ jobs:
       - name: Linux setup
         if: runner.os == 'Linux'
         run: |
+          # workaround for Xlib.error.XauthError: ~/.Xauthority: [Errno 2] No such file or directory: '/home/runner/.Xauthority'
+          touch ~/.Xauthority
           # various psychopy system dependencies
           sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot libnotify-dev pandoc
-          # install pre-built ubuntu/gtk3 wxPython wheel
-          pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }}/ wxPython
           # enable colours in logs
           echo "FORCE_COLOR=1" >> $GITHUB_ENV
           echo "TERM=xterm-256color" >> $GITHUB_ENV
@@ -43,7 +44,15 @@ jobs:
           # start an Xvfb server for GUI tests
           nohup Xvfb :99 -screen 0 1024x768x24 &
           echo "DISPLAY=:99" >> $GITHUB_ENV
-      - run: pip install -e .[tests,docs] --verbose
+      - name: "Install minimal set of psychopy pip dependencies"
+        run: pip install pyqt5 numpy pandas matplotlib glfw
+      - name: "Install our test/docs deps"
+        run: pip install pytest pytest-cov pyautogui ascii-magic keyboard ipykernel matplotlib nbsphinx pandoc sphinx>=4.5.0 sphinx_rtd_theme>=1.0.0
+      - name: "Install psychopy with --no-deps"
+        run: pip install psychopy --no-deps
+      - name: "Install our package with --no-deps"
+        run: pip install -e . --verbose --no-deps
+      #      - run: pip install -e .[tests,docs] --verbose --no-deps
       - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s
       - name: Build documentation
         if: runner.os == 'Linux'
