@@ -1,11 +1,7 @@
-import copy
 from typing import Dict
-from typing import Optional
 
 import motor_task_prototype.common as mtpcommon
 from motor_task_prototype.types import MotorTaskDisplayOptions
-from psychopy import core
-from psychopy.gui import DlgFromDict
 
 
 def default_display_options() -> MotorTaskDisplayOptions:
@@ -26,7 +22,7 @@ def default_display_options() -> MotorTaskDisplayOptions:
     }
 
 
-def display_options_labels() -> Dict:
+def display_options_labels() -> Dict[str, str]:
     return {
         "to_target_paths": "Display cursor paths to target",
         "to_center_paths": "Display cursor paths back to center",
@@ -42,24 +38,6 @@ def display_options_labels() -> Dict:
         "to_center_rmse": "Statistic: RMSE movement to center",
         "averages": "Also show statistics averaged over all targets",
     }
-
-
-def get_display_options_from_user(
-    initial_display_options: Optional[MotorTaskDisplayOptions] = None,
-) -> MotorTaskDisplayOptions:
-    if initial_display_options:
-        display_options = copy.deepcopy(initial_display_options)
-    else:
-        display_options = default_display_options()
-    dialog = DlgFromDict(
-        display_options,
-        title="Motor task display options",
-        labels=display_options_labels(),
-        sortKeys=False,
-    )
-    if not dialog.OK:
-        core.quit()
-    return display_options
 
 
 def import_display_options(display_options_dict: dict) -> MotorTaskDisplayOptions:

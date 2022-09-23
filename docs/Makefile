@@ -4,4 +4,4 @@ html:
 	sphinx-build -M html . _build
 
 clean:
-	rm -rf _build _autosummary
+	rm -rf _build developer/_autosummary

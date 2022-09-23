@@ -1,16 +1,7 @@
-Running an existing experiment
-==============================
+Running an experiment
+=====================
 
-Start dialog
-------------
-
-To run an existing experiment, click on "Import and run an existing experiment", then "OK".
-
-.. figure:: images/start-screen-2.png
-   :alt: start dialog
-
-   The options available when you start the program.
-
+To run an experiment, got to Experiment -> Run, or press ``Ctrl+R``, or click on the circular green toolbar button
 
 Splash screen
 -------------
@@ -43,10 +34,3 @@ Depending on the trial settings, results may be displayed after a trial or block
    :alt: experiment results screen
 
    An example of a results display after a block of trials during an experiment.
-
-
-Saving the experiment
----------------------
-
-When the tasks are completed the experiment can be saved as a psydat file.
-This file contains both the experimental setup as well as the results.

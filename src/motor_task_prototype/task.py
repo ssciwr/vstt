@@ -5,17 +5,11 @@ from typing import Union
 
 import numpy as np
 from motor_task_prototype import vis as mtpvis
-from motor_task_prototype.display import default_display_options
 from motor_task_prototype.geom import PointRotator
-from motor_task_prototype.meta import default_metadata
-from motor_task_prototype.meta import MotorTaskMetadata
-from motor_task_prototype.trial import MotorTaskTrial
-from motor_task_prototype.trial import validate_trial
 from psychopy.clock import Clock
 from psychopy.data import TrialHandlerExt
 from psychopy.event import Mouse
 from psychopy.event import xydist
-from psychopy.gui import fileSaveDlg
 from psychopy.hardware.keyboard import Keyboard
 from psychopy.sound import Sound
 from psychopy.visual.basevisual import BaseVisualStim
@@ -24,47 +18,13 @@ from psychopy.visual.shape import ShapeStim
 from psychopy.visual.window import Window
 
 
-def new_experiment_from_trialhandler(experiment: TrialHandlerExt) -> TrialHandlerExt:
-    for trial in experiment.trialList:
-        validate_trial(trial)
-    if not experiment.extraInfo:
-        experiment.extraInfo = {}
-    if "display_options" not in experiment.extraInfo:
-        experiment.extraInfo["display_options"] = default_display_options()
-    if "metadata" not in experiment.extraInfo:
-        experiment.extraInfo["metadata"] = default_metadata()
-    return TrialHandlerExt(
-        experiment.trialList,
-        nReps=1,
-        method=experiment.method,
-        originPath=-1,
-        extraInfo=experiment.extraInfo,
-    )
-
-
-def new_experiment_from_dicts(
-    trials: List[MotorTaskTrial],
-    display_options: mtpvis.MotorTaskDisplayOptions,
-    metadata: MotorTaskMetadata,
-) -> TrialHandlerExt:
-    for trial in trials:
-        validate_trial(trial)
-    return TrialHandlerExt(
-        trials,
-        nReps=1,
-        method="sequential",
-        originPath=-1,
-        extraInfo={"display_options": display_options, "metadata": metadata},
-    )
-
-
-def save_experiment(experiment: TrialHandlerExt) -> None:
-    filename = fileSaveDlg(
-        prompt="Save trial conditions and results as psydat file",
-        allowed="Psydat files (*.psydat)",
-    )
-    if filename is not None:
-        experiment.saveAsPickle(filename)
+def task_is_empty(trial_handler: TrialHandlerExt) -> bool:
+    if trial_handler.trialList is None:
+        return True
+    for trial in trial_handler.trialList:
+        if trial is None:
+            return True
+    return False
 
 
 class MotorTask:
@@ -76,6 +36,8 @@ class MotorTask:
     def run(
         self, win: Optional[Window] = None, win_type: str = "pyglet"
     ) -> TrialHandlerExt:
+        if task_is_empty(self.trial_handler):
+            return self.trial_handler
         close_window_when_done = False
         if win is None:
             win = Window(fullscr=True, units="height", winType=win_type)
