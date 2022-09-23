@@ -130,7 +130,7 @@ def make_stats_txt(
 
 def display_results(
     results: TrialHandlerExt,
-    trial_indices: Optional[List[int]] = None,
+    trial_indices: List[int],
     win: Optional[Window] = None,
     win_type: str = "pyglet",
 ) -> None:
@@ -144,18 +144,6 @@ def display_results(
         display_options = results.extraInfo.get(
             "display_options", default_display_options()
         )
-    if trial_indices is None:
-        # if not specified, default to show block from the first condition for now
-        # todo: instead of this, should have a separate wrapper for calling this
-        # when displaying results from existing experiments
-        trial_indices = []
-        index = 0
-        # assuming a single repetition of experiment:
-        i_rep = 0
-        for condition_index in results.sequenceIndices:
-            if condition_index[i_rep] == 0:
-                trial_indices.append(index)
-            index += 1
     win.flip()
     kb = Keyboard()
     drawables: List[BaseVisualStim] = []
@@ -165,6 +153,17 @@ def display_results(
     i_condition = results.sequenceIndices[trial_indices[0]][i_repeat]
     conditions = results.trialList[i_condition]
     targets = results.data["target_pos"][trial_indices[0]][i_repeat]
+    drawables.append(
+        TextBox2(
+            win,
+            f"Condition {i_condition}, trial{'s' if len(trial_indices) > 1 else ''} {trial_indices}",
+            anchor="top_center",
+            pos=(0, 0.5),
+            color="black",
+            alignment="top_center",
+            letterHeight=0.02,
+        )
+    )
     # stats
     stats = mtpstat.MotorTaskStats(results, trial_indices)
     letter_height = 0.015
