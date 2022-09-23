@@ -5,7 +5,9 @@ from typing import Union
 
 import numpy as np
 from motor_task_prototype import vis as mtpvis
+from motor_task_prototype.display import default_display_options
 from motor_task_prototype.geom import PointRotator
+from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.meta import MotorTaskMetadata
 from motor_task_prototype.trial import MotorTaskTrial
 from motor_task_prototype.trial import validate_trial
@@ -25,6 +27,12 @@ from psychopy.visual.window import Window
 def new_experiment_from_trialhandler(experiment: TrialHandlerExt) -> TrialHandlerExt:
     for trial in experiment.trialList:
         validate_trial(trial)
+    if not experiment.extraInfo:
+        experiment.extraInfo = {}
+    if "display_options" not in experiment.extraInfo:
+        experiment.extraInfo["display_options"] = default_display_options()
+    if "metadata" not in experiment.extraInfo:
+        experiment.extraInfo["metadata"] = default_metadata()
     return TrialHandlerExt(
         experiment.trialList,
         nReps=1,
