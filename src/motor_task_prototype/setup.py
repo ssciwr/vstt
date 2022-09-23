@@ -3,7 +3,6 @@ from typing import List
 from typing import Optional
 
 import motor_task_prototype as mtp
-import wx
 from motor_task_prototype.display import get_display_options_from_user
 from motor_task_prototype.meta import get_metadata_from_user
 from motor_task_prototype.task import new_experiment_from_dicts
@@ -13,7 +12,9 @@ from motor_task_prototype.trial import get_trial_from_user
 from motor_task_prototype.trial import MotorTaskTrial
 from psychopy.data import TrialHandlerExt
 from psychopy.gui import fileOpenDlg
+from psychopy.gui.qtgui import ensureQtApp
 from psychopy.misc import fromFile
+from PyQt5 import QtWidgets
 
 
 @dataclass
@@ -31,42 +32,40 @@ def get_experiment_from_user() -> TrialHandlerExt:
         if len(trials) > 0:
             initial_trial = trials[-1]
         trials.append(get_trial_from_user(initial_trial))
-        dia_yes_no = wx.MessageDialog(
+        yes_no = QtWidgets.QMessageBox.question(
             None,
+            "Add another trial?",
             "Trials in experiment:\n\n"
             + describe_trials(trials)
             + "\n\nAdd another trial to the experiment?",
-            "Add another trial?",
-            style=wx.YES_NO,
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
         )
-        result_yes_no = dia_yes_no.ShowModal()
-        dia_yes_no.Destroy()
-        if result_yes_no != wx.ID_YES:
+        if yes_no == QtWidgets.QMessageBox.Yes:
             add_another_trial = False
     display_options = get_display_options_from_user()
     return new_experiment_from_dicts(trials, display_options, metadata)
 
 
 def setup() -> Optional[UserChoices]:
-    app = wx.App(False)
-    app.MainLoop()
+    ensureQtApp()
     title = f"Motor Task Prototype {mtp.__version__}"
-    dialog = wx.SingleChoiceDialog(
+    options = [
+        "Create and run a new experiment",
+        "Import and run an existing experiment",
+        "Display existing experiment results",
+        "Exit",
+    ]
+    result, ok = QtWidgets.QInputDialog.getItem(
         None,
-        f"{title}\n\nhttps://ssciwr.github.io/motor-task-prototype/",
         title,
-        [
-            "Create and run a new experiment",
-            "Import and run an existing experiment",
-            "Display existing experiment results",
-            "Exit",
-        ],
+        f"{title}\n\nhttps://ssciwr.github.io/motor-task-prototype/",
+        options,
+        0,
+        False,
     )
-    result = dialog.ShowModal()
-    selection = dialog.GetSelection()
-    dialog.Destroy()
-    if result != wx.ID_OK:
+    if not ok:
         return None
+    selection = options.index(result)
     if selection == 0:
         return UserChoices(True, get_experiment_from_user())
     elif selection == 1:
