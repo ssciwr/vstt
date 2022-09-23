@@ -40,7 +40,7 @@ def get_experiment_from_user() -> TrialHandlerExt:
             + "\n\nAdd another trial to the experiment?",
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
         )
-        if yes_no == QtWidgets.QMessageBox.Yes:
+        if yes_no == QtWidgets.QMessageBox.No:
             add_another_trial = False
     display_options = get_display_options_from_user()
     return new_experiment_from_dicts(trials, display_options, metadata)
