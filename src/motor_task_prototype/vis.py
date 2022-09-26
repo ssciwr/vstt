@@ -128,26 +128,29 @@ def make_stats_txt(
     return txt_stats
 
 
-def display_results(
-    results: TrialHandlerExt,
-    trial_indices: List[int],
-    win: Optional[Window] = None,
-    win_type: str = "pyglet",
-) -> None:
-    close_window_when_done = False
-    if win is None:
-        win = Window(fullscr=True, units="height", winType=win_type)
-        close_window_when_done = True
+def make_drawables(
+    results: TrialHandlerExt, trial_indices: List[int], win: Window
+) -> List[BaseVisualStim]:
+    drawables: List[BaseVisualStim] = []
+    drawables.append(
+        TextBox2(
+            win,
+            "Press press Enter when you are ready to continue...",
+            pos=(0, -0.47),
+            color="navy",
+            alignment="center",
+            letterHeight=0.03,
+        )
+    )
+    if len(trial_indices) == 0 or "target_pos" not in results.data:
+        # no results to display
+        return drawables
     if not results.extraInfo:
         display_options = default_display_options()
     else:
         display_options = results.extraInfo.get(
             "display_options", default_display_options()
         )
-    win.flip()
-    kb = Keyboard()
-    drawables: List[BaseVisualStim] = []
-    assert len(trial_indices) >= 1, "At least one trial is needed to be displayed"
     # for now assume the experiment is only repeated once
     i_repeat = 0
     i_condition = results.sequenceIndices[trial_indices[0]][i_repeat]
@@ -265,16 +268,22 @@ def display_results(
                         lineWidth=3,
                     )
                 )
-    drawables.append(
-        TextBox2(
-            win,
-            "Press press Enter when you are ready to continue...",
-            pos=(0, -0.47),
-            color="navy",
-            alignment="center",
-            letterHeight=0.03,
-        )
-    )
+    return drawables
+
+
+def display_results(
+    results: TrialHandlerExt,
+    trial_indices: List[int],
+    win: Optional[Window] = None,
+    win_type: str = "pyglet",
+) -> None:
+    close_window_when_done = False
+    if win is None:
+        win = Window(fullscr=True, units="height", winType=win_type)
+        close_window_when_done = True
+    win.flip()
+    kb = Keyboard()
+    drawables = make_drawables(results, trial_indices, win)
     kb.clearEvents()
     while True:
         if not draw_and_flip(win, drawables, kb):

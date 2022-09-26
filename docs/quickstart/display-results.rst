@@ -1,27 +1,25 @@
 Displaying results
 ==================
 
-Start dialog
-------------
+To display the results from a trial, select it from the list and click "Display Trial".
+You can also display all the trials with the same conditions with "Display Condition".
 
-To display the results of a previous experiment, click on "Display existing experiment results", then "OK".
+.. figure:: images/results-list.png
+   :alt: Results
 
-.. figure:: images/start-screen-3.png
-   :alt: start dialog
-
-   The options available when you start the program.
+   Results: a list of trials which can be displayed
 
 
 Display options
 ---------------
 
-You can then choose which results and statistics to display.
-When you are finished, click "OK".
+You can choose which results and statistics to display in the Display Options section.
 
-.. figure:: images/display-screen.png
-   :alt: trial settings dialog
+.. figure:: images/display-options.png
+   :alt: Display Options
 
-   Dialog to select which results and statistics to display
+   Display Options: select which results and statistics to display
+
 
 Results
 -------

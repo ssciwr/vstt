@@ -1,11 +1,21 @@
-import copy
 from typing import Dict
-from typing import Optional
 
 import motor_task_prototype.common as mtpcommon
 from motor_task_prototype.types import MotorTaskMetadata
-from psychopy import core
-from psychopy.gui import DlgFromDict
+
+
+def empty_metadata() -> MotorTaskMetadata:
+    return {
+        "name": "",
+        "subject": "",
+        "date": "",
+        "author": "",
+        "display_title": "",
+        "display_text1": "",
+        "display_text2": "",
+        "display_text3": "",
+        "display_text4": "",
+    }
 
 
 def default_metadata() -> MotorTaskMetadata:
@@ -37,21 +47,6 @@ def metadata_labels() -> Dict:
         "display_text3": "Main text line 3",
         "display_text4": "Main text line 4",
     }
-
-
-def get_metadata_from_user(
-    initial_metadata: Optional[MotorTaskMetadata] = None,
-) -> MotorTaskMetadata:
-    if initial_metadata:
-        metadata = copy.deepcopy(initial_metadata)
-    else:
-        metadata = default_metadata()
-    dialog = DlgFromDict(
-        metadata, title="Experiment metadata", labels=metadata_labels(), sortKeys=False
-    )
-    if not dialog.OK:
-        core.quit()
-    return metadata
 
 
 def import_metadata(metadata_dict: dict) -> MotorTaskMetadata:

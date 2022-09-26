@@ -7,7 +7,7 @@ Pre-requisites
 The only dependency is `psychopy <https://www.psychopy.org/index.html>`_.
 Unfortunately, psychopy itself has a lot of dependencies, some of which are system libraries.
 
-* on Ubuntu 22.04 with Python 3.10 I needed to do
+* on Ubuntu 22.04 with Python 3.9 I needed to do
    * ``sudo apt-get install swig libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libgtk-3-dev``
    * ``pip install wxPython`` (which took a long time to complete - alternative is to install a `pre-built wheel <https://extras.wxpython.org/wxPython4/extras/linux/gtk3/>`_)
    * additionally, at runtime PTB/psychtoolbox needs extra permissions on linux to run

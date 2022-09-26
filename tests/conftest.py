@@ -7,9 +7,9 @@ import numpy as np
 import numpy.typing as npt
 import pyautogui
 import pytest
+from motor_task_prototype.experiment import new_experiment_from_dicts
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.meta import default_metadata
-from motor_task_prototype.task import new_experiment_from_dicts
 from motor_task_prototype.trial import default_trial
 from motor_task_prototype.vis import default_display_options
 from psychopy.data import TrialHandlerExt
@@ -35,7 +35,7 @@ def tests_init() -> None:
     pyautogui.FAILSAFE = False
 
 
-# fixture to create a wxPython Window for testing gui functions
+# fixture to create a Window for testing gui functions
 # GLFW backend used for tests as it works better with Xvfb
 @pytest.fixture(scope="session")
 def window() -> Window:

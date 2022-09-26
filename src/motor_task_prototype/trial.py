@@ -6,7 +6,6 @@ from typing import Optional
 import motor_task_prototype.common as mtpcommon
 import numpy as np
 from motor_task_prototype.types import MotorTaskTrial
-from psychopy import core
 from psychopy.gui import DlgFromDict
 
 
@@ -68,7 +67,7 @@ def trial_labels() -> Dict:
 
 def get_trial_from_user(
     initial_trial: Optional[MotorTaskTrial] = None,
-) -> MotorTaskTrial:
+) -> Optional[MotorTaskTrial]:
     if initial_trial:
         trial = copy.deepcopy(initial_trial)
     else:
@@ -82,7 +81,7 @@ def get_trial_from_user(
         trial, title="Trial settings", labels=trial_labels(), sortKeys=False
     )
     if not dialog.OK:
-        core.quit()
+        return None
     return trial
 
 
