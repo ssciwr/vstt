@@ -13,6 +13,7 @@ from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.trial import default_trial
 from motor_task_prototype.vis import default_display_options
 from psychopy.data import TrialHandlerExt
+from psychopy.gui.qtgui import ensureQtApp
 from psychopy.visual.window import Window
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
@@ -23,6 +24,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
 # session scope means it is only called once
 # so this fixture runs once before any tests
 def tests_init() -> None:
+    # opencv-python installs its own qt version and sets env vars accordingly
+    # we remove these to avoid pyqt picking up their XCB QPA plugin & crashing
+    for k, v in os.environ.items():
+        if k.startswith("QT_") and "cv2" in v:
+            del os.environ[k]
+    # ensure psychopy has initialized the qt app
+    ensureQtApp()
     # work around for PsychHID-WARNING about X11 not being initialized on linux
     if sys.platform == "linux":
         import ctypes

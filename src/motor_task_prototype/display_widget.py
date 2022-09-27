@@ -1,5 +1,6 @@
 from typing import Callable
 from typing import Dict
+from typing import Optional
 
 from motor_task_prototype.display import default_display_options
 from motor_task_prototype.display import display_options_labels
@@ -12,14 +13,14 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
     widgets: Dict[str, QtWidgets.QCheckBox] = {}
     unsaved_changes: bool = False
 
-    def update_value_callback(self, key: str) -> Callable[[bool], None]:
-        def update_value(value: bool) -> None:
+    def _update_value_callback(self, key: str) -> Callable[[bool], None]:
+        def _update_value(value: bool) -> None:
             self.options[key] = value  # type: ignore
             self.unsaved_changes = True
 
-        return update_value
+        return _update_value
 
-    def __init__(self, parent: QtWidgets.QWidget):
+    def __init__(self, parent: Optional[QtWidgets.QWidget] = None):
         super().__init__(parent)
         outer_layout = QtWidgets.QVBoxLayout()
         group_box = QtWidgets.QGroupBox("Display Options")
@@ -30,7 +31,7 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
         for row_index, key in enumerate(default_display_options().keys()):
             checkbox = QtWidgets.QCheckBox(f"{labels[key]}", self)
             inner_layout.addWidget(checkbox)
-            checkbox.stateChanged.connect(self.update_value_callback(key))
+            checkbox.clicked.connect(self._update_value_callback(key))
             self.widgets[key] = checkbox
         self.setLayout(outer_layout)
         self.unsaved_changes = False
