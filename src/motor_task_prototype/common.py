@@ -15,7 +15,7 @@ MtpTypedDict = TypeVar(
 )
 
 
-def has_valid_type(var: Any, correct_type: Type) -> bool:
+def _has_valid_type(var: Any, correct_type: Type) -> bool:
     if isinstance(var, correct_type):
         # var has the correct type
         return True
@@ -35,7 +35,7 @@ def import_typed_dict(
             # import all valid keys from input_dict
             correct_type = type(default_value)
             value = input_dict[key]
-            if has_valid_type(value, correct_type):
+            if _has_valid_type(value, correct_type):
                 output_dict[key] = correct_type(value)  # type: ignore
             else:
                 logging.warning(
