@@ -9,13 +9,13 @@ from PyQt5 import QtWidgets
 
 
 class DisplayOptionsWidget(QtWidgets.QWidget):
-    options: MotorTaskDisplayOptions = default_display_options()
-    widgets: Dict[str, QtWidgets.QCheckBox] = {}
     unsaved_changes: bool = False
+    _options: MotorTaskDisplayOptions = default_display_options()
+    _widgets: Dict[str, QtWidgets.QCheckBox] = {}
 
     def _update_value_callback(self, key: str) -> Callable[[bool], None]:
         def _update_value(value: bool) -> None:
-            self.options[key] = value  # type: ignore
+            self._options[key] = value  # type: ignore
             self.unsaved_changes = True
 
         return _update_value
@@ -32,15 +32,15 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
             checkbox = QtWidgets.QCheckBox(f"{labels[key]}", self)
             inner_layout.addWidget(checkbox)
             checkbox.clicked.connect(self._update_value_callback(key))
-            self.widgets[key] = checkbox
+            self._widgets[key] = checkbox
         self.setLayout(outer_layout)
         self.unsaved_changes = False
 
     def set_display_options(self, display_options: MotorTaskDisplayOptions) -> None:
-        self.options = display_options
-        for key, widget in self.widgets.items():
-            widget.setChecked(self.options[key])  # type: ignore
+        self._options = display_options
+        for key, widget in self._widgets.items():
+            widget.setChecked(self._options[key])  # type: ignore
         self.unsaved_changes = False
 
     def get_display_options(self) -> MotorTaskDisplayOptions:
-        return self.options
+        return self._options
