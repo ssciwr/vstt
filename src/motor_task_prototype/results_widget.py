@@ -11,7 +11,7 @@ from PyQt5 import QtWidgets
 
 class ResultListWidget(QtWidgets.QWidget):
     experiment: Optional[TrialHandlerExt] = None
-    condition_to_trials: DefaultDict[int, List[int]] = defaultdict(list[int])
+    condition_to_trials: DefaultDict[int, List[int]] = defaultdict(list)
     trial_to_condition: Dict[int, int] = dict()
 
     def __init__(self, parent: QtWidgets.QWidget):
