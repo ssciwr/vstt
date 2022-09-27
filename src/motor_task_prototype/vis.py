@@ -90,6 +90,9 @@ def draw_and_flip(
 def make_txt(
     name: str, units: str, stat: npt.NDArray[np.float64], index: Optional[int] = None
 ) -> str:
+    if stat.shape[-1] == 0:
+        # no data available for this statistic
+        return ""
     if index is None:
         av = np.mean(stat)
     else:
