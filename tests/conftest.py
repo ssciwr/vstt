@@ -82,7 +82,7 @@ def experiment_no_results() -> TrialHandlerExt:
 
 @pytest.fixture
 def experiment_with_results() -> TrialHandlerExt:
-    # trial without auto-move to center, 2 reps, 8 targets
+    # trial without auto-move to center, 3 reps, 8 targets
     trial0 = default_trial()
     # disable sounds due to issues with sounds within tests on linux
     trial0["play_sound"] = False
@@ -110,16 +110,14 @@ def experiment_with_results() -> TrialHandlerExt:
             to_target_mouse_positions.append(
                 make_mouse_positions(pos, to_target_timestamps[-1])
             )
-            to_center_timestamps.append(make_timestamps())
-            to_center_mouse_positions.append(
-                list(reversed(make_mouse_positions(pos, to_center_timestamps[-1])))
-            )
+            if not trial["automove_cursor_to_center"]:
+                to_center_timestamps.append(make_timestamps())
+                to_center_mouse_positions.append(
+                    list(reversed(make_mouse_positions(pos, to_center_timestamps[-1])))
+                )
         exp.addData("target_pos", np.array(target_pos))
         exp.addData("to_target_timestamps", np.array(to_target_timestamps))
         exp.addData("to_target_mouse_positions", np.array(to_target_mouse_positions))
-        if not trial["automove_cursor_to_center"]:
-            exp.addData("to_center_timestamps", np.array(to_center_timestamps))
-            exp.addData(
-                "to_center_mouse_positions", np.array(to_center_mouse_positions)
-            )
+        exp.addData("to_center_timestamps", np.array(to_center_timestamps))
+        exp.addData("to_center_mouse_positions", np.array(to_center_mouse_positions))
     return exp

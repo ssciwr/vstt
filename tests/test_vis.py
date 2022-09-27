@@ -118,7 +118,17 @@ def test_display_results_nothing(
         "to_center_rmse": False,
         "averages": False,
     }
+    # trial data without auto-move to center
     trial_indices = [0, 1, 2]
+    screenshot = gtu.call_target_and_get_screenshot(
+        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+    )
+    # all pixels grey except for blue continue text
+    assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
+    # no off-white pixels
+    assert gtu.pixel_color_fraction(screenshot, (240, 248, 255)) == 0.000
+    # trial data with auto-move to center
+    trial_indices = [3]
     screenshot = gtu.call_target_and_get_screenshot(
         mtpvis.display_results, (experiment_with_results, trial_indices, window)
     )
@@ -146,11 +156,21 @@ def test_display_results_everything(
         "to_center_rmse": True,
         "averages": True,
     }
+    # trial data without auto-move to center
     trial_indices = [0, 1, 2]
     screenshot = gtu.call_target_and_get_screenshot(
         mtpvis.display_results, (experiment_with_results, trial_indices, window)
     )
     # less grey: lots of other colors for targets, paths and stats
-    assert 0.750 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.950
+    grey_pixels = gtu.pixel_color_fraction(screenshot, (128, 128, 128))
+    assert 0.750 < grey_pixels < 0.950
     # some off-white pixels for one of the targets
-    assert 0.002 < gtu.pixel_color_fraction(screenshot, (240, 248, 255)) < 0.100
+    off_white_pixels = gtu.pixel_color_fraction(screenshot, (240, 248, 255))
+    assert 0.002 < off_white_pixels < 0.100
+    # trial data with auto-move to center
+    trial_indices = [3]
+    screenshot = gtu.call_target_and_get_screenshot(
+        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+    )
+    # more grey since less paths and stats to display
+    assert gtu.pixel_color_fraction(screenshot, (128, 128, 128)) > grey_pixels
