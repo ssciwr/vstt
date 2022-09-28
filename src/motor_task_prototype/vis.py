@@ -4,7 +4,6 @@ from typing import Optional
 import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.stat as mtpstat
 import numpy as np
-import numpy.typing as npt
 from motor_task_prototype.display import default_display_options
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.types import MotorTaskDisplayOptions
@@ -88,7 +87,7 @@ def draw_and_flip(
 
 
 def make_txt(
-    name: str, units: str, stat: npt.NDArray[np.float64], index: Optional[int] = None
+    name: str, units: str, stat: np.ndarray, index: Optional[int] = None
 ) -> str:
     if stat.shape[-1] == 0:
         # no data available for this statistic
