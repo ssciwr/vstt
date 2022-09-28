@@ -2,21 +2,20 @@ from typing import List
 from typing import Tuple
 
 import numpy as np
-import numpy.typing as npt
 from psychopy.data import TrialHandlerExt
 from psychopy.event import xydist
 
 
 class MotorTaskStats:
     # 2d arrays of [trial_index][target_index]
-    to_target_reaction_times: npt.NDArray[np.float64]
-    to_center_reaction_times: npt.NDArray[np.float64]
-    to_target_times: npt.NDArray[np.float64]
-    to_center_times: npt.NDArray[np.float64]
-    to_target_distances: npt.NDArray[np.float64]
-    to_center_distances: npt.NDArray[np.float64]
-    to_target_rmses: npt.NDArray[np.float64]
-    to_center_rmses: npt.NDArray[np.float64]
+    to_target_reaction_times: np.ndarray
+    to_center_reaction_times: np.ndarray
+    to_target_times: np.ndarray
+    to_center_times: np.ndarray
+    to_target_distances: np.ndarray
+    to_center_distances: np.ndarray
+    to_target_rmses: np.ndarray
+    to_center_rmses: np.ndarray
 
     def __init__(self, results: TrialHandlerExt, trials: List[int]):
         all_to_target_reaction_times = []

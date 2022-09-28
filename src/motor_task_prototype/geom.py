@@ -1,21 +1,20 @@
 from typing import Tuple
 
 import numpy as np
-import numpy.typing as npt
 
 """
 An array of `n_points` equidistantly spaced angles in radians
 """
 
 
-def equidistant_angles(n_points: int) -> npt.NDArray[np.float64]:
+def equidistant_angles(n_points: int) -> np.ndarray:
     max_angle = 2.0 * np.pi * (n_points - 1.0) / n_points
     return np.linspace(0, max_angle, n_points)
 
 
 def points_on_circle(
     n_points: int, radius: float, include_centre: bool = False
-) -> npt.NDArray[np.float64]:
+) -> np.ndarray:
     points = [
         [radius * np.sin(angle), radius * np.cos(angle)]
         for angle in equidistant_angles(n_points)

@@ -4,7 +4,6 @@ import sys
 from typing import Tuple
 
 import numpy as np
-import numpy.typing as npt
 import pyautogui
 import pytest
 from motor_task_prototype.experiment import new_experiment_from_dicts
@@ -63,12 +62,12 @@ def noise(scale: float = 0.01) -> float:
 
 
 def make_mouse_positions(
-    pos: Tuple[float, float], time_points: npt.NDArray[np.float64]
-) -> npt.NDArray[np.float64]:
+    pos: Tuple[float, float], time_points: np.ndarray
+) -> np.ndarray:
     return np.array([(pos[0] * t + noise(), pos[1] * t + noise()) for t in time_points])
 
 
-def make_timestamps(n_min: int = 8, n_max: int = 20) -> npt.NDArray[np.float64]:
+def make_timestamps(n_min: int = 8, n_max: int = 20) -> np.ndarray:
     return np.linspace(0.0, 1.0, np.random.randint(n_min, n_max))
 
 
