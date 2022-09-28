@@ -13,9 +13,9 @@ from motor_task_prototype.results_widget import ResultsWidget
 from motor_task_prototype.task import MotorTask
 from motor_task_prototype.trials_widget import TrialsWidget
 from psychopy.data import TrialHandlerExt
-from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class MotorTaskGui(QtWidgets.QMainWindow):
@@ -34,7 +34,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         self.setWindowTitle(f"Motor Task Prototype {mtp.__version__}")
 
         grid_layout = QtWidgets.QVBoxLayout()
-        split_top_bottom = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        split_top_bottom = QtWidgets.QSplitter(Qt.Vertical)
 
         split_metadata_display = QtWidgets.QSplitter()
         self.metadata_widget = MetadataWidget(self)
@@ -45,14 +45,12 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         split_metadata_display.setSizes([5000, 1000])
 
         split_trial_results = QtWidgets.QSplitter()
-        self.trial_list_widget = TrialsWidget(self)
-        split_trial_results.addWidget(self.trial_list_widget)
-        self.result_list_widget = ResultsWidget(self)
-        split_trial_results.addWidget(self.result_list_widget)
+        self.trials_widget = TrialsWidget(self)
+        split_trial_results.addWidget(self.trials_widget)
+        self.results_widget = ResultsWidget(self)
+        split_trial_results.addWidget(self.results_widget)
 
-        self.trial_list_widget.trials_changed.connect(
-            self.result_list_widget.clear_results
-        )
+        self.trials_widget.trials_changed.connect(self.results_widget.clear_results)
 
         split_top_bottom.addWidget(split_metadata_display)
         split_top_bottom.addWidget(split_trial_results)
@@ -83,14 +81,14 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         return save_experiment(self.experiment)
 
     def btn_run_clicked(self) -> None:
-        if not self.trial_list_widget.get_trial_list():
+        if not self.trials_widget.get_trial_list():
             QtWidgets.QMessageBox.warning(
                 self,
                 "No trial conditions",
                 "Please add a trial condition before running the experiment.",
             )
             return
-        if self.result_list_widget.have_results():
+        if self.results_widget.have_results():
             yes_no = QtWidgets.QMessageBox.question(
                 self,
                 "Clear existing results?",
@@ -109,7 +107,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             self.unsaved_changes
             or self.metadata_widget.unsaved_changes
             or self.display_options_widget.unsaved_changes
-            or self.trial_list_widget.unsaved_changes
+            or self.trials_widget.unsaved_changes
         ):
             yes_no = QtWidgets.QMessageBox.question(
                 self,
@@ -129,9 +127,9 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         self.display_options_widget.set_display_options(
             self.experiment.extraInfo["display_options"]
         )
-        self.result_list_widget.set_results(self.experiment)
-        self.trial_list_widget.set_trial_list(
-            self.experiment.trialList, self.result_list_widget.have_results()
+        self.results_widget.set_results(self.experiment)
+        self.trials_widget.set_trial_list(
+            self.experiment.trialList, self.results_widget.have_results()
         )
         self.unsaved_changes = False
 
@@ -210,5 +208,5 @@ def create_menu_and_toolbar(gui: MotorTaskGui) -> None:
     )
     help_menu = menu.addMenu("&Help")
     add_action("&About", gui.about, help_menu)
-    toolbar.setContextMenuPolicy(QtCore.Qt.PreventContextMenu)
+    toolbar.setContextMenuPolicy(Qt.PreventContextMenu)
     gui.addToolBar(toolbar)
