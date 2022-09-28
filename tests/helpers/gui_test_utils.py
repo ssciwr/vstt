@@ -6,6 +6,7 @@ from typing import Callable
 from typing import Tuple
 
 import ascii_magic
+from psychopy.visual.window import Window
 
 if sys.platform.startswith("win"):
     # use alternative library to generate keyboard events on windows
@@ -109,7 +110,9 @@ def get_screenshot_when_ready(
 
 
 # call target with args, get screenshot when ready, press Enter to close screen
-def call_target_and_get_screenshot(target: Callable, args: Tuple) -> np.ndarray:
+def call_target_and_get_screenshot(
+    target: Callable, args: Tuple, win: Window
+) -> np.ndarray:
     screenshot_queue: queue.Queue = queue.Queue()
     screenshot_before = pyautogui.screenshot()
     screenshot_thread = threading.Thread(
@@ -120,7 +123,7 @@ def call_target_and_get_screenshot(target: Callable, args: Tuple) -> np.ndarray:
     screenshot_thread.start()
     target(*args)
     # flip window when finished to make screen all-grey
-    args[-1].flip()
+    win.flip()
     screenshot_thread.join()
     return screenshot_queue.get()
 

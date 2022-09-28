@@ -13,6 +13,7 @@ from motor_task_prototype.results_widget import ResultsWidget
 from motor_task_prototype.task import MotorTask
 from motor_task_prototype.trials_widget import TrialsWidget
 from psychopy.data import TrialHandlerExt
+from psychopy.visual.window import Window
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
@@ -21,23 +22,33 @@ from PyQt5.QtCore import Qt
 class MotorTaskGui(QtWidgets.QMainWindow):
     experiment: TrialHandlerExt
     unsaved_changes: bool = False
+    _win: Optional[Window]
+    _win_type: str
 
-    def __init__(self, filename: Optional[str]):
+    def __init__(
+        self,
+        filename: Optional[str] = None,
+        win: Optional[Window] = None,
+        win_type: str = "pyglet",
+    ):
         super().__init__()
+        self._win = win
+        self._win_type = win_type
         if filename:
             self.experiment = import_experiment_from_file(
                 filename
             )  # todo: handle failure here gracefully
         else:
             self.experiment = new_default_experiment()
-
         self.setWindowTitle(f"Motor Task Prototype {mtp.__version__}")
 
         grid_layout = QtWidgets.QVBoxLayout()
         split_top_bottom = QtWidgets.QSplitter(Qt.Vertical)
 
         split_metadata_display = QtWidgets.QSplitter()
-        self.metadata_widget = MetadataWidget(self)
+        self.metadata_widget = MetadataWidget(
+            self, win=self._win, win_type=self._win_type
+        )
         split_metadata_display.addWidget(self.metadata_widget)
 
         self.display_options_widget = DisplayOptionsWidget(self)
@@ -47,7 +58,9 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         split_trial_results = QtWidgets.QSplitter()
         self.trials_widget = TrialsWidget(self)
         split_trial_results.addWidget(self.trials_widget)
-        self.results_widget = ResultsWidget(self)
+        self.results_widget = ResultsWidget(
+            self, win=self._win, win_type=self._win_type
+        )
         split_trial_results.addWidget(self.results_widget)
 
         self.trials_widget.trials_changed.connect(self.results_widget.clear_results)
@@ -98,7 +111,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
                 return
         new_experiment = new_experiment_from_trialhandler(self.experiment)
         motor_task = MotorTask(new_experiment)
-        self.experiment = motor_task.run()
+        self.experiment = motor_task.run(win=self._win, win_type=self._win_type)
         self.reload_experiment()
         self.unsaved_changes = True
 
@@ -138,6 +151,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             self,
             "About Motor Task Prototype",
             f"Motor Task Prototype {mtp.__version__}\n\n"
+            f"Psychopy backend: {self._win_type}\n\n"
             + "https://ssciwr.github.io/motor-task-prototype",
         )
 
