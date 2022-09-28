@@ -6,6 +6,7 @@ from typing import Optional
 
 from motor_task_prototype.vis import display_results
 from psychopy.data import TrialHandlerExt
+from psychopy.visual.window import Window
 from PyQt5 import QtWidgets
 
 
@@ -13,9 +14,18 @@ class ResultsWidget(QtWidgets.QWidget):
     _experiment: Optional[TrialHandlerExt] = None
     _condition_to_trials: DefaultDict[int, List[int]] = defaultdict(list)
     _trial_to_condition: Dict[int, int] = dict()
+    _win: Optional[Window]
+    _win_type: str
 
-    def __init__(self, parent: Optional[QtWidgets.QWidget] = None):
+    def __init__(
+        self,
+        parent: Optional[QtWidgets.QWidget] = None,
+        win: Optional[Window] = None,
+        win_type: str = "pyglet",
+    ):
         super().__init__(parent)
+        self._win = win
+        self._win_type = win_type
         outer_layout = QtWidgets.QVBoxLayout()
         group_box = QtWidgets.QGroupBox("Results")
         outer_layout.addWidget(group_box)
@@ -46,14 +56,19 @@ class ResultsWidget(QtWidgets.QWidget):
         row = self._list_trials.currentRow()
         if not self._is_valid(row):
             return
-        display_results(self._experiment, [row])
+        display_results(self._experiment, [row], win=self._win, win_type=self._win_type)
 
     def _btn_display_condition_clicked(self) -> None:
         row = self._list_trials.currentRow()
         if not self._is_valid(row):
             return
         condition = self._trial_to_condition[row]
-        display_results(self._experiment, self._condition_to_trials[condition])
+        display_results(
+            self._experiment,
+            self._condition_to_trials[condition],
+            win=self._win,
+            win_type=self._win_type,
+        )
 
     def clear_results(self) -> None:
         self._experiment = None

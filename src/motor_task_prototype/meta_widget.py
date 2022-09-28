@@ -5,12 +5,15 @@ from typing import Optional
 import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.vis as mtpvis
 from motor_task_prototype.types import MotorTaskMetadata
+from psychopy.visual.window import Window
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
 
 class MetadataWidget(QtWidgets.QWidget):
-    unsaved_changes: bool = False
+    unsaved_changes: bool
+    _win: Optional[Window]
+    _win_type: str
     _meta: MotorTaskMetadata = mtpmeta.empty_metadata()
     _widgets: Dict[str, QtWidgets.QLineEdit] = {}
 
@@ -21,8 +24,15 @@ class MetadataWidget(QtWidgets.QWidget):
 
         return _update_value
 
-    def __init__(self, parent: Optional[QtWidgets.QWidget] = None):
+    def __init__(
+        self,
+        parent: Optional[QtWidgets.QWidget] = None,
+        win: Optional[Window] = None,
+        win_type: str = "pyglet",
+    ):
         super().__init__(parent)
+        self._win = win
+        self._win_type = win_type
         group_box = QtWidgets.QGroupBox("Metadata")
         outer_layout = QtWidgets.QVBoxLayout()
         outer_layout.addWidget(group_box)
@@ -41,14 +51,14 @@ class MetadataWidget(QtWidgets.QWidget):
             line_edit.textEdited.connect(self._update_value_callback(key))
             self._widgets[key] = line_edit
         inner_layout.addWidget(fields)
-        btn_preview_metadata = QtWidgets.QPushButton("Preview Splash Screen")
-        btn_preview_metadata.clicked.connect(self._btn_preview_metadata_clicked)
-        inner_layout.addWidget(btn_preview_metadata)
+        self._btn_preview_metadata = QtWidgets.QPushButton("Preview Splash Screen")
+        self._btn_preview_metadata.clicked.connect(self._btn_preview_metadata_clicked)
+        inner_layout.addWidget(self._btn_preview_metadata)
         self.setLayout(outer_layout)
         self.unsaved_changes = False
 
     def _btn_preview_metadata_clicked(self) -> None:
-        mtpvis.splash_screen(self._meta)
+        mtpvis.splash_screen(self._meta, win=self._win, win_type=self._win_type)
 
     def set_metadata(self, metadata: MotorTaskMetadata) -> None:
         self._meta = metadata

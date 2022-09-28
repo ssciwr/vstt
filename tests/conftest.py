@@ -57,7 +57,7 @@ def window() -> Window:
     window.close()
 
 
-def noise(scale: float = 0.01) -> float:
+def noise(scale: float = 0.02) -> float:
     return scale * (np.random.random_sample() - 0.1)
 
 

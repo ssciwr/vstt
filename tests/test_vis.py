@@ -90,7 +90,7 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
 def test_splash_screen_defaults(window: Window) -> None:
     metadata = mtpmeta.default_metadata()
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.splash_screen, (metadata, window)
+        mtpvis.splash_screen, (metadata, window), window
     )
     # most pixels grey except for black main text and blue continue text
     assert 0.900 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
@@ -121,7 +121,7 @@ def test_display_results_nothing(
     # trial data without auto-move to center
     trial_indices = [0, 1, 2]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
     )
     # all pixels grey except for blue continue text
     assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
@@ -130,7 +130,7 @@ def test_display_results_nothing(
     # trial data with auto-move to center
     trial_indices = [3]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
     )
     # all pixels grey except for blue continue text
     assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
@@ -159,7 +159,7 @@ def test_display_results_everything(
     # trial data without auto-move to center
     trial_indices = [0, 1, 2]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
     )
     # less grey: lots of other colors for targets, paths and stats
     grey_pixels = gtu.pixel_color_fraction(screenshot, (128, 128, 128))
@@ -170,7 +170,7 @@ def test_display_results_everything(
     # trial data with auto-move to center
     trial_indices = [3]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window)
+        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
     )
-    # more grey since less paths and stats to display
+    # more grey since there are fewer paths and stats to display
     assert gtu.pixel_color_fraction(screenshot, (128, 128, 128)) > grey_pixels
