@@ -9,7 +9,7 @@ from psychopy.data import TrialHandlerExt
 from PyQt5 import QtWidgets
 
 
-class ResultListWidget(QtWidgets.QWidget):
+class ResultsWidget(QtWidgets.QWidget):
     _experiment: Optional[TrialHandlerExt] = None
     _condition_to_trials: DefaultDict[int, List[int]] = defaultdict(list)
     _trial_to_condition: Dict[int, int] = dict()

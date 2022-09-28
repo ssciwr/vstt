@@ -9,9 +9,9 @@ from motor_task_prototype.experiment import new_default_experiment
 from motor_task_prototype.experiment import new_experiment_from_trialhandler
 from motor_task_prototype.experiment import save_experiment
 from motor_task_prototype.meta_widget import MetadataWidget
-from motor_task_prototype.results_widget import ResultListWidget
+from motor_task_prototype.results_widget import ResultsWidget
 from motor_task_prototype.task import MotorTask
-from motor_task_prototype.trials_widget import TrialListWidget
+from motor_task_prototype.trials_widget import TrialsWidget
 from psychopy.data import TrialHandlerExt
 from PyQt5 import QtCore
 from PyQt5 import QtGui
@@ -45,9 +45,9 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         split_metadata_display.setSizes([5000, 1000])
 
         split_trial_results = QtWidgets.QSplitter()
-        self.trial_list_widget = TrialListWidget(self)
+        self.trial_list_widget = TrialsWidget(self)
         split_trial_results.addWidget(self.trial_list_widget)
-        self.result_list_widget = ResultListWidget(self)
+        self.result_list_widget = ResultsWidget(self)
         split_trial_results.addWidget(self.result_list_widget)
 
         self.trial_list_widget.trials_changed.connect(

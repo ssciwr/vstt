@@ -1,13 +1,13 @@
-from motor_task_prototype.results_widget import ResultListWidget
+from motor_task_prototype.results_widget import ResultsWidget
 from psychopy.data import TrialHandlerExt
 from PyQt5.QtCore import Qt
 from PyQt5.QtTest import QTest
 
 
-def test_result_list_widget(
+def test_results_widget(
     experiment_no_results: TrialHandlerExt, experiment_with_results: TrialHandlerExt
 ) -> None:
-    widget = ResultListWidget(None)
+    widget = ResultsWidget(None)
     # initially empty
     assert widget.have_results() is False
     assert widget._list_trials.count() == 0
