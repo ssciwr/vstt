@@ -54,7 +54,12 @@ def import_experiment_from_file(filename: str) -> TrialHandlerExt:
     return experiment
 
 
-def new_experiment_from_trialhandler(experiment: TrialHandlerExt) -> TrialHandlerExt:
+def new_experiment_from_trialhandler(
+    experiment: TrialHandlerExt,
+) -> Optional[TrialHandlerExt]:
+    if experiment.trialList[0] is None:
+        # psychopy converts an empty triallist into a list with a None element
+        return None
     validate_experiment_inplace(experiment)
     return TrialHandlerExt(
         experiment.trialList,
@@ -87,6 +92,6 @@ def save_experiment(experiment: TrialHandlerExt) -> bool:
         allowed="Psydat files (*.psydat)",
     )
     if filename is not None:
-        experiment.saveAsPickle(filename)
+        experiment.saveAsPickle(filename, fileCollisionMethod="overwrite")
         return True
     return False
