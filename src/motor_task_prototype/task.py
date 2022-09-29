@@ -177,7 +177,7 @@ class MotorTask:
             if display_trial_results:
                 mtpvis.display_results(
                     self.trial_handler,
-                    [self.trial_handler.thisIndex],
+                    [self.trial_handler.thisTrialN],
                     win,
                 )
             if display_block_results:
