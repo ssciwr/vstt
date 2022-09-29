@@ -70,12 +70,9 @@ def test_task_no_trials(window: Window) -> None:
         },
     )
     do_task_thread = launch_do_task(experiment_no_trials, [])
-    task = mtptask.MotorTask(experiment_no_trials)
-    results = task.run(window)
+    results = mtptask.run_task(experiment_no_trials, window)
     do_task_thread.join()
-    # no trials so task just returns trialHandler
-    assert results.finished is False
-    assert "to_target_timestamps" not in results.data
+    assert results is None
 
 
 def test_task(experiment_no_results: TrialHandlerExt, window: Window) -> None:
@@ -93,9 +90,9 @@ def test_task(experiment_no_results: TrialHandlerExt, window: Window) -> None:
             ]
         )
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    task = mtptask.MotorTask(experiment_no_results)
-    results = task.run(window)
+    results = mtptask.run_task(experiment_no_results, window)
     do_task_thread.join()
+    assert results is not None
     # check that we hit all the targets without timing out
     for timestamps in results.data["to_target_timestamps"][0][0]:
         assert (
@@ -120,9 +117,9 @@ def test_task_no_automove_to_center(
             tp.append(gtu.pos_to_pixels((0, 0)))
         target_pixels.append(tp)
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    task = mtptask.MotorTask(experiment_no_results)
-    results = task.run(window)
+    results = mtptask.run_task(experiment_no_results, window)
     do_task_thread.join()
+    assert results is not None
     # check that we hit all the targets
     for to_target_timestamps, to_center_timestamps in zip(
         results.data["to_target_timestamps"][0][0],

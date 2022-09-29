@@ -7,7 +7,6 @@ import numpy as np
 from motor_task_prototype.display import default_display_options
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.types import MotorTaskDisplayOptions
-from psychopy import core
 from psychopy.colors import colors
 from psychopy.data import TrialHandlerExt
 from psychopy.hardware.keyboard import Keyboard
@@ -72,16 +71,16 @@ def update_target_colors(
 
 
 def draw_and_flip(
-    win: Window, drawables: List[BaseVisualStim], kb: Optional[Keyboard] = None
+    win: Window,
+    drawables: List[BaseVisualStim],
+    kb: Keyboard,
+    kb_stop_key: str = "escape",
 ) -> bool:
     should_continue = True
     for drawable in drawables:
         drawable.draw()
-    if kb is not None:
-        if kb.getKeys(["escape"]):
-            core.quit()
-        if kb.getKeys(["return"]):
-            should_continue = False
+    if kb.getKeys([kb_stop_key]):
+        should_continue = False
     win.flip()
     return should_continue
 
@@ -288,7 +287,7 @@ def display_results(
     drawables = make_drawables(results, trial_indices, win)
     kb.clearEvents()
     while True:
-        if not draw_and_flip(win, drawables, kb):
+        if not draw_and_flip(win, drawables, kb, "return"):
             if close_window_when_done:
                 win.close()
             return
@@ -348,7 +347,7 @@ def splash_screen(
     )
     kb.clearEvents()
     while True:
-        if not draw_and_flip(win, drawables, kb):
+        if not draw_and_flip(win, drawables, kb, "return"):
             if close_window_when_done:
                 win.close()
             return

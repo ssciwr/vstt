@@ -6,11 +6,10 @@ from motor_task_prototype.display_widget import DisplayOptionsWidget
 from motor_task_prototype.experiment import get_experiment_filename_from_user
 from motor_task_prototype.experiment import import_experiment_from_file
 from motor_task_prototype.experiment import new_default_experiment
-from motor_task_prototype.experiment import new_experiment_from_trialhandler
 from motor_task_prototype.experiment import save_experiment
 from motor_task_prototype.meta_widget import MetadataWidget
 from motor_task_prototype.results_widget import ResultsWidget
-from motor_task_prototype.task import MotorTask
+from motor_task_prototype.task import run_task
 from motor_task_prototype.trials_widget import TrialsWidget
 from psychopy.data import TrialHandlerExt
 from psychopy.visual.window import Window
@@ -91,7 +90,10 @@ class MotorTaskGui(QtWidgets.QMainWindow):
                 self.reload_experiment()
 
     def btn_save_clicked(self) -> bool:
-        return save_experiment(self.experiment)
+        success = save_experiment(self.experiment)
+        if success:
+            self.reload_experiment()
+        return success
 
     def btn_run_clicked(self) -> None:
         if not self.trials_widget.get_trial_list():
@@ -109,11 +111,13 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             )
             if yes_no != QtWidgets.QMessageBox.Yes:
                 return
-        new_experiment = new_experiment_from_trialhandler(self.experiment)
-        motor_task = MotorTask(new_experiment)
-        self.experiment = motor_task.run(win=self._win, win_type=self._win_type)
-        self.reload_experiment()
-        self.unsaved_changes = True
+        experiment_with_results = run_task(
+            self.experiment, win=self._win, win_type=self._win_type
+        )
+        if experiment_with_results is not None:
+            self.experiment = experiment_with_results
+            self.reload_experiment()
+            self.unsaved_changes = True
 
     def save_changes_check_continue(self) -> bool:
         if (
