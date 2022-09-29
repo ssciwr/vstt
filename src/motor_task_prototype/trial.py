@@ -77,6 +77,9 @@ def get_trial_from_user(
         if target_order != order_of_targets[0]:
             order_of_targets.append(target_order)
     trial["target_order"] = order_of_targets
+    if not isinstance(trial["target_indices"], str):
+        # convert list / np.array of target indices to a string
+        trial["target_indices"] = " ".join(f"{int(i)}" for i in trial["target_indices"])
     dialog = DlgFromDict(
         trial, title="Trial settings", labels=trial_labels(), sortKeys=False
     )
