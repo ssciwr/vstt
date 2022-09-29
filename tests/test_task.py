@@ -4,6 +4,8 @@ from typing import List
 from typing import Tuple
 
 import gui_test_utils as gtu
+import motor_task_prototype.display as mtpdisplay
+import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.task as mtptask
 import pyautogui
 from motor_task_prototype.geom import points_on_circle
@@ -54,6 +56,26 @@ def launch_do_task(
     )
     thread.start()
     return thread
+
+
+def test_task_no_trials(window: Window) -> None:
+    experiment_no_trials = TrialHandlerExt(
+        [],
+        nReps=1,
+        method="sequential",
+        originPath=-1,
+        extraInfo={
+            "display_options": mtpdisplay.default_display_options(),
+            "metadata": mtpmeta.default_metadata(),
+        },
+    )
+    do_task_thread = launch_do_task(experiment_no_trials, [])
+    task = mtptask.MotorTask(experiment_no_trials)
+    results = task.run(window)
+    do_task_thread.join()
+    # no trials so task just returns trialHandler
+    assert results.finished is False
+    assert "to_target_timestamps" not in results.data
 
 
 def test_task(experiment_no_results: TrialHandlerExt, window: Window) -> None:

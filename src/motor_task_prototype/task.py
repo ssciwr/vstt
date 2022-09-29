@@ -19,8 +19,6 @@ from psychopy.visual.window import Window
 
 
 def task_is_empty(trial_handler: TrialHandlerExt) -> bool:
-    if trial_handler.trialList is None:
-        return True
     for trial in trial_handler.trialList:
         if trial is None:
             return True
