@@ -1,40 +1,41 @@
 import gui_test_utils as gtu
+from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.results_widget import ResultsWidget
-from psychopy.data import TrialHandlerExt
 from psychopy.visual.window import Window
 from PyQt5.QtCore import Qt
 from PyQt5.QtTest import QTest
 
 
-def test_results_widget_no_experiment() -> None:
-    widget = ResultsWidget(None)
+def test_results_widget_no_experiment(window: Window) -> None:
+    widget = ResultsWidget(parent=None, win=window)
     # initially empty
-    assert widget.have_results() is False
+    assert widget.experiment.trial_handler_with_results is None
     assert widget._list_trials.count() == 0
     assert widget._btn_display_trial.isEnabled() is False
     assert widget._btn_display_condition.isEnabled() is False
 
 
 def test_results_widget_experiment_no_results(
-    experiment_no_results: TrialHandlerExt,
+    experiment_no_results: MotorTaskExperiment, window: Window
 ) -> None:
-    widget = ResultsWidget(None)
+    widget = ResultsWidget(parent=None, win=window)
     # assign experiment without results
-    widget.set_results(experiment_no_results)
-    assert widget.have_results() is False
+    widget.experiment = experiment_no_results
+    assert widget.experiment.trial_handler_with_results is None
     assert widget._list_trials.count() == 0
     assert widget._btn_display_trial.isEnabled() is False
     assert widget._btn_display_condition.isEnabled() is False
 
 
 def test_results_widget_experiment_with_results(
-    experiment_with_results: TrialHandlerExt, window: Window
+    experiment_with_results: MotorTaskExperiment, window: Window
 ) -> None:
     widget = ResultsWidget(parent=None, win=window)
     # assign experiment with results
-    widget.set_results(experiment_with_results)
+    widget.experiment = experiment_with_results
     n_trials = 4
-    assert widget.have_results() is True
+    assert widget.experiment.trial_handler_with_results is not None
+    assert widget.experiment.trial_handler_with_results.nTotal == n_trials
     assert widget._list_trials.count() == n_trials
     # select first row
     for _ in range(n_trials):
@@ -68,9 +69,10 @@ def test_results_widget_experiment_with_results(
         assert widget._btn_display_condition.isEnabled() is True
         QTest.keyClick(widget._list_trials, Qt.Key_Down)
     assert widget._list_trials.currentRow() == n_trials - 1
-    # clear results
-    widget.clear_results()
-    assert widget.have_results() is False
+    # assign a new experiment without results
+    experiment_with_results.clear_results()
+    widget.experiment = experiment_with_results
+    assert widget.experiment.trial_handler_with_results is None
     assert widget._list_trials.count() == 0
     assert widget._btn_display_trial.isEnabled() is False
     assert widget._btn_display_condition.isEnabled() is False

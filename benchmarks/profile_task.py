@@ -1,20 +1,13 @@
 import cProfile
 
-from motor_task_prototype.display import default_display_options
-from motor_task_prototype.experiment import new_experiment_from_dicts
-from motor_task_prototype.meta import default_metadata
+from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.task import run_task
-from motor_task_prototype.trial import default_trial
 from psychopy import core
 
-
-trial = default_trial()
-trial["weight"] = 1
-trial["inter_target_duration"] = 0
-trial["post_block_display_results"] = False
-experiment = new_experiment_from_dicts(
-    [trial], default_display_options(), default_metadata()
-)
+experiment = MotorTaskExperiment()
+experiment.trial_list[0]["weight"] = 1
+experiment.trial_list[0]["inter_target_duration"] = 0
+experiment.trial_list[0]["post_block_display_results"] = False
 with cProfile.Profile() as pr:
     results = run_task(experiment=experiment)
 pr.dump_stats("profile_task.prof")

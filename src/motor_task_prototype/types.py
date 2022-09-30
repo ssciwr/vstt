@@ -2,8 +2,6 @@ import sys
 from typing import List
 from typing import Union
 
-import numpy as np
-
 if sys.version_info >= (3, 8):
     from typing import TypedDict
 else:
@@ -14,7 +12,7 @@ class MotorTaskTrial(TypedDict):
     weight: int
     num_targets: int
     target_order: Union[str, List]
-    target_indices: Union[np.ndarray, str]
+    target_indices: str
     target_duration: float
     inter_target_duration: float
     target_distance: float

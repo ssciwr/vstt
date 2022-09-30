@@ -4,12 +4,10 @@ from typing import List
 from typing import Tuple
 
 import gui_test_utils as gtu
-import motor_task_prototype.display as mtpdisplay
-import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.task as mtptask
 import pyautogui
+from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.geom import points_on_circle
-from psychopy.data import TrialHandlerExt
 from psychopy.visual.window import Window
 
 
@@ -34,17 +32,17 @@ def move_mouse_to_target(
 
 
 def do_task(
-    experiment: TrialHandlerExt, target_pixels: List[List[Tuple[float, float]]]
+    experiment: MotorTaskExperiment, target_pixels: List[List[Tuple[float, float]]]
 ) -> None:
     gtu.ascii_screenshot()
-    for target_pixels_block, trial in zip(target_pixels, experiment.trialList):
+    for target_pixels_block, trial in zip(target_pixels, experiment.trial_list):
         for rep in range(trial["weight"]):
             for target_pixel in target_pixels_block:
                 move_mouse_to_target(target_pixel)
 
 
 def launch_do_task(
-    experiment: TrialHandlerExt, target_pixels: List[List[Tuple[float, float]]]
+    experiment: MotorTaskExperiment, target_pixels: List[List[Tuple[float, float]]]
 ) -> threading.Thread:
     thread = threading.Thread(
         target=do_task,
@@ -59,25 +57,23 @@ def launch_do_task(
 
 
 def test_task_no_trials(window: Window) -> None:
-    experiment_no_trials = TrialHandlerExt(
-        [],
-        nReps=1,
-        method="sequential",
-        originPath=-1,
-        extraInfo={
-            "display_options": mtpdisplay.default_display_options(),
-            "metadata": mtpmeta.default_metadata(),
-        },
-    )
+    experiment_no_trials = MotorTaskExperiment()
+    experiment_no_trials.trial_list = []
+    experiment_no_trials.has_unsaved_changes = False
+    assert experiment_no_trials.trial_handler_with_results is None
     do_task_thread = launch_do_task(experiment_no_trials, [])
-    results = mtptask.run_task(experiment_no_trials, window)
+    success = mtptask.run_task(experiment_no_trials, window)
     do_task_thread.join()
-    assert results is None
+    assert success is False
+    assert experiment_no_trials.has_unsaved_changes is False
+    assert experiment_no_trials.trial_handler_with_results is None
 
 
-def test_task(experiment_no_results: TrialHandlerExt, window: Window) -> None:
+def test_task(experiment_no_results: MotorTaskExperiment, window: Window) -> None:
     target_pixels = []
-    for trial in experiment_no_results.trialList:
+    experiment_no_results.has_unsaved_changes = False
+    assert experiment_no_results.trial_handler_with_results is None
+    for trial in experiment_no_results.trial_list:
         trial["automove_cursor_to_center"] = True
         target_pixels.append(
             [
@@ -90,21 +86,29 @@ def test_task(experiment_no_results: TrialHandlerExt, window: Window) -> None:
             ]
         )
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    results = mtptask.run_task(experiment_no_results, window)
+    success = mtptask.run_task(experiment_no_results, window)
     do_task_thread.join()
-    assert results is not None
+    # task ran successfully, updated experiment with results
+    assert success is True
+    assert experiment_no_results.has_unsaved_changes is True
+    assert experiment_no_results.trial_handler_with_results is not None
     # check that we hit all the targets without timing out
-    for timestamps in results.data["to_target_timestamps"][0][0]:
+    for timestamps in experiment_no_results.trial_handler_with_results.data[
+        "to_target_timestamps"
+    ][0][0]:
         assert (
-            timestamps[-1] < 0.5 * experiment_no_results.trialList[0]["target_duration"]
+            timestamps[-1]
+            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
         )
 
 
 def test_task_no_automove_to_center(
-    experiment_no_results: TrialHandlerExt, window: Window
+    experiment_no_results: MotorTaskExperiment, window: Window
 ) -> None:
+    experiment_no_results.has_unsaved_changes = False
+    assert experiment_no_results.trial_handler_with_results is None
     target_pixels = []
-    for trial in experiment_no_results.trialList:
+    for trial in experiment_no_results.trial_list:
         trial["automove_cursor_to_center"] = False
         tp = []
         for pos in points_on_circle(
@@ -117,19 +121,26 @@ def test_task_no_automove_to_center(
             tp.append(gtu.pos_to_pixels((0, 0)))
         target_pixels.append(tp)
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    results = mtptask.run_task(experiment_no_results, window)
+    success = mtptask.run_task(experiment_no_results, window)
     do_task_thread.join()
-    assert results is not None
+    # task ran successfully, updated experiment with results
+    assert success is True
+    assert experiment_no_results.has_unsaved_changes is True
+    assert experiment_no_results.trial_handler_with_results is not None
     # check that we hit all the targets
     for to_target_timestamps, to_center_timestamps in zip(
-        results.data["to_target_timestamps"][0][0],
-        results.data["to_center_timestamps"][0][0],
+        experiment_no_results.trial_handler_with_results.data["to_target_timestamps"][
+            0
+        ][0],
+        experiment_no_results.trial_handler_with_results.data["to_center_timestamps"][
+            0
+        ][0],
     ):
         assert (
             to_target_timestamps[-1]
-            < 0.5 * experiment_no_results.trialList[0]["target_duration"]
+            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
         )
         assert (
             to_center_timestamps[-1]
-            < 0.5 * experiment_no_results.trialList[0]["target_duration"]
+            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
         )

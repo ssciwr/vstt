@@ -2,6 +2,7 @@ import queue
 import sys
 import threading
 from time import sleep
+from typing import Any
 from typing import Callable
 from typing import Tuple
 
@@ -136,3 +137,19 @@ def pixel_color_fraction(img: np.ndarray, color: Tuple[int, int, int]) -> float:
 # return fraction of pixels in current screen of the supplied color
 def screenshot_pixel_color_fraction(color: Tuple[int, int, int]) -> float:
     return pixel_color_fraction(np.asarray(pyautogui.screenshot()), color)
+
+
+# class to receive a pyqt signal
+class SignalReceived:
+    def __init__(self, signal: Any):
+        self._signal_received = False
+        signal.connect(self._receive)
+
+    def __bool__(self) -> bool:
+        return self._signal_received
+
+    def _receive(self) -> None:
+        self._signal_received = True
+
+    def clear(self) -> None:
+        self._signal_received = False

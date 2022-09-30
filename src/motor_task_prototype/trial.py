@@ -77,15 +77,12 @@ def get_trial_from_user(
         if target_order != order_of_targets[0]:
             order_of_targets.append(target_order)
     trial["target_order"] = order_of_targets
-    if not isinstance(trial["target_indices"], str):
-        # convert list / np.array of target indices to a string
-        trial["target_indices"] = " ".join(f"{int(i)}" for i in trial["target_indices"])
     dialog = DlgFromDict(
         trial, title="Trial settings", labels=trial_labels(), sortKeys=False
     )
     if not dialog.OK:
         return None
-    return trial
+    return validate_trial(trial)
 
 
 def import_trial(trial_dict: dict) -> MotorTaskTrial:
@@ -102,22 +99,19 @@ def validate_trial(trial: MotorTaskTrial) -> MotorTaskTrial:
     ]:
         if trial[duration] < 0.0:  # type: ignore
             trial[duration] = 0.0  # type: ignore
-    if isinstance(trial["target_indices"], str):
-        # convert string of target indices to a numpy array of ints
-        trial["target_indices"] = np.fromstring(
-            trial["target_indices"], dtype="int", sep=" "
-        )
+    # convert string of target indices to a numpy array of ints
+    target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
     if trial["target_order"] == "fixed":
         # clip indices to valid range
-        trial["target_indices"] = np.clip(
-            trial["target_indices"], 0, trial["num_targets"] - 1
-        )
+        target_indices = np.clip(target_indices, 0, trial["num_targets"] - 1)
     else:
         # construct clockwise sequence
-        trial["target_indices"] = np.array(range(trial["num_targets"]))
+        target_indices = np.array(range(trial["num_targets"]))
         if trial["target_order"] == "anti-clockwise":
-            trial["target_indices"] = np.flip(trial["target_indices"])
+            target_indices = np.flip(target_indices)
         elif trial["target_order"] == "random":
             rng = np.random.default_rng()
-            rng.shuffle(trial["target_indices"])
+            rng.shuffle(target_indices)
+    # convert array of indices back to a string
+    trial["target_indices"] = " ".join(f"{int(i)}" for i in target_indices)
     return trial

@@ -1,97 +1,89 @@
-from typing import List
+import pickle
 from typing import Optional
 
-from motor_task_prototype import vis as mtpvis
 from motor_task_prototype.display import default_display_options
+from motor_task_prototype.display import import_display_options
 from motor_task_prototype.meta import default_metadata
-from motor_task_prototype.meta import empty_metadata
-from motor_task_prototype.meta import MotorTaskMetadata
+from motor_task_prototype.meta import import_metadata
 from motor_task_prototype.trial import default_trial
-from motor_task_prototype.trial import MotorTaskTrial
 from motor_task_prototype.trial import validate_trial
 from psychopy.data import TrialHandlerExt
-from psychopy.gui import fileOpenDlg
-from psychopy.gui import fileSaveDlg
 from psychopy.misc import fromFile
 
 
-def new_default_experiment() -> TrialHandlerExt:
-    return TrialHandlerExt(
-        [default_trial()],
-        nReps=1,
-        method="sequential",
-        originPath=-1,
-        extraInfo={
-            "display_options": default_display_options(),
-            "metadata": default_metadata(),
-        },
-    )
+class MotorTaskExperiment:
+    def __init__(self, filename: Optional[str] = None):
+        if filename is not None:
+            self.load_psydat(filename)
+            return
 
+        self.filename = "default-experiment.psydat"
+        self.has_unsaved_changes = True
+        self.metadata = default_metadata()
+        self.display_options = default_display_options()
+        self.trial_list = [default_trial()]
+        self.trial_handler_with_results: Optional[TrialHandlerExt] = None
 
-def validate_experiment_inplace(experiment: TrialHandlerExt) -> None:
-    for trial in experiment.trialList:
-        # psychopy trial handler converts empty trial list [] -> [None]
-        if trial is not None:
+    def create_trialhandler(self) -> TrialHandlerExt:
+        for trial in self.trial_list:
             validate_trial(trial)
-    if not experiment.extraInfo:
-        experiment.extraInfo = {}
-    if "display_options" not in experiment.extraInfo:
-        experiment.extraInfo["display_options"] = default_display_options()
-    if "metadata" not in experiment.extraInfo:
-        experiment.extraInfo["metadata"] = empty_metadata()
+        return TrialHandlerExt(
+            self.trial_list,
+            nReps=1,
+            method="sequential",
+            originPath=-1,
+            extraInfo={
+                "display_options": self.display_options,
+                "metadata": self.metadata,
+            },
+        )
 
+    def clear_results(self) -> None:
+        self.trial_handler_with_results = None
 
-def get_experiment_filename_from_user() -> Optional[str]:
-    filename = fileOpenDlg(allowed="Psydat files (*.psydat)")
-    if filename is None or len(filename) < 1:
-        return None
-    return filename[0]
+    def save_psydat(self, filename: str) -> None:
+        if not filename.endswith(".psydat"):
+            filename += ".psydat"
 
+        if self.trial_handler_with_results is not None:
+            # save existing trial handler with results, only update its extraInfo dict
+            self.trial_handler_with_results.extraInfo = {
+                "display_options": self.display_options,
+                "metadata": self.metadata,
+            }
+            self.trial_handler_with_results.saveAsPickle(
+                filename, fileCollisionMethod="overwrite"
+            )
+        else:
+            # create a new trial handler to save this experiment
+            trial_handler = self.create_trialhandler()
+            # temporary hack as the psyschopy function only saves if there are results!
+            with open(filename, "wb") as f:
+                pickle.dump(trial_handler, f)
+        self.filename = filename
+        self.has_unsaved_changes = False
 
-def import_experiment_from_file(filename: str) -> TrialHandlerExt:
-    experiment = fromFile(filename)
-    validate_experiment_inplace(experiment)
-    return experiment
+    def load_psydat(self, filename: str) -> None:
+        self.import_and_validate_trial_handler(fromFile(filename))
+        self.filename = filename
+        self.has_unsaved_changes = False
 
-
-def new_experiment_from_trialhandler(
-    experiment: TrialHandlerExt,
-) -> Optional[TrialHandlerExt]:
-    if experiment.trialList[0] is None:
-        # psychopy converts an empty triallist into a list with a None element
-        return None
-    validate_experiment_inplace(experiment)
-    return TrialHandlerExt(
-        experiment.trialList,
-        nReps=1,
-        method=experiment.method,
-        originPath=-1,
-        extraInfo=experiment.extraInfo,
-    )
-
-
-def new_experiment_from_dicts(
-    trials: List[MotorTaskTrial],
-    display_options: mtpvis.MotorTaskDisplayOptions,
-    metadata: MotorTaskMetadata,
-) -> TrialHandlerExt:
-    for trial in trials:
-        validate_trial(trial)
-    return TrialHandlerExt(
-        trials,
-        nReps=1,
-        method="sequential",
-        originPath=-1,
-        extraInfo={"display_options": display_options, "metadata": metadata},
-    )
-
-
-def save_experiment(experiment: TrialHandlerExt) -> bool:
-    filename = fileSaveDlg(
-        prompt="Save trial conditions and results as psydat file",
-        allowed="Psydat files (*.psydat)",
-    )
-    if filename is not None:
-        experiment.saveAsPickle(filename, fileCollisionMethod="overwrite")
-        return True
-    return False
+    def import_and_validate_trial_handler(self, trial_handler: TrialHandlerExt) -> None:
+        # psychopy trial handler converts empty trial list [] -> [None]
+        if trial_handler.trialList == [None]:
+            trial_handler.trialList = []
+        for trial in trial_handler.trialList:
+            validate_trial(trial)
+        self.trial_list = trial_handler.trialList
+        if not trial_handler.extraInfo:
+            trial_handler.extraInfo = {}
+        self.metadata = import_metadata(
+            trial_handler.extraInfo.get("metadata", default_metadata())
+        )
+        self.display_options = import_display_options(
+            trial_handler.extraInfo.get("display_options", default_display_options())
+        )
+        if trial_handler.finished:
+            self.trial_handler_with_results = trial_handler
+        else:
+            self.trial_handler_with_results = None
