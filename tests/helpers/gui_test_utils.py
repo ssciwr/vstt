@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import queue
 import sys
 import threading
@@ -5,6 +7,7 @@ from time import sleep
 from typing import Any
 from typing import Callable
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 import ascii_magic
@@ -166,8 +169,8 @@ class SignalReceived:
 class ModalWidgetTimer:
     def __init__(self, keys: List[str]) -> None:
         self.timer = QtCore.QTimer()
-        self.other_mwt_to_start = None
-        self.widget_to_ignore = None
+        self.other_mwt_to_start: Optional[ModalWidgetTimer] = None
+        self.widget_to_ignore: Optional[QtWidgets.QWidget] = None
         self.keys = keys
         self.timeout = 30000
         self.timer.timeout.connect(self._send_keys)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict
 
 import motor_task_prototype.common as mtpcommon
