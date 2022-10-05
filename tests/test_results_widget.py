@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import gui_test_utils as gtu
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.results_widget import ResultsWidget

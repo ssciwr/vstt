@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import gui_test_utils as gtu
 import motor_task_prototype.display as mtpdisplay
 from motor_task_prototype.display_widget import DisplayOptionsWidget

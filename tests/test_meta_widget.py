@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import gui_test_utils as gtu
 import motor_task_prototype.meta as mtpmeta
 from motor_task_prototype.experiment import MotorTaskExperiment

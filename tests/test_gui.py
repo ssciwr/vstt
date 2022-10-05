@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pathlib
 
 import gui_test_utils as gtu
