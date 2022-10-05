@@ -177,3 +177,34 @@ def test_trials_widget_no_results(window: Window) -> None:
     assert widget._btn_remove.isEnabled() is False
     assert widget.experiment.has_unsaved_changes is True
     assert signal_received
+
+
+def test_trials_widget_with_results(
+    experiment_with_results: MotorTaskExperiment, window: Window
+) -> None:
+    widget = TrialsWidget(parent=None, win=window)
+    signal_received = gtu.SignalReceived(widget.experiment_modified)
+    assert not signal_received
+    experiment_with_results.has_unsaved_changes = False
+    assert experiment_with_results.trial_handler_with_results is not None
+    # set an experiment with results
+    widget.experiment = experiment_with_results
+    # select first row
+    for _ in range(3):
+        QTest.keyClick(widget._widget_list_trials, Qt.Key_Up)
+    # click no when asked if we want to clear the results
+    mwt = gtu.ModalWidgetTimer(["N"])
+    mwt.start()
+    # click on remove button
+    QTest.mouseClick(widget._btn_remove, Qt.MouseButton.LeftButton)
+    assert not signal_received
+    assert experiment_with_results.has_unsaved_changes is False
+    assert experiment_with_results.trial_handler_with_results is not None
+    # this time click yes when asked if we want to clear the results
+    mwt = gtu.ModalWidgetTimer(["Y"])
+    mwt.start()
+    # click on remove button
+    QTest.mouseClick(widget._btn_remove, Qt.MouseButton.LeftButton)
+    assert signal_received
+    assert experiment_with_results.has_unsaved_changes is True
+    assert experiment_with_results.trial_handler_with_results is None

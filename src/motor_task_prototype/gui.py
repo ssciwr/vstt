@@ -64,6 +64,12 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         self.reload_experiment()
         self.resize(800, 600)
 
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
+        if self.save_changes_check_continue():
+            event.accept()
+        else:
+            event.ignore()
+
     def btn_new_clicked(self) -> None:
         if self.save_changes_check_continue():
             self.experiment = MotorTaskExperiment()
@@ -122,8 +128,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         return True
 
     def btn_exit_clicked(self) -> None:
-        if self.save_changes_check_continue():
-            self.close()
+        self.close()
 
     def reload_results(self) -> None:
         self.results_widget.experiment = self.experiment
