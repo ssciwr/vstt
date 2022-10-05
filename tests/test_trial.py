@@ -1,5 +1,4 @@
 import motor_task_prototype.trial as mtptrial
-import numpy as np
 
 
 def test_describe_trial() -> None:
@@ -118,32 +117,27 @@ def test_validate_trial_target_order() -> None:
     # clockwise
     trial["target_order"] = "clockwise"
     vtrial = mtptrial.validate_trial(trial)
-    assert isinstance(vtrial["target_indices"], np.ndarray)
-    assert vtrial["target_indices"].shape == (8,)
-    assert np.allclose(vtrial["target_indices"], [0, 1, 2, 3, 4, 5, 6, 7])
+    assert isinstance(vtrial["target_indices"], str)
+    assert vtrial["target_indices"] == "0 1 2 3 4 5 6 7"
     # anti-clockwise
     trial["target_order"] = "anti-clockwise"
     vtrial = mtptrial.validate_trial(trial)
-    assert isinstance(vtrial["target_indices"], np.ndarray)
-    assert vtrial["target_indices"].shape == (8,)
-    assert np.allclose(vtrial["target_indices"], [7, 6, 5, 4, 3, 2, 1, 0])
+    assert isinstance(vtrial["target_indices"], str)
+    assert vtrial["target_indices"] == "7 6 5 4 3 2 1 0"
     # random
     trial["target_order"] = "random"
     vtrial = mtptrial.validate_trial(trial)
-    assert isinstance(vtrial["target_indices"], np.ndarray)
-    assert vtrial["target_indices"].shape == (8,)
-    assert np.allclose(np.sort(vtrial["target_indices"]), [0, 1, 2, 3, 4, 5, 6, 7])
+    assert isinstance(vtrial["target_indices"], str)
+    assert len(set(vtrial["target_indices"].split(" "))) == 8
     # fixed & valid
     trial["target_order"] = "fixed"
     trial["target_indices"] = "0 1 2 3 4 5 6 7"
     vtrial = mtptrial.validate_trial(trial)
-    assert isinstance(vtrial["target_indices"], np.ndarray)
-    assert vtrial["target_indices"].shape == (8,)
-    assert np.allclose(vtrial["target_indices"], [0, 1, 2, 3, 4, 5, 6, 7])
+    assert isinstance(vtrial["target_indices"], str)
+    assert vtrial["target_indices"] == "0 1 2 3 4 5 6 7"
     # fixed & invalid - clipped to nearest valid indices
     trial["target_order"] = "fixed"
     trial["target_indices"] = "-2 8 1 5 12 -5"
     vtrial = mtptrial.validate_trial(trial)
-    assert isinstance(vtrial["target_indices"], np.ndarray)
-    assert vtrial["target_indices"].shape == (6,)
-    assert np.allclose(vtrial["target_indices"], [0, 7, 1, 5, 7, 0])
+    assert isinstance(vtrial["target_indices"], str)
+    assert vtrial["target_indices"] == "0 7 1 5 7 0"

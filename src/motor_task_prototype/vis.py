@@ -4,7 +4,6 @@ from typing import Optional
 import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.stat as mtpstat
 import numpy as np
-from motor_task_prototype.display import default_display_options
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.types import MotorTaskDisplayOptions
 from psychopy.colors import colors
@@ -130,7 +129,10 @@ def make_stats_txt(
 
 
 def make_drawables(
-    results: TrialHandlerExt, trial_indices: List[int], win: Window
+    trial_handler: TrialHandlerExt,
+    display_options: MotorTaskDisplayOptions,
+    trial_indices: List[int],
+    win: Window,
 ) -> List[BaseVisualStim]:
     drawables: List[BaseVisualStim] = []
     drawables.append(
@@ -143,20 +145,14 @@ def make_drawables(
             letterHeight=0.03,
         )
     )
-    if len(trial_indices) == 0 or "target_pos" not in results.data:
+    if len(trial_indices) == 0 or trial_handler is None:
         # no results to display
         return drawables
-    if not results.extraInfo:
-        display_options = default_display_options()
-    else:
-        display_options = results.extraInfo.get(
-            "display_options", default_display_options()
-        )
     # for now assume the experiment is only repeated once
     i_repeat = 0
-    i_condition = results.sequenceIndices[trial_indices[0]][i_repeat]
-    conditions = results.trialList[i_condition]
-    targets = results.data["target_pos"][trial_indices[0]][i_repeat]
+    i_condition = trial_handler.sequenceIndices[trial_indices[0]][i_repeat]
+    conditions = trial_handler.trialList[i_condition]
+    targets = trial_handler.data["target_pos"][trial_indices[0]][i_repeat]
     drawables.append(
         TextBox2(
             win,
@@ -169,7 +165,7 @@ def make_drawables(
         )
     )
     # stats
-    stats = mtpstat.MotorTaskStats(results, trial_indices)
+    stats = mtpstat.MotorTaskStats(trial_handler, trial_indices)
     letter_height = 0.015
     for i_target, (color, target_pos) in enumerate(zip(colors, targets)):
         txt_stats = make_stats_txt(display_options, stats, i_target)
@@ -234,14 +230,14 @@ def make_drawables(
     # paths
     for i_trial in trial_indices:
         assert (
-            results.sequenceIndices[i_trial][i_repeat] == i_condition
+            trial_handler.sequenceIndices[i_trial][i_repeat] == i_condition
         ), "Trials to display should all use the same conditions"
-        trial_mouse_positions = results.data["to_target_mouse_positions"][i_trial][
-            i_repeat
-        ]
-        trial_mouse_positions_back = results.data["to_center_mouse_positions"][i_trial][
-            i_repeat
-        ]
+        trial_mouse_positions = trial_handler.data["to_target_mouse_positions"][
+            i_trial
+        ][i_repeat]
+        trial_mouse_positions_back = trial_handler.data["to_center_mouse_positions"][
+            i_trial
+        ][i_repeat]
         # paths to center
         if (
             display_options["to_center_paths"]
@@ -273,7 +269,8 @@ def make_drawables(
 
 
 def display_results(
-    results: TrialHandlerExt,
+    trial_handler: TrialHandlerExt,
+    display_options: MotorTaskDisplayOptions,
     trial_indices: List[int],
     win: Optional[Window] = None,
     win_type: str = "pyglet",
@@ -284,7 +281,7 @@ def display_results(
         close_window_when_done = True
     win.flip()
     kb = Keyboard()
-    drawables = make_drawables(results, trial_indices, win)
+    drawables = make_drawables(trial_handler, display_options, trial_indices, win)
     kb.clearEvents()
     while True:
         if not draw_and_flip(win, drawables, kb, "return"):

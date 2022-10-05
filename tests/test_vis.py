@@ -7,7 +7,7 @@ import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.vis as mtpvis
 import numpy as np
 import pytest
-from psychopy.data import TrialHandlerExt
+from motor_task_prototype.experiment import MotorTaskExperiment
 from psychopy.visual.window import Window
 
 
@@ -101,9 +101,9 @@ def test_splash_screen_defaults(window: Window) -> None:
 
 
 def test_display_results_nothing(
-    experiment_with_results: TrialHandlerExt, window: Window
+    experiment_with_results: MotorTaskExperiment, window: Window
 ) -> None:
-    experiment_with_results.extraInfo["display_options"] = {
+    experiment_with_results.display_options = {
         "to_target_paths": False,
         "to_center_paths": False,
         "targets": False,
@@ -121,7 +121,14 @@ def test_display_results_nothing(
     # trial data without auto-move to center
     trial_indices = [0, 1, 2]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
+        mtpvis.display_results,
+        (
+            experiment_with_results.trial_handler_with_results,
+            experiment_with_results.display_options,
+            trial_indices,
+            window,
+        ),
+        window,
     )
     # all pixels grey except for blue continue text
     assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
@@ -130,7 +137,14 @@ def test_display_results_nothing(
     # trial data with auto-move to center
     trial_indices = [3]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
+        mtpvis.display_results,
+        (
+            experiment_with_results.trial_handler_with_results,
+            experiment_with_results.display_options,
+            trial_indices,
+            window,
+        ),
+        window,
     )
     # all pixels grey except for blue continue text
     assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
@@ -139,9 +153,9 @@ def test_display_results_nothing(
 
 
 def test_display_results_everything(
-    experiment_with_results: TrialHandlerExt, window: Window
+    experiment_with_results: MotorTaskExperiment, window: Window
 ) -> None:
-    experiment_with_results.extraInfo["display_options"] = {
+    experiment_with_results.display_options = {
         "to_target_paths": True,
         "to_center_paths": True,
         "targets": True,
@@ -159,7 +173,14 @@ def test_display_results_everything(
     # trial data without auto-move to center
     trial_indices = [0, 1, 2]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
+        mtpvis.display_results,
+        (
+            experiment_with_results.trial_handler_with_results,
+            experiment_with_results.display_options,
+            trial_indices,
+            window,
+        ),
+        window,
     )
     # less grey: lots of other colors for targets, paths and stats
     grey_pixels = gtu.pixel_color_fraction(screenshot, (128, 128, 128))
@@ -170,7 +191,14 @@ def test_display_results_everything(
     # trial data with auto-move to center
     trial_indices = [3]
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.display_results, (experiment_with_results, trial_indices, window), window
+        mtpvis.display_results,
+        (
+            experiment_with_results.trial_handler_with_results,
+            experiment_with_results.display_options,
+            trial_indices,
+            window,
+        ),
+        window,
     )
     # more grey since there are fewer paths and stats to display
     assert gtu.pixel_color_fraction(screenshot, (128, 128, 128)) > grey_pixels

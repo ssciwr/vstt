@@ -6,12 +6,9 @@ from typing import Tuple
 import numpy as np
 import pyautogui
 import pytest
-from motor_task_prototype.experiment import new_experiment_from_dicts
+from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.geom import points_on_circle
-from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.trial import default_trial
-from motor_task_prototype.vis import default_display_options
-from psychopy.data import TrialHandlerExt
 from psychopy.gui.qtgui import ensureQtApp
 from psychopy.visual.window import Window
 
@@ -72,23 +69,24 @@ def make_timestamps(n_min: int = 8, n_max: int = 20) -> np.ndarray:
 
 
 @pytest.fixture
-def experiment_no_results() -> TrialHandlerExt:
+def experiment_no_results() -> MotorTaskExperiment:
+    experiment = MotorTaskExperiment()
     trial0 = default_trial()
+    trial0["num_targets"] = 4
     trial0["play_sound"] = False
     trial0["target_duration"] = 30.0
     trial0["inter_target_duration"] = 0.0
     trial0["post_block_display_results"] = False
     trial1 = copy.deepcopy(trial0)
     trial1["weight"] = 2
-    trial1["num_targets"] = 4
-    trial1["post_block_display_results"] = False
-    display_options = default_display_options()
-    metadata = default_metadata()
-    return new_experiment_from_dicts([trial0, trial1], display_options, metadata)
+    trial1["num_targets"] = 3
+    experiment.trial_list = [trial0, trial1]
+    return experiment
 
 
 @pytest.fixture
-def experiment_with_results() -> TrialHandlerExt:
+def experiment_with_results() -> MotorTaskExperiment:
+    experiment = MotorTaskExperiment()
     # trial without auto-move to center, 3 reps, 8 targets
     trial0 = default_trial()
     # disable sounds due to issues with sounds within tests on linux
@@ -101,10 +99,9 @@ def experiment_with_results() -> TrialHandlerExt:
     trial1["weight"] = 1
     trial1["num_targets"] = 4
     trial1["automove_cursor_to_center"] = True
-    display_options = default_display_options()
-    metadata = default_metadata()
-    exp = new_experiment_from_dicts([trial0, trial1], display_options, metadata)
-    for trial in exp:
+    experiment.trial_list = [trial0, trial1]
+    trial_handler = experiment.create_trialhandler()
+    for trial in trial_handler:
         to_target_timestamps = []
         to_center_timestamps = []
         to_target_mouse_positions = []
@@ -122,9 +119,14 @@ def experiment_with_results() -> TrialHandlerExt:
                 to_center_mouse_positions.append(
                     list(reversed(make_mouse_positions(pos, to_center_timestamps[-1])))
                 )
-        exp.addData("target_pos", np.array(target_pos))
-        exp.addData("to_target_timestamps", np.array(to_target_timestamps))
-        exp.addData("to_target_mouse_positions", np.array(to_target_mouse_positions))
-        exp.addData("to_center_timestamps", np.array(to_center_timestamps))
-        exp.addData("to_center_mouse_positions", np.array(to_center_mouse_positions))
-    return exp
+        trial_handler.addData("target_pos", np.array(target_pos))
+        trial_handler.addData("to_target_timestamps", np.array(to_target_timestamps))
+        trial_handler.addData(
+            "to_target_mouse_positions", np.array(to_target_mouse_positions)
+        )
+        trial_handler.addData("to_center_timestamps", np.array(to_center_timestamps))
+        trial_handler.addData(
+            "to_center_mouse_positions", np.array(to_center_mouse_positions)
+        )
+    experiment.trial_handler_with_results = trial_handler
+    return experiment
