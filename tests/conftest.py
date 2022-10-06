@@ -14,6 +14,7 @@ from motor_task_prototype.trial import default_trial
 from psychopy.gui.qtgui import ensureQtApp
 from psychopy.visual.window import Window
 
+# add tests helpers package location to path so tests can import gui_test_utils
 sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
 
 
@@ -131,4 +132,5 @@ def experiment_with_results() -> MotorTaskExperiment:
             "to_center_mouse_positions", np.array(to_center_mouse_positions)
         )
     experiment.trial_handler_with_results = trial_handler
+    experiment.has_unsaved_changes = True
     return experiment

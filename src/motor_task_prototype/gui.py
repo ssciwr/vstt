@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Callable
 from typing import Optional
 
@@ -24,7 +25,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         win_type: str = "pyglet",
     ):
         super().__init__()
-        self.experiment = MotorTaskExperiment(filename)
+        self.experiment = MotorTaskExperiment()
         self._win = win
         self._win_type = win_type
 
@@ -58,12 +59,16 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         split_top_bottom.setSizes([1000, 5000])
         grid_layout.addWidget(split_top_bottom)
 
-        _create_menu_and_toolbar(self)
+        self.toolbar = _create_menu_and_toolbar(self)
+        self.addToolBar(self.toolbar)
 
         central_widget = QtWidgets.QWidget()
         central_widget.setLayout(grid_layout)
         self.setCentralWidget(central_widget)
-        self.reload_experiment()
+        if filename is not None:
+            self._open_psydat_file(filename)
+        else:
+            self.reload_experiment()
         self.resize(800, 600)
 
     def closeEvent(self, event: QtGui.QCloseEvent) -> None:
@@ -77,14 +82,26 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             self.experiment = MotorTaskExperiment()
             self.reload_experiment()
 
+    def _open_psydat_file(self, filename: str) -> None:
+        try:
+            self.experiment.load_psydat(filename)
+        except Exception as e:
+            logging.warning(f"Failed to load file {filename}: {e}")
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Invalid file",
+                f"Could not read file '{filename}'",
+            )
+        self.reload_experiment()
+
     def btn_open_clicked(self) -> None:
         if self.save_changes_check_continue():
             filename, _ = QtWidgets.QFileDialog.getOpenFileName(
                 self, "Open an experiment", filter="Psydat files (*.psydat)"
             )
-            if filename is not None:
-                self.experiment.load_psydat(filename)
-                self.reload_experiment()
+            if filename == "":
+                return
+            self._open_psydat_file(filename)
 
     def btn_save_clicked(self) -> bool:
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -178,7 +195,7 @@ def _add_action(
         toolbar.addAction(action)
 
 
-def _create_menu_and_toolbar(gui: MotorTaskGui) -> None:
+def _create_menu_and_toolbar(gui: MotorTaskGui) -> QtWidgets.QToolBar:
     menu = gui.menuBar()
     toolbar = QtWidgets.QToolBar()
     file_menu = menu.addMenu("&File")
@@ -226,4 +243,4 @@ def _create_menu_and_toolbar(gui: MotorTaskGui) -> None:
     help_menu = menu.addMenu("&Help")
     _add_action("&About", gui.about, help_menu)
     toolbar.setContextMenuPolicy(Qt.PreventContextMenu)
-    gui.addToolBar(toolbar)
+    return toolbar

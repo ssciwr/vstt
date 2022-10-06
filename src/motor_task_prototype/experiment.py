@@ -20,7 +20,7 @@ class MotorTaskExperiment:
             return
 
         self.filename = "default-experiment.psydat"
-        self.has_unsaved_changes = True
+        self.has_unsaved_changes = False
         self.metadata = default_metadata()
         self.display_options = default_display_options()
         self.trial_list = [default_trial()]

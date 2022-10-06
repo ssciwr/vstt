@@ -4,19 +4,11 @@ import queue
 import sys
 import threading
 from time import sleep
-from typing import Any
 from typing import Callable
-from typing import List
-from typing import Optional
 from typing import Tuple
 
 import ascii_magic
 from psychopy.visual.window import Window
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtTest import QTest
 
 if sys.platform.startswith("win"):
     # use alternative library to generate keyboard events on windows
@@ -146,61 +138,3 @@ def pixel_color_fraction(img: np.ndarray, color: Tuple[int, int, int]) -> float:
 # return fraction of pixels in current screen of the supplied color
 def screenshot_pixel_color_fraction(color: Tuple[int, int, int]) -> float:
     return pixel_color_fraction(np.asarray(pyautogui.screenshot()), color)
-
-
-# class to receive a pyqt signal
-class SignalReceived:
-    def __init__(self, signal: Any):
-        self._signal_received = False
-        signal.connect(self._receive)
-
-    def __bool__(self) -> bool:
-        return self._signal_received
-
-    def _receive(self) -> None:
-        self._signal_received = True
-
-    def clear(self) -> None:
-        self._signal_received = False
-
-
-# Class for interacting with modal widgets (partial python port of C++ code from sme)
-# https://github.com/spatial-model-editor/spatial-model-editor/blob/main/test/test_utils/qt_test_utils.hpp
-class ModalWidgetTimer:
-    def __init__(self, keys: List[str]) -> None:
-        self.timer = QtCore.QTimer()
-        self.other_mwt_to_start: Optional[ModalWidgetTimer] = None
-        self.widget_to_ignore: Optional[QtWidgets.QWidget] = None
-        self.keys = keys
-        self.timeout = 30000
-        self.timer.timeout.connect(self._send_keys)
-
-    def _send_keys(self) -> None:
-        widget = QtWidgets.QApplication.activeModalWidget()
-        self.timeout -= self.timer.interval()
-        if self.timeout < 0:
-            print("ModalWidgetTimer :: Timeout waiting for modal widget", flush=True)
-            self.timer.stop()
-            return
-        if widget is None or widget is self.widget_to_ignore:
-            return
-        if self.other_mwt_to_start is not None:
-            print(
-                f"\nModalWidgetTimer :: starting {self.other_mwt_to_start}", flush=True
-            )
-            self.other_mwt_to_start.widget_to_ignore = widget
-            self.other_mwt_to_start.start()
-        print(f"\nModalWidgetTimer :: Found {widget}", flush=True)
-        for key in self.keys:
-            key_seq = QtGui.QKeySequence(key)
-            str_key = key_seq.toString()
-            qt_key = Qt.Key(key_seq[0])
-            print(
-                f"ModalWidgetTimer ::   - sending '{str_key} [{qt_key}]' tp {widget}",
-                flush=True,
-            )
-            QTest.keyClick(widget, qt_key)
-        self.timer.stop()
-
-    def start(self, timer_interval: int = 100) -> None:
-        self.timer.start(timer_interval)
