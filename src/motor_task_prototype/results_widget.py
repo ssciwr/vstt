@@ -45,6 +45,13 @@ class ResultsWidget(QtWidgets.QWidget):
         self._row_changed()
 
     def _is_valid(self, row: int) -> bool:
+        if (
+            self._list_trials.count() > 0
+            and self.experiment.trial_handler_with_results is None
+        ):
+            # experiment results have been cleared - re-assign experiment to update widget
+            self.experiment = self._experiment
+            return False
         return (
             self.experiment.trial_handler_with_results is not None
             and 0 <= row < self._list_trials.count()

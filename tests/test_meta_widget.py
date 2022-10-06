@@ -2,24 +2,23 @@ from __future__ import annotations
 
 import gui_test_utils as gtu
 import motor_task_prototype.meta as mtpmeta
+import qt_test_utils as qtu
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.meta_widget import MetadataWidget
 from psychopy.visual.window import Window
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtTest import QTest
 
 
 def test_metadata_widget(window: Window) -> None:
     widget = MetadataWidget(parent=None, win=window)
-    signal_received = gtu.SignalReceived(widget.experiment_modified)
+    signal_received = qtu.SignalReceived(widget.experiment_modified)
     # default-constructed widget has a default experiment with default metadata
     assert widget.experiment.metadata == mtpmeta.default_metadata()
-    assert widget.experiment.has_unsaved_changes is True
+    assert widget.experiment.has_unsaved_changes is False
     assert not signal_received
     screenshot = gtu.call_target_and_get_screenshot(
-        QTest.mouseClick,
-        (widget._btn_preview_metadata, Qt.MouseButton.LeftButton),
+        qtu.click,
+        (widget._btn_preview_metadata,),
         window,
     )
     # most pixels are grey
@@ -29,7 +28,6 @@ def test_metadata_widget(window: Window) -> None:
     assert 0.005 <= gtu.pixel_color_fraction(screenshot, (0, 0, 0)) <= 0.050
     experiment = MotorTaskExperiment()
     experiment.metadata = mtpmeta.empty_metadata()
-    experiment.has_unsaved_changes = False
     # assign experiment with empty metadata
     widget.experiment = experiment
     assert widget.experiment is experiment
@@ -37,8 +35,8 @@ def test_metadata_widget(window: Window) -> None:
     assert widget.experiment.has_unsaved_changes is False
     assert not signal_received
     screenshot = gtu.call_target_and_get_screenshot(
-        QTest.mouseClick,
-        (widget._btn_preview_metadata, Qt.MouseButton.LeftButton),
+        qtu.click,
+        (widget._btn_preview_metadata,),
         window,
     )
     # all pixels grey except for blue continue text
@@ -56,7 +54,7 @@ def test_metadata_widget(window: Window) -> None:
         assert type(line_edit) is QtWidgets.QLineEdit
         assert widget.experiment.metadata[key] == ""  # type: ignore
         signal_received.clear()
-        QTest.keyClicks(line_edit, key)
+        qtu.press_keys(line_edit, key)
         assert widget.experiment.metadata[key] == key  # type: ignore
         assert widget.experiment.has_unsaved_changes is True
         assert signal_received
@@ -74,7 +72,7 @@ def test_metadata_widget(window: Window) -> None:
         assert line_edit is not None
         assert type(line_edit) is QtWidgets.QLineEdit
         assert widget.experiment.metadata[key] == value  # type: ignore
-        QTest.keyClicks(line_edit, "2")
+        qtu.press_keys(line_edit, "2")
         assert widget.experiment.metadata[key] == value + "2"  # type: ignore
         assert widget.experiment.has_unsaved_changes is True
         assert signal_received

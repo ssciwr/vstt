@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import pathlib
+import pickle
 
 import numpy as np
+import pytest
 from motor_task_prototype.display import default_display_options
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.trial import default_trial
+from psychopy.data import TrialHandlerExt
 
 
 def test_experiment_no_results(tmp_path: pathlib.Path) -> None:
@@ -16,7 +19,7 @@ def test_experiment_no_results(tmp_path: pathlib.Path) -> None:
     assert exp.metadata == default_metadata()
     assert exp.display_options == default_display_options()
     assert exp.trial_handler_with_results is None
-    assert exp.has_unsaved_changes is True
+    assert exp.has_unsaved_changes is False
     # get a trial handler for this experiment
     th = exp.create_trialhandler()
     assert th.trialList == [default_trial()]
@@ -34,12 +37,13 @@ def test_experiment_no_results(tmp_path: pathlib.Path) -> None:
     assert th.extraInfo["metadata"]["author"] == "Joe Smith"
     assert th.extraInfo["display_options"]["to_target_paths"] is False
     assert th.finished is False
-    # save the experiment
-    filename = str(tmp_path / "ex1.psydat")
-    exp.save_psydat(filename)
+    # save the experiment (psydat file extension is automatically added if missing)
+    filename_to_save = str(tmp_path / "ex1")
+    filename_to_load = str(tmp_path / "ex1.psydat")
+    exp.save_psydat(filename_to_save)
     assert exp.has_unsaved_changes is False
     # load the experiment
-    exp2 = MotorTaskExperiment(filename)
+    exp2 = MotorTaskExperiment(filename_to_load)
     assert exp2.metadata["author"] == "Joe Smith"
     assert exp2.display_options["to_target_paths"] is False
     assert exp2.has_unsaved_changes is False
@@ -102,3 +106,29 @@ def test_experiment_with_results(
     assert th2.extraInfo["display_options"] == experiment_with_results.display_options
     assert "to_target_timestamps" not in th2.data
     assert th2.finished is False
+
+
+def test_experiment_invalid_file(tmp_path: pathlib.Path) -> None:
+    # file doesn't exist
+    with pytest.raises(ValueError):
+        MotorTaskExperiment("I don't exist!")
+
+    # file exists and has psydat extension but is garbage
+    file = tmp_path / "invalid.psydat"
+    file.write_text("beep boop")
+    with pytest.raises(pickle.PickleError):
+        MotorTaskExperiment(str(file))
+
+
+def test_experiment_empty_trialhandler() -> None:
+    # construct an empty TrialHandlerExt: no trials, no extraInfo dict
+    empty_th = TrialHandlerExt([], 1)
+    # this is what gets constructed from an empty trial list:
+    assert empty_th.trialList == [None]
+    assert empty_th.extraInfo is None
+    experiment = MotorTaskExperiment()
+    experiment.import_and_validate_trial_handler(empty_th)
+    # defaults are used for missing metadata and display_options
+    assert experiment.metadata == default_metadata()
+    assert experiment.display_options == default_display_options()
+    assert len(experiment.trial_list) == 0
