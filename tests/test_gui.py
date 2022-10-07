@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import pathlib
+from typing import Any
+from typing import Tuple
 
 import motor_task_prototype.display as mtpdisplay
 import motor_task_prototype.meta as mtpmeta
@@ -8,6 +10,8 @@ import motor_task_prototype.trial as mtptrial
 import qt_test_utils as qtu
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.gui import MotorTaskGui
+from PyQt5.QtWidgets import QFileDialog
+from pytest import MonkeyPatch
 
 
 def test_gui_run_no_trials() -> None:
@@ -19,7 +23,7 @@ def test_gui_run_no_trials() -> None:
     mwt = qtu.ModalWidgetTimer(["Enter"])
     mwt.start()
     # try to run experiment
-    open_action = gui.toolbar.actions()[3]
+    open_action = gui.toolbar.actions()[4]
     assert open_action.text() == "&Run"
     open_action.trigger()
     assert mwt.widget_type == "QMessageBox"
@@ -111,16 +115,87 @@ def test_gui_file_with_results(
     gui.close()
 
 
+def test_gui_import_excel(
+    tmp_path: pathlib.Path, experiment_with_results: MotorTaskExperiment
+) -> None:
+    filepath = tmp_path / "experiment.xlsx"
+    experiment_with_results.save_excel(str(filepath))
+    gui = MotorTaskGui(filename=str(filepath))
+    assert gui.experiment.metadata == experiment_with_results.metadata
+    assert gui.experiment.display_options == experiment_with_results.display_options
+    assert len(gui.experiment.trial_list) == len(experiment_with_results.trial_list)
+    assert gui.experiment.has_unsaved_changes is True
+    assert gui.experiment.trial_handler_with_results is None
+    assert "*" in gui.windowTitle()
+    assert gui.experiment.filename == str(filepath.with_suffix(".psydat"))
+
+
+def test_gui_import_json(
+    tmp_path: pathlib.Path, experiment_with_results: MotorTaskExperiment
+) -> None:
+    filepath = tmp_path / "experiment.json"
+    experiment_with_results.save_json(str(filepath))
+    gui = MotorTaskGui(filename=str(filepath))
+    assert gui.experiment.metadata == experiment_with_results.metadata
+    assert gui.experiment.display_options == experiment_with_results.display_options
+    assert len(gui.experiment.trial_list) == len(experiment_with_results.trial_list)
+    assert gui.experiment.has_unsaved_changes is True
+    assert gui.experiment.trial_handler_with_results is None
+    assert "*" in gui.windowTitle()
+    assert gui.experiment.filename == str(filepath.with_suffix(".psydat"))
+
+
+def test_gui_import_export(
+    tmp_path: pathlib.Path,
+    experiment_with_results: MotorTaskExperiment,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    filepath = tmp_path / "experiment.psydat"
+    experiment_with_results.save_psydat(str(filepath))
+    for suffix, filter in [
+        (".xlsx", "Excel file (*.xlsx)"),
+        (".json", "JSON file (*.json)"),
+    ]:
+        export_filepath = filepath.with_suffix(suffix)
+        assert not export_filepath.is_file()
+
+        # mwt doesn't yet fully work with file save dialog
+        # instead we monkey patch QFileDialog.getSaveFileName to return desired output
+        def mock_getSaveFileName(*args: Any, **kwargs: Any) -> Tuple[str, str]:
+            return str(export_filepath), filter
+
+        monkeypatch.setattr(QFileDialog, "getSaveFileName", mock_getSaveFileName)
+        gui = MotorTaskGui(filename=str(filepath))
+        assert gui.experiment.metadata == experiment_with_results.metadata
+        assert gui.experiment.display_options == experiment_with_results.display_options
+        assert len(gui.experiment.trial_list) == len(experiment_with_results.trial_list)
+        assert gui.experiment.has_unsaved_changes is False
+        export_action = gui.toolbar.actions()[3]
+        assert export_action.text() == "&Export"
+        export_action.trigger()
+        assert export_filepath.is_file()
+        # re-import exported file
+        exp = MotorTaskExperiment(str(export_filepath))
+        assert exp.metadata == experiment_with_results.metadata
+        assert exp.display_options == experiment_with_results.display_options
+        assert exp.trial_list == experiment_with_results.trial_list
+        assert exp.trial_handler_with_results is None
+        assert exp.has_unsaved_changes is True
+        assert exp.filename == str(filepath)
+
+
 def test_gui_invalid_file(tmp_path: pathlib.Path) -> None:
-    file = tmp_path / "invalid.psydat"
-    file.write_text("beep boop")
-    # mwt to click ok when failed to open file message box is shown
-    mwt = qtu.ModalWidgetTimer(["Enter"])
-    mwt.start()
-    gui = MotorTaskGui(filename=str(file))
-    assert mwt.widget_type == "QMessageBox"
-    assert "Could not read file" in mwt.widget_text
-    gui.close()
+    for extension in ["psydat", "xlsx", "json", "zzz"]:
+        file = tmp_path / f"invalid.{extension}"
+        file.write_text("beep boop")
+        # mwt to click ok when failed to open file message box is shown
+        mwt = qtu.ModalWidgetTimer(["Enter"])
+        mwt.start()
+        gui = MotorTaskGui(filename=str(file))
+        assert mwt.widget_type == "QMessageBox"
+        assert "Could not read file" in mwt.widget_text
+        assert extension in mwt.widget_text
+        gui.close()
 
 
 def test_gui_nonexistent_file() -> None:

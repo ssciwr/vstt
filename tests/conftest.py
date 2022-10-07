@@ -84,6 +84,11 @@ def experiment_no_results() -> MotorTaskExperiment:
     trial1["weight"] = 2
     trial1["num_targets"] = 3
     experiment.trial_list = [trial0, trial1]
+    experiment.metadata["name"] = "Experiment with no results"
+    experiment.metadata["author"] = "experiment_no_results @pytest.fixture"
+    experiment.metadata["date"] = "1666"
+    experiment.display_options["to_target_rmse"] = False
+    experiment.display_options["averages"] = False
     return experiment
 
 
@@ -103,6 +108,11 @@ def experiment_with_results() -> MotorTaskExperiment:
     trial1["num_targets"] = 4
     trial1["automove_cursor_to_center"] = True
     experiment.trial_list = [trial0, trial1]
+    experiment.metadata["name"] = "Experiment with results"
+    experiment.metadata["author"] = "experiment_with_results @pytest.fixture"
+    experiment.metadata["date"] = "2000"
+    experiment.display_options["to_target_rmse"] = False
+    experiment.display_options["averages"] = False
     trial_handler = experiment.create_trialhandler()
     for trial in trial_handler:
         to_target_timestamps = []

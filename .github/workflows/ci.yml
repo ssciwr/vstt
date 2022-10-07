@@ -47,7 +47,11 @@ jobs:
           # see Qt debug output when loading plugins
           echo "QT_DEBUG_PLUGINS=1" >> $GITHUB_ENV
       - run: pip install -e .[tests,docs] --verbose
-      - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s
+      - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s -x
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          path: "*.*"
       - name: Build documentation
         if: runner.os == 'Linux'
         run: cd docs && make && touch _build/html/.nojekyll

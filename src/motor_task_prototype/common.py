@@ -37,11 +37,15 @@ def import_typed_dict(
             # import all valid keys from input_dict
             correct_type = type(default_value)
             value = input_dict[key]
-            if _has_valid_type(value, correct_type):
-                output_dict[key] = correct_type(value)  # type: ignore
-            else:
+            if not _has_valid_type(value, correct_type):
                 logging.warning(
                     f"Key '{key}' invalid: expected {correct_type}, got {type(value)} '{value}'"
+                )
+            try:
+                output_dict[key] = correct_type(value)  # type: ignore
+            except ValueError:
+                logging.warning(
+                    f"Failed to coerce Key '{key}' with type {type(value)} to correct type {correct_type}"
                 )
         else:
             # warn if a key is missing
