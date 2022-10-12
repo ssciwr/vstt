@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import json
+import pathlib
 import pickle
+from typing import Any
+from typing import Dict
+from typing import List
 from typing import Optional
 
+import pandas as pd
 from motor_task_prototype.display import default_display_options
 from motor_task_prototype.display import import_display_options
 from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.meta import import_metadata
 from motor_task_prototype.trial import default_trial
+from motor_task_prototype.trial import import_trial
 from motor_task_prototype.trial import validate_trial
 from psychopy.data import TrialHandlerExt
 from psychopy.misc import fromFile
@@ -15,16 +22,14 @@ from psychopy.misc import fromFile
 
 class MotorTaskExperiment:
     def __init__(self, filename: Optional[str] = None):
-        if filename is not None:
-            self.load_psydat(filename)
-            return
-
         self.filename = "default-experiment.psydat"
         self.has_unsaved_changes = False
         self.metadata = default_metadata()
         self.display_options = default_display_options()
         self.trial_list = [default_trial()]
         self.trial_handler_with_results: Optional[TrialHandlerExt] = None
+        if filename is not None:
+            self.load_file(filename)
 
     def create_trialhandler(self) -> TrialHandlerExt:
         for trial in self.trial_list:
@@ -42,6 +47,23 @@ class MotorTaskExperiment:
 
     def clear_results(self) -> None:
         self.trial_handler_with_results = None
+
+    def _as_dict(self) -> Dict[str, Any]:
+        return {
+            "metadata": self.metadata,
+            "display_options": self.display_options,
+            "trial_list": self.trial_list,
+        }
+
+    def load_file(self, filename: str) -> None:
+        suffix = pathlib.Path(filename).suffix
+        if suffix == ".xlsx":
+            self.load_excel(filename)
+        elif suffix == ".json":
+            self.load_json(filename)
+        else:
+            # assume psydat format by default
+            self.load_psydat(filename)
 
     def save_psydat(self, filename: str) -> None:
         if not filename.endswith(".psydat"):
@@ -69,6 +91,60 @@ class MotorTaskExperiment:
         self.import_and_validate_trial_handler(fromFile(filename))
         self.filename = filename
         self.has_unsaved_changes = False
+
+    def save_excel(self, filename: str) -> None:
+        if not filename.endswith(".xlsx"):
+            filename += ".xlsx"
+        with pd.ExcelWriter(filename) as writer:
+            pd.DataFrame([self.metadata]).to_excel(
+                writer, sheet_name="metadata", index=False
+            )
+            pd.DataFrame([self.display_options]).to_excel(
+                writer, sheet_name="display_options", index=False
+            )
+            pd.DataFrame(self.trial_list).to_excel(
+                writer, sheet_name="trial_list", index=False
+            )
+
+    def load_excel(self, filename: str) -> None:
+        dfs = pd.read_excel(filename, ["metadata", "display_options", "trial_list"])
+        self.import_and_validate_dicts(
+            filename,
+            dfs["metadata"].to_dict("records")[0],
+            dfs["display_options"].to_dict("records")[0],
+            dfs["trial_list"].to_dict("records"),
+        )
+
+    def save_json(self, filename: str) -> None:
+        if not filename.endswith(".json"):
+            filename += ".json"
+        with open(filename, "w") as f:
+            json.dump(self._as_dict(), f)
+
+    def load_json(self, filename: str) -> None:
+        with open(filename, "r") as f:
+            d = json.load(f)
+        self.import_and_validate_dicts(
+            filename, d["metadata"], d["display_options"], d["trial_list"]
+        )
+
+    def import_and_validate_dicts(
+        self,
+        filename: str,
+        metadata_dict: Dict,
+        display_options_dict: Dict,
+        trial_dict_list: List[Dict],
+    ) -> None:
+        self.metadata = import_metadata(metadata_dict)
+        self.display_options = import_display_options(display_options_dict)
+        self.trial_list = []
+        for trial_dict in trial_dict_list:
+            trial = import_trial(trial_dict)
+            validate_trial(trial)
+            self.trial_list.append(trial)
+        self.trial_handler_with_results = None
+        self.has_unsaved_changes = True
+        self.filename = str(pathlib.Path(filename).with_suffix(".psydat"))
 
     def import_and_validate_trial_handler(self, trial_handler: TrialHandlerExt) -> None:
         # psychopy trial handler converts empty trial list [] -> [None]

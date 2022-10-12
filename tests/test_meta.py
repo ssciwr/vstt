@@ -28,9 +28,14 @@ def test_import_metadata() -> None:
     # all keys missing -> replaced with defaults
     metadata = mtpmeta.import_metadata({})
     assert metadata == mtpmeta.default_metadata()
-    # valid keys present but values have wrong type -> replaced with defaults
-    metadata = mtpmeta.import_metadata({"name": 12, "data": 2.4, "author": [1, 2, 3]})
-    assert metadata == mtpmeta.default_metadata()
-    # invalid keys are ignored
-    metadata = mtpmeta.import_metadata({"whoops": "ok"})
+    # valid keys present but values have wrong type:
+    #   - coerced to correct type if legal to do so
+    #   - otherwise replaced with defaults
+    metadata = mtpmeta.import_metadata(
+        {"name": 12, "data": 2.4, "author": [1, 2, 3], "whoops": "ok"}
+    )
+    assert metadata["name"] == "12"
+    assert metadata["author"] == "[1, 2, 3]"
+    # unknwon keys are ignored
+    assert "data" not in metadata
     assert "whoops" not in metadata

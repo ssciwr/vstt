@@ -58,7 +58,9 @@ class SignalReceived:
 # https://github.com/spatial-model-editor/spatial-model-editor/blob/main/test/test_utils/qt_test_utils.hpp
 class ModalWidgetTimer:
     def __init__(
-        self, keys: List[str], start_after: Optional[ModalWidgetTimer] = None
+        self,
+        keys: List[str],
+        start_after: Optional[ModalWidgetTimer] = None,
     ) -> None:
         self._keys = keys
         if start_after is not None:
@@ -79,10 +81,17 @@ class ModalWidgetTimer:
                     QtWidgets.QFileDialog.AcceptMode, f"Accept{mode}"
                 ):
                     self._widget_type += f".{mode}"
+            print(
+                f"ModalWidgetTimer ::   - {widget.selectedNameFilter()} / {widget.nameFilters()}",
+                flush=True,
+            )
+            print(f"ModalWidgetTimer ::   - {widget.selectedFiles()}", flush=True)
         if isinstance(widget, QtWidgets.QMessageBox):
             self._widget_text = widget.text()
+            print(f"ModalWidgetTimer ::   - {widget.text()}", flush=True)
         else:
             self._widget_text = widget.windowTitle()
+            print(f"ModalWidgetTimer ::   - {widget.windowTitle()}", flush=True)
 
     def _send_keys(self) -> None:
         widget = QtWidgets.QApplication.activeModalWidget()
@@ -104,7 +113,7 @@ class ModalWidgetTimer:
             str_key = key_seq.toString()
             qt_key = Qt.Key(key_seq[0])
             print(
-                f"ModalWidgetTimer ::   - sending '{str_key} [{qt_key}]' tp {widget}",
+                f"ModalWidgetTimer ::   - sending '{str_key} [{qt_key}]' to {widget}",
                 flush=True,
             )
             QTest.keyClick(widget, qt_key)

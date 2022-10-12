@@ -108,6 +108,38 @@ def test_experiment_with_results(
     assert th2.finished is False
 
 
+def test_experiment_to_excel(
+    experiment_with_results: MotorTaskExperiment, tmp_path: pathlib.Path
+) -> None:
+    # export to an Excel file
+    excel_file = tmp_path / "export.xlsx"
+    experiment_with_results.save_excel(str(excel_file))
+    # import this Excel file again
+    exp = MotorTaskExperiment(str(excel_file))
+    assert exp.metadata == experiment_with_results.metadata
+    assert exp.display_options == experiment_with_results.display_options
+    assert exp.trial_list == experiment_with_results.trial_list
+    assert exp.trial_handler_with_results is None
+    assert exp.has_unsaved_changes is True
+    assert exp.filename == str(excel_file.with_suffix(".psydat"))
+
+
+def test_experiment_to_json(
+    experiment_with_results: MotorTaskExperiment, tmp_path: pathlib.Path
+) -> None:
+    # export to a json file
+    json_file = tmp_path / "export.json"
+    experiment_with_results.save_json(str(json_file))
+    # import this json file again
+    exp = MotorTaskExperiment(str(json_file))
+    assert exp.metadata == experiment_with_results.metadata
+    assert exp.display_options == experiment_with_results.display_options
+    assert exp.trial_list == experiment_with_results.trial_list
+    assert exp.trial_handler_with_results is None
+    assert exp.has_unsaved_changes is True
+    assert exp.filename == str(json_file.with_suffix(".psydat"))
+
+
 def test_experiment_invalid_file(tmp_path: pathlib.Path) -> None:
     # file doesn't exist
     with pytest.raises(ValueError):

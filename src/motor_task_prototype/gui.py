@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import pathlib
 from typing import Callable
 from typing import Optional
 
@@ -66,7 +67,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         central_widget.setLayout(grid_layout)
         self.setCentralWidget(central_widget)
         if filename is not None:
-            self._open_psydat_file(filename)
+            self._open_file(filename)
         else:
             self.reload_experiment()
         self.resize(800, 600)
@@ -82,9 +83,9 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             self.experiment = MotorTaskExperiment()
             self.reload_experiment()
 
-    def _open_psydat_file(self, filename: str) -> None:
+    def _open_file(self, filename: str) -> None:
         try:
-            self.experiment.load_psydat(filename)
+            self.experiment.load_file(filename)
         except Exception as e:
             logging.warning(f"Failed to load file {filename}: {e}")
             QtWidgets.QMessageBox.critical(
@@ -97,11 +98,14 @@ class MotorTaskGui(QtWidgets.QMainWindow):
     def btn_open_clicked(self) -> None:
         if self.save_changes_check_continue():
             filename, _ = QtWidgets.QFileDialog.getOpenFileName(
-                self, "Open an experiment", filter="Psydat files (*.psydat)"
+                self,
+                "Open an experiment",
+                filter="Psydat files (*.psydat) ;; Excel files (*.xlsx) ;; JSON files (*.json) ;; All files (*.*)",
+                initialFilter="Psydat files (*.psydat)",
             )
             if filename == "":
                 return
-            self._open_psydat_file(filename)
+            self._open_file(filename)
 
     def btn_save_clicked(self) -> bool:
         filename, _ = QtWidgets.QFileDialog.getSaveFileName(
@@ -112,7 +116,42 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         )
         if filename == "":
             return False
-        self.experiment.save_psydat(filename)
+        try:
+            self.experiment.save_psydat(filename)
+        except Exception as e:
+            logging.warning(f"Failed to save file {filename}: {e}")
+            QtWidgets.QMessageBox.critical(
+                self,
+                "File save error",
+                f"Could not save file '{filename}'",
+            )
+        self.reload_experiment()
+        return True
+
+    def btn_export_clicked(self) -> bool:
+        filename, selected_filter = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Export experiment",
+            directory=str(pathlib.Path(self.experiment.filename).with_suffix(".xlsx")),
+            filter="Excel file (*.xlsx) ;; JSON file (*.json)",
+            initialFilter="Excel file (*.xlsx)",
+        )
+        if filename == "":
+            return False
+        try:
+            if selected_filter == "Excel file (*.xlsx)":
+                self.experiment.save_excel(filename)
+            elif selected_filter == "JSON file (*.json)":
+                self.experiment.save_json(filename)
+            else:
+                raise RuntimeError(f"Selected filter {selected_filter} is not valid.")
+        except Exception as e:
+            logging.warning(f"Failed to export to file {filename}: {e}")
+            QtWidgets.QMessageBox.critical(
+                self,
+                "File export error",
+                f"Could not export file '{filename}'",
+            )
         self.reload_experiment()
         return True
 
@@ -224,11 +263,19 @@ def _create_menu_and_toolbar(gui: MotorTaskGui) -> QtWidgets.QToolBar:
         QtWidgets.QStyle.SP_DialogSaveButton,
     )
     _add_action(
+        "&Export",
+        gui.btn_export_clicked,
+        file_menu,
+        toolbar,
+        None,
+        QtWidgets.QStyle.SP_DriveFDIcon,
+    )
+    _add_action(
         "E&xit",
         gui.btn_exit_clicked,
         file_menu,
         None,
-        "Ctrl+X",
+        None,
         QtWidgets.QStyle.SP_DialogCloseButton,
     )
     experiment_menu = menu.addMenu("&Experiment")

@@ -38,13 +38,13 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
     ]
     for key in missing_keys:
         display_options_dict.pop(key)
-    invalid_values = ["to_center_paths"]
     display_options = mtpdisplay.import_display_options(display_options_dict)
-    for key in display_options:
-        if key in missing_keys or key in invalid_values:
-            assert display_options[key] == default_display_options[key]  # type: ignore
+    for key, value in display_options.items():
+        if key in missing_keys:
+            assert value == default_display_options[key]  # type: ignore
         else:
-            assert display_options[key] == display_options_dict[key]  # type: ignore
+            value_type = type(value)
+            assert value == value_type(display_options_dict[key])  # type: ignore
     log_messages = {r.message for r in caplog.records}
     expected_log_messages = {
         "Key 'to_center_reaction_time' missing, using default 'False'",
