@@ -14,8 +14,13 @@ from psychopy.visual.window import Window
 
 
 def test_make_cursor(window: Window) -> None:
-    cursor = mtpvis.make_cursor(window)
-    assert np.allclose(cursor.pos, [0, 0])
+    for cursor_size in [0.01, 0.02235457]:
+        cursor = mtpvis.make_cursor(window, cursor_size)
+        assert np.allclose(cursor.pos, [0, 0])
+        # x size:
+        assert np.allclose(cursor.vertices[1][0] - cursor.vertices[0][0], cursor_size)
+        # y size:
+        assert np.allclose(cursor.vertices[-1][1] - cursor.vertices[-2][1], cursor_size)
 
 
 @pytest.mark.parametrize(

@@ -21,18 +21,18 @@ from psychopy.visual.window import Window
 colors.pop("none")
 
 
-def make_cursor(window: Window) -> ShapeStim:
+def make_cursor(window: Window, cursor_size: float) -> ShapeStim:
     return ShapeStim(
         window,
         lineColor="black",
         pos=(0, 0),
         lineWidth=5,
         vertices=[
-            (-0.01, 0.00),
-            (0.01, 0.00),
+            (-cursor_size * 0.5, 0.00),
+            (cursor_size * 0.5, 0.00),
             (0.00, 0.00),
-            (0.00, -0.01),
-            (0.00, 0.01),
+            (0.00, -cursor_size * 0.5),
+            (0.00, cursor_size * 0.5),
         ],
         closeShape=False,
     )

@@ -56,7 +56,7 @@ def run_task(
             trial["central_target_size"],
         )
         drawables: List[Union[BaseVisualStim, ElementArrayStim]] = [targets]
-        cursor = mtpvis.make_cursor(win)
+        cursor = mtpvis.make_cursor(win, trial["cursor_size"])
         if trial["show_cursor"]:
             drawables.append(cursor)
         point_rotator = PointRotator(trial["cursor_rotation_degrees"])
