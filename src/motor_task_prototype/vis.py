@@ -59,10 +59,12 @@ def make_targets(
 
 
 def update_target_colors(
-    targets: ElementArrayStim, index: Optional[int] = None
+    targets: ElementArrayStim, show_inactive_targets: bool, index: Optional[int] = None
 ) -> None:
-    # make all targets grey
-    c = np.array([[0.1, 0.1, 0.1]] * targets.nElements)
+    inactive_rgb = 0.0
+    if show_inactive_targets:
+        inactive_rgb = 0.1
+    c = np.array([[inactive_rgb, inactive_rgb, inactive_rgb]] * targets.nElements)
     if index is not None:
         # make specified target red
         c[index][0] = 1

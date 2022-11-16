@@ -74,24 +74,31 @@ def test_make_targets(
 
 @pytest.mark.parametrize("n_targets", [1])
 def test_update_target_colors(window: Window, n_targets: int) -> None:
-    grey = (0.1, 0.1, 0.1)
-    red = (1.0, -1.0, -1.0)
-    targets = mtpvis.make_targets(window, n_targets, 0.5, 0.05, 0.05)
-    n_elem = n_targets + 1
-    # calling without specifying an index makes all elements grey
-    mtpvis.update_target_colors(targets)
-    assert targets.colors.shape == (n_elem, 3)
-    for color in targets.colors:
-        assert np.allclose(color, grey)
-    # calling with index makes that element red, the rest grey
-    for index in range(n_elem):
-        mtpvis.update_target_colors(targets, index=index)
+    for show_inactive_targets, inactive_color in [
+        (True, (0.1, 0.1, 0.1)),
+        (False, (0, 0, 0)),
+    ]:
+        red = (1.0, -1.0, -1.0)
+        targets = mtpvis.make_targets(window, n_targets, 0.5, 0.05, 0.05)
+        n_elem = n_targets + 1
+        # calling without specifying an index makes all elements grey
+        mtpvis.update_target_colors(
+            targets, show_inactive_targets=show_inactive_targets
+        )
         assert targets.colors.shape == (n_elem, 3)
-        for i in range(n_elem):
-            if i == index:
-                assert np.allclose(targets.colors[i], red)
-            else:
-                assert np.allclose(targets.colors[i], grey)
+        for color in targets.colors:
+            assert np.allclose(color, inactive_color)
+        # calling with index makes that element red, the rest grey
+        for index in range(n_elem):
+            mtpvis.update_target_colors(
+                targets, show_inactive_targets=show_inactive_targets, index=index
+            )
+            assert targets.colors.shape == (n_elem, 3)
+            for i in range(n_elem):
+                if i == index:
+                    assert np.allclose(targets.colors[i], red)
+                else:
+                    assert np.allclose(targets.colors[i], inactive_color)
 
 
 def test_splash_screen_defaults(window: Window) -> None:

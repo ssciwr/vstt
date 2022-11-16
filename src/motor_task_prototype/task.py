@@ -89,7 +89,9 @@ def run_task(
             if not trial["automove_cursor_to_center"]:
                 indices.append(trial["num_targets"])
             for target_index in indices:
-                mtpvis.update_target_colors(targets, None)
+                mtpvis.update_target_colors(
+                    targets, trial["show_inactive_targets"], None
+                )
                 is_central_target = target_index == trial["num_targets"]
                 if is_central_target:
                     prev_cursor_path.vertices = cursor_path.vertices
@@ -107,7 +109,9 @@ def run_task(
                             return _clean_up_and_return()
                     mouse.setPos((0.0, 0.0))
                     mouse_pos = (0.0, 0.0)
-                mtpvis.update_target_colors(targets, target_index)
+                mtpvis.update_target_colors(
+                    targets, trial["show_inactive_targets"], target_index
+                )
                 if trial["play_sound"]:
                     Sound("A", secs=0.3, blockSize=512).play()
                 if not is_central_target:
