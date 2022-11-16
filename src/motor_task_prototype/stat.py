@@ -110,12 +110,11 @@ def rmse(
 ) -> float:
     assert len(mouse_positions) > 1
     # use first mouse position as origin point, so exclude it from RMSE measure
-    origin = mouse_positions[0]
-    norm = np.power(origin[0] - target[0], 2) + np.power(origin[1] - target[1], 2)
+    x1, y1 = mouse_positions[0]
+    x2, y2 = target
+    norm = np.power(x2 - x1, 2) + np.power(y2 - y1, 2)
     norm *= len(mouse_positions) - 1
-    dx = target[0] - origin[0]
-    dy = target[1] - origin[1]
     sum_of_squares = 0
-    for p in mouse_positions[1:]:
-        sum_of_squares += np.power(dx * (origin[1] - p[1]) - dy * (origin[0] - p[0]), 2)
+    for x0, y0 in mouse_positions[1:]:
+        sum_of_squares += np.power((x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1), 2)
     return np.sqrt(sum_of_squares / norm)

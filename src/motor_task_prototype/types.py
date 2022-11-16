@@ -20,6 +20,7 @@ class MotorTaskTrial(TypedDict):
     target_distance: float
     target_size: float
     central_target_size: float
+    show_inactive_targets: bool
     play_sound: bool
     automove_cursor_to_center: bool
     show_cursor: bool
