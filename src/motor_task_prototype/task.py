@@ -47,6 +47,7 @@ def run_task(
     kb = Keyboard()
     mtpvis.splash_screen(experiment.metadata, win)
     condition_trial_indices: List[List[int]] = [[] for _ in trial_handler.trialList]
+    rng = np.random.default_rng()
     for trial in trial_handler:
         targets: ElementArrayStim = mtpvis.make_targets(
             win,
@@ -84,7 +85,10 @@ def run_task(
         trial_to_target_mouse_positions = []
         trial_to_center_mouse_positions = []
         mouse_pos = (0.0, 0.0)
-        for index in np.fromstring(trial["target_indices"], dtype="int", sep=" "):
+        target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
+        if trial["target_order"] == "random":
+            rng.shuffle(target_indices)
+        for index in target_indices:
             indices = [index]
             if not trial["automove_cursor_to_center"]:
                 indices.append(trial["num_targets"])
@@ -144,6 +148,7 @@ def run_task(
                 else:
                     trial_to_target_timestamps.append(np.array(mouse_times))
                     trial_to_target_mouse_positions.append(np.array(mouse_positions))
+        trial_handler.addData("target_indices", np.array(target_indices))
         trial_handler.addData("target_pos", np.array(trial_target_pos))
         trial_handler.addData(
             "to_target_timestamps", np.array(trial_to_target_timestamps)
