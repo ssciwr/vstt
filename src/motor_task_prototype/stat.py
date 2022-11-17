@@ -24,43 +24,55 @@ class MotorTaskStats:
         # for now assume the experiment is only repeated once
         i_repeat = 0
         for i_trial in trials:
-            to_target_reaction_times = []
-            to_target_times = []
-            to_target_distances = []
-            to_target_rmses = []
             targets = data["target_pos"][i_trial][i_repeat]
-            for to_target_timestamps, to_target_mouse_positions, target_pos in zip(
+            n_targets = len(targets)
+            to_target_reaction_times = [0.0] * n_targets
+            to_target_times = [0.0] * n_targets
+            to_target_distances = [0.0] * n_targets
+            to_target_rmses = [0.0] * n_targets
+            for (
+                to_target_timestamps,
+                to_target_mouse_positions,
+                target_pos,
+                target_index,
+            ) in zip(
                 data["to_target_timestamps"][i_trial][i_repeat],
                 data["to_target_mouse_positions"][i_trial][i_repeat],
                 targets,
+                data["target_indices"][i_trial][i_repeat],
             ):
                 to_target_reaction_time, to_target_time = reaction_movement_times(
                     to_target_timestamps, to_target_mouse_positions
                 )
-                to_target_reaction_times.append(to_target_reaction_time)
-                to_target_times.append(to_target_time)
-                to_target_distances.append(distance(to_target_mouse_positions))
-                to_target_rmses.append(rmse(to_target_mouse_positions, target_pos))
+                to_target_reaction_times[target_index] = to_target_reaction_time
+                to_target_times[target_index] = to_target_time
+                to_target_distances[target_index] = distance(to_target_mouse_positions)
+                to_target_rmses[target_index] = rmse(
+                    to_target_mouse_positions, target_pos
+                )
             all_to_target_reaction_times.append(to_target_reaction_times)
             all_to_target_times.append(to_target_times)
             all_to_target_distances.append(to_target_distances)
             all_to_target_rmses.append(to_target_rmses)
-            to_center_reaction_times = []
-            to_center_times = []
-            to_center_distances = []
-            to_center_rmses = []
+            to_center_reaction_times = [0.0] * n_targets
+            to_center_times = [0.0] * n_targets
+            to_center_distances = [0.0] * n_targets
+            to_center_rmses = [0.0] * n_targets
             central_target = (0.0, 0.0)
-            for to_center_timestamps, to_center_mouse_positions in zip(
+            for to_center_timestamps, to_center_mouse_positions, target_index in zip(
                 data["to_center_timestamps"][i_trial][i_repeat],
                 data["to_center_mouse_positions"][i_trial][i_repeat],
+                data["target_indices"][i_trial][i_repeat],
             ):
                 to_center_reaction_time, to_center_time = reaction_movement_times(
                     to_center_timestamps, to_center_mouse_positions
                 )
-                to_center_reaction_times.append(to_center_reaction_time)
-                to_center_times.append(to_center_time)
-                to_center_distances.append(distance(to_center_mouse_positions))
-                to_center_rmses.append(rmse(to_center_mouse_positions, central_target))
+                to_center_reaction_times[target_index] = to_center_reaction_time
+                to_center_times[target_index] = to_center_time
+                to_center_distances[target_index] = distance(to_center_mouse_positions)
+                to_center_rmses[target_index] = rmse(
+                    to_center_mouse_positions, central_target
+                )
             all_to_center_reaction_times.append(to_center_reaction_times)
             all_to_center_times.append(to_center_times)
             all_to_center_distances.append(to_center_distances)

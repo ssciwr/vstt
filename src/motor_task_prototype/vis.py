@@ -8,7 +8,7 @@ import motor_task_prototype.stat as mtpstat
 import numpy as np
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.types import MotorTaskDisplayOptions
-from psychopy.colors import colors
+from psychopy.colors import colorNames
 from psychopy.data import TrialHandlerExt
 from psychopy.hardware.keyboard import Keyboard
 from psychopy.visual.basevisual import BaseVisualStim
@@ -18,7 +18,8 @@ from psychopy.visual.shape import ShapeStim
 from psychopy.visual.textbox2 import TextBox2
 from psychopy.visual.window import Window
 
-colors.pop("none")
+colorNames.pop("none")
+colors = list(colorNames.values())
 
 
 def make_cursor(window: Window, cursor_size: float) -> ShapeStim:
@@ -157,6 +158,7 @@ def make_drawables(
     i_condition = trial_handler.sequenceIndices[trial_indices[0]][i_repeat]
     conditions = trial_handler.trialList[i_condition]
     targets = trial_handler.data["target_pos"][trial_indices[0]][i_repeat]
+    target_indices = trial_handler.data["target_indices"][trial_indices[0]][i_repeat]
     drawables.append(
         TextBox2(
             win,
@@ -171,7 +173,8 @@ def make_drawables(
     # stats
     stats = mtpstat.MotorTaskStats(trial_handler, trial_indices)
     letter_height = 0.015
-    for i_target, (color, target_pos) in enumerate(zip(colors, targets)):
+    for i_target, target_pos in zip(target_indices, targets):
+        color = colors[i_target]
         txt_stats = make_stats_txt(display_options, stats, i_target)
         if target_pos[0] > 0:
             text_pos = target_pos[0] + 0.18, target_pos[1]
@@ -222,13 +225,13 @@ def make_drawables(
         )
     # targets
     if display_options["targets"]:
-        for color, target_pos in zip(colors, targets):
+        for i_target, target_pos in zip(target_indices, targets):
             drawables.append(
                 Circle(
                     win,
                     radius=conditions["target_size"],
                     pos=target_pos,
-                    fillColor=color,
+                    fillColor=colors[i_target],
                 )
             )
     # paths
@@ -236,6 +239,7 @@ def make_drawables(
         assert (
             trial_handler.sequenceIndices[i_trial][i_repeat] == i_condition
         ), "Trials to display should all use the same conditions"
+        target_indices = trial_handler.data["target_indices"][i_trial][i_repeat]
         trial_mouse_positions = trial_handler.data["to_target_mouse_positions"][
             i_trial
         ][i_repeat]
@@ -247,24 +251,28 @@ def make_drawables(
             display_options["to_center_paths"]
             and not conditions["automove_cursor_to_center"]
         ):
-            for color, mouse_positions_back in zip(colors, trial_mouse_positions_back):
+            for target_index, mouse_positions_back in zip(
+                target_indices, trial_mouse_positions_back
+            ):
                 drawables.append(
                     ShapeStim(
                         win,
                         vertices=mouse_positions_back,
-                        lineColor=color,
+                        lineColor=colors[target_index],
                         closeShape=False,
                         lineWidth=3,
                     )
                 )
         # paths to target
         if display_options["to_target_paths"]:
-            for color, mouse_positions in zip(colors, trial_mouse_positions):
+            for target_index, mouse_positions in zip(
+                target_indices, trial_mouse_positions
+            ):
                 drawables.append(
                     ShapeStim(
                         win,
                         vertices=mouse_positions,
-                        lineColor=color,
+                        lineColor=colors[target_index],
                         closeShape=False,
                         lineWidth=3,
                     )
