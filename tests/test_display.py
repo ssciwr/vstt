@@ -20,6 +20,8 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
         "central_target": True,
         "to_target_reaction_time": True,
         "to_center_reaction_time": True,
+        "to_target_movement_time": True,
+        "to_center_movement_time": True,
         "to_target_time": True,
         "to_center_time": True,
         "to_target_distance": False,

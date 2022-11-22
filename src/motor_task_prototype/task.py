@@ -84,6 +84,8 @@ def run_task(
         trial_to_center_timestamps = []
         trial_to_target_mouse_positions = []
         trial_to_center_mouse_positions = []
+        trial_to_target_success = []
+        trial_to_center_success = []
         mouse_pos = (0.0, 0.0)
         target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
         if trial["target_order"] == "random":
@@ -141,6 +143,11 @@ def run_task(
                     dist = xydist(mouse_pos, targets.xys[target_index])
                     if not mtpvis.draw_and_flip(win, drawables, kb):
                         return _clean_up_and_return()
+                success = clock.getTime() < trial["target_duration"]
+                if is_central_target:
+                    trial_to_center_success.append(success)
+                else:
+                    trial_to_target_success.append(success)
                 win.recordFrameIntervals = False
                 if is_central_target:
                     trial_to_center_timestamps.append(np.array(mouse_times))
@@ -156,12 +163,14 @@ def run_task(
         trial_handler.addData(
             "to_target_mouse_positions", np.array(trial_to_target_mouse_positions)
         )
+        trial_handler.addData("to_target_success", np.array(trial_to_target_success))
         trial_handler.addData(
             "to_center_timestamps", np.array(trial_to_center_timestamps)
         )
         trial_handler.addData(
             "to_center_mouse_positions", np.array(trial_to_center_mouse_positions)
         )
+        trial_handler.addData("to_center_success", np.array(trial_to_center_success))
         clock.reset()
         while clock.getTime() < post_trial_delay:
             if not mtpvis.draw_and_flip(win, [], kb):
@@ -183,14 +192,16 @@ def run_task(
             mtpvis.display_results(
                 trial_handler,
                 experiment.display_options,
-                [trial_handler.thisTrialN],
+                trial_handler.thisTrialN,
+                False,
                 win,
             )
         if display_block_results:
             mtpvis.display_results(
                 trial_handler,
                 experiment.display_options,
-                condition_trial_indices[trial_handler.thisIndex],
+                trial_handler.thisTrialN,
+                True,
                 win,
             )
     if win.nDroppedFrames > 0:
