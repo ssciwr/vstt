@@ -27,11 +27,16 @@ def test_metadata_widget(window: Window) -> None:
     # a couple percent of black pixels due to black text
     assert 0.005 <= gtu.pixel_color_fraction(screenshot, (0, 0, 0)) <= 0.050
     experiment = MotorTaskExperiment()
-    experiment.metadata = mtpmeta.empty_metadata()
-    # assign experiment with empty metadata
+    empty_metadata = mtpmeta.default_metadata()
+    for key, value in empty_metadata.items():
+        if type(value) is str:
+            empty_metadata[key] = ""  # type: ignore
+    empty_metadata["show_delay_countdown"] = False
+    experiment.metadata = empty_metadata
+    # assign experiment with empty metadata strings
     widget.experiment = experiment
     assert widget.experiment is experiment
-    assert widget.experiment.metadata == mtpmeta.empty_metadata()
+    assert widget.experiment.metadata == empty_metadata
     assert widget.experiment.has_unsaved_changes is False
     assert not signal_received
     screenshot = gtu.call_target_and_get_screenshot(
@@ -46,10 +51,10 @@ def test_metadata_widget(window: Window) -> None:
     assert gtu.pixel_color_fraction(screenshot, (0, 0, 0)) == 0.000
     # reset to experiment with empty metadata, then type variable name in each line edit
     assert widget.experiment.has_unsaved_changes is False
-    assert widget.experiment.metadata == mtpmeta.empty_metadata()
+    assert widget.experiment.metadata == empty_metadata
     assert not signal_received
-    for key in mtpmeta.empty_metadata().keys():
-        line_edit = widget._widgets[key]
+    for key in widget._str_widgets.keys():
+        line_edit = widget._str_widgets[key]
         assert line_edit is not None
         assert type(line_edit) is QtWidgets.QLineEdit
         assert widget.experiment.metadata[key] == ""  # type: ignore
@@ -59,7 +64,8 @@ def test_metadata_widget(window: Window) -> None:
         assert widget.experiment.has_unsaved_changes is True
         assert signal_received
     for key, value in widget.experiment.metadata.items():
-        assert value == key
+        if type(value) is str:
+            assert value == key
     # assign another experiment to widget & update fields
     experiment2 = MotorTaskExperiment()
     experiment2.has_unsaved_changes = False
@@ -67,18 +73,21 @@ def test_metadata_widget(window: Window) -> None:
     assert widget.experiment is experiment2
     assert widget.experiment.has_unsaved_changes is False
     for key, value in mtpmeta.default_metadata().items():
-        line_edit = widget._widgets[key]
-        signal_received.clear()
-        assert line_edit is not None
-        assert type(line_edit) is QtWidgets.QLineEdit
-        assert widget.experiment.metadata[key] == value  # type: ignore
-        qtu.press_keys(line_edit, "2")
-        assert widget.experiment.metadata[key] == value + "2"  # type: ignore
-        assert widget.experiment.has_unsaved_changes is True
-        assert signal_received
+        if type(value) is str:
+            line_edit = widget._str_widgets[key]
+            signal_received.clear()
+            assert line_edit is not None
+            assert type(line_edit) is QtWidgets.QLineEdit
+            assert widget.experiment.metadata[key] == value  # type: ignore
+            qtu.press_keys(line_edit, "2")
+            assert widget.experiment.metadata[key] == value + "2"  # type: ignore
+            assert widget.experiment.has_unsaved_changes is True
+            assert signal_received
     # experiment2 has been updated
     for key, value in experiment2.metadata.items():
-        assert value == mtpmeta.default_metadata()[key] + "2"  # type: ignore
+        if type(value) is str:
+            assert value == mtpmeta.default_metadata()[key] + "2"  # type: ignore
     # previous experiment was not modified
     for key, value in experiment.metadata.items():
-        assert value == key
+        if type(value) is str:
+            assert value == key

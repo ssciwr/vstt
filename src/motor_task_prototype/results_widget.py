@@ -56,31 +56,27 @@ class ResultsWidget(QtWidgets.QWidget):
         self._btn_display_trial.setEnabled(valid)
         self._btn_display_condition.setEnabled(valid)
 
-    def _btn_display_trial_clicked(self) -> None:
+    def _display_results(self, all_trials_for_this_condition: bool) -> None:
         row = self._list_trials.currentRow()
         if not self._is_valid(row):
             return
         display_results(
+            60,
+            True,
+            False,
             self._experiment.trial_handler_with_results,
             self._experiment.display_options,
             row,
-            False,
+            all_trials_for_this_condition,
             win=self._win,
             win_type=self._win_type,
         )
 
+    def _btn_display_trial_clicked(self) -> None:
+        self._display_results(False)
+
     def _btn_display_condition_clicked(self) -> None:
-        row = self._list_trials.currentRow()
-        if not self._is_valid(row):
-            return
-        display_results(
-            self._experiment.trial_handler_with_results,
-            self._experiment.display_options,
-            row,
-            True,
-            win=self._win,
-            win_type=self._win_type,
-        )
+        self._display_results(True)
 
     @property
     def experiment(self) -> MotorTaskExperiment:

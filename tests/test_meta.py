@@ -22,6 +22,9 @@ def test_import_metadata() -> None:
         "display_text2": "t2",
         "display_text3": "t3",
         "display_text4": "t4",
+        "display_duration": 123,
+        "show_delay_countdown": False,
+        "enter_to_skip_delay": False,
     }
     metadata = mtpmeta.import_metadata(valid_dict)
     assert metadata == valid_dict

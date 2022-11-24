@@ -41,8 +41,10 @@ def default_trial() -> MotorTaskTrial:
         "cursor_rotation_degrees": 0.0,
         "post_trial_delay": 0.0,
         "post_trial_display_results": False,
-        "post_block_delay": 0.0,
+        "post_block_delay": 5.0,
         "post_block_display_results": True,
+        "show_delay_countdown": True,
+        "enter_to_skip_delay": True,
     }
 
 
@@ -68,6 +70,8 @@ def trial_labels() -> Dict:
         "post_trial_display_results": "Display results after each trial",
         "post_block_delay": "Delay after last trial (secs)",
         "post_block_display_results": "Display results after this block",
+        "show_delay_countdown": "Display a countdown during delays",
+        "enter_to_skip_delay": "Skip delay by pressing enter key",
     }
 
 

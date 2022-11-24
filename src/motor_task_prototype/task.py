@@ -45,7 +45,13 @@ def run_task(
     mouse = Mouse(visible=False, win=win)
     clock = Clock()
     kb = Keyboard()
-    mtpvis.splash_screen(experiment.metadata, win)
+    mtpvis.splash_screen(
+        display_time_seconds=experiment.metadata["display_duration"],
+        enter_to_skip_delay=experiment.metadata["enter_to_skip_delay"],
+        show_delay_countdown=experiment.metadata["show_delay_countdown"],
+        metadata=experiment.metadata,
+        win=win,
+    )
     condition_trial_indices: List[List[int]] = [[] for _ in trial_handler.trialList]
     rng = np.random.default_rng()
     for trial in trial_handler:
@@ -76,9 +82,6 @@ def run_task(
         is_final_trial_of_block = (
             len(condition_trial_indices[trial_handler.thisIndex]) == trial["weight"]
         )
-        post_trial_delay = trial["post_trial_delay"]
-        if is_final_trial_of_block:
-            post_trial_delay = trial["post_block_delay"]
         trial_target_pos = []
         trial_to_target_timestamps = []
         trial_to_center_timestamps = []
@@ -119,7 +122,7 @@ def run_task(
                     targets, trial["show_inactive_targets"], target_index
                 )
                 if trial["play_sound"]:
-                    Sound("A", secs=0.3, blockSize=512).play()
+                    Sound("A", secs=0.3, blockSize=1024).play()
                 if not is_central_target:
                     trial_target_pos.append(targets.xys[target_index])
                 dist = xydist(mouse_pos, targets.xys[target_index])
@@ -171,34 +174,23 @@ def run_task(
             "to_center_mouse_positions", np.array(trial_to_center_mouse_positions)
         )
         trial_handler.addData("to_center_success", np.array(trial_to_center_success))
-        clock.reset()
-        while clock.getTime() < post_trial_delay:
-            if not mtpvis.draw_and_flip(win, [], kb):
-                return _clean_up_and_return()
-        n_trials_currently_in_block = len(
-            condition_trial_indices[trial_handler.thisIndex]
-        )
-        display_trial_results = trial["post_trial_display_results"] or (
-            is_final_trial_of_block
-            and trial["post_block_display_results"]
-            and n_trials_currently_in_block == 1
-        )
-        display_block_results = (
-            is_final_trial_of_block
-            and trial["post_block_display_results"]
-            and n_trials_currently_in_block > 1
-        )
-        if display_trial_results:
+        if trial["post_trial_delay"] > 0:
             mtpvis.display_results(
-                trial_handler,
+                trial["post_trial_delay"],
+                trial["enter_to_skip_delay"],
+                trial["show_delay_countdown"],
+                trial_handler if trial["post_trial_display_results"] else None,
                 experiment.display_options,
                 trial_handler.thisTrialN,
                 False,
                 win,
             )
-        if display_block_results:
+        if is_final_trial_of_block and trial["post_block_delay"] > 0:
             mtpvis.display_results(
-                trial_handler,
+                trial["post_block_delay"],
+                trial["enter_to_skip_delay"],
+                trial["show_delay_countdown"],
+                trial_handler if trial["post_block_display_results"] else None,
                 experiment.display_options,
                 trial_handler.thisTrialN,
                 True,

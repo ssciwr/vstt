@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.types import MotorTaskDisplayOptions
+from psychopy.clock import Clock
 from psychopy.colors import colorNames
 from psychopy.data import TrialHandlerExt
 from psychopy.hardware.keyboard import Keyboard
@@ -78,19 +79,19 @@ def update_target_colors(
 def draw_and_flip(
     win: Window,
     drawables: List[BaseVisualStim],
-    kb: Keyboard,
+    kb: Optional[Keyboard],
     kb_stop_key: str = "escape",
 ) -> bool:
     should_continue = True
     for drawable in drawables:
         drawable.draw()
-    if kb.getKeys([kb_stop_key]):
+    if kb is not None and kb.getKeys([kb_stop_key]):
         should_continue = False
     win.flip()
     return should_continue
 
 
-def make_stats_txt(display_options: MotorTaskDisplayOptions, stats: pd.Series) -> str:
+def _make_stats_txt(display_options: MotorTaskDisplayOptions, stats: pd.Series) -> str:
     txt_stats = ""
     for destination, stat_label_units in mtpstat.list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
@@ -99,23 +100,13 @@ def make_stats_txt(display_options: MotorTaskDisplayOptions, stats: pd.Series) -
     return txt_stats
 
 
-def make_drawables(
+def _make_stats_drawables(
     trial_handler: TrialHandlerExt,
     display_options: MotorTaskDisplayOptions,
     stats_df: pd.DataFrame,
     win: Window,
 ) -> List[BaseVisualStim]:
     drawables: List[BaseVisualStim] = []
-    drawables.append(
-        TextBox2(
-            win,
-            "Press press Enter when you are ready to continue...",
-            pos=(0, -0.47),
-            color="navy",
-            alignment="center",
-            letterHeight=0.03,
-        )
-    )
     if stats_df.shape[0] == 0:
         # no results to display
         return drawables
@@ -134,23 +125,27 @@ def make_drawables(
         )
     )
     # stats
-    letter_height = 0.015
+    letter_height = 0.014
     # split target_pos pair into two scalars so they survive the groupby.mean()
     stats_df[["target_pos_x", "target_pos_y"]] = pd.DataFrame(
         stats_df.target_pos.tolist(), index=stats_df.index
     )
-    for _, row in stats_df.groupby("target_index", as_index=False).mean().iterrows():
+    for _, row in (
+        stats_df.groupby("target_index", as_index=False)
+        .mean(numeric_only=True)
+        .iterrows()
+    ):
         color = colors[int(np.rint(row.target_index))]
-        txt_stats = make_stats_txt(display_options, row)
+        txt_stats = _make_stats_txt(display_options, row)
         if row.target_pos_x > 0:
             text_pos = row.target_pos_x + 0.18, row.target_pos_y
         else:
             text_pos = row.target_pos_x - 0.18, row.target_pos_y
         n_lines = txt_stats.count("\n")
         if n_lines <= 4:
-            letter_height = 0.03
+            letter_height = 0.028
         if n_lines <= 6:
-            letter_height = 0.02
+            letter_height = 0.018
         if len(txt_stats) > 0:
             drawables.append(
                 TextBox2(
@@ -164,7 +159,9 @@ def make_drawables(
             )
     # average stats
     if display_options["averages"]:
-        txt_stats = "Averages:\n" + make_stats_txt(display_options, stats_df.mean())
+        txt_stats = "Averages:\n" + _make_stats_txt(
+            display_options, stats_df.mean(numeric_only=True)
+        )
         drawables.append(
             TextBox2(
                 win,
@@ -200,7 +197,6 @@ def make_drawables(
                     fillColor=colors[row.target_index],
                 )
             )
-    # paths
     # paths to center
     if (
         display_options["to_center_paths"]
@@ -232,7 +228,10 @@ def make_drawables(
 
 
 def display_results(
-    trial_handler: TrialHandlerExt,
+    display_time_seconds: float,
+    enter_to_skip_delay: bool,
+    show_delay_countdown: bool,
+    trial_handler: Optional[TrialHandlerExt],
     display_options: MotorTaskDisplayOptions,
     i_trial: int,
     all_trials_for_this_condition: bool,
@@ -241,60 +240,133 @@ def display_results(
 ) -> None:
     close_window_when_done = False
     if win is None:
-        win = Window(fullscr=True, units="height", winType=win_type)
+        win = _make_window(win_type)
         close_window_when_done = True
-    win.flip()
-    kb = Keyboard()
-    stats_df = mtpstat.stats_dataframe(trial_handler)
-    if all_trials_for_this_condition:
-        condition_index = stats_df.loc[
-            stats_df.i_trial == i_trial
-        ].condition_index.to_numpy()[0]
-        stats_df = stats_df.loc[stats_df.condition_index == condition_index]
+    drawables = []
+    if trial_handler is not None:
+        stats_df = mtpstat.stats_dataframe(trial_handler)
+        if all_trials_for_this_condition:
+            condition_index = stats_df.loc[
+                stats_df.i_trial == i_trial
+            ].condition_index.to_numpy()[0]
+            stats_df = stats_df.loc[stats_df.condition_index == condition_index]
+        else:
+            stats_df = stats_df.loc[stats_df.i_trial == i_trial]
+        drawables = _make_stats_drawables(trial_handler, display_options, stats_df, win)
+    display_drawables(
+        display_time_seconds,
+        enter_to_skip_delay,
+        show_delay_countdown,
+        drawables,
+        win,
+        close_window_when_done,
+    )
+
+
+def _make_textbox_press_enter(win: Window) -> TextBox2:
+    return TextBox2(
+        win,
+        "Press press Enter when you are ready to continue...",
+        pos=(0, -0.47),
+        color="navy",
+        alignment="center",
+        letterHeight=0.03,
+    )
+
+
+def _make_textbox_title(title: str, win: Window) -> TextBox2:
+    return TextBox2(
+        win,
+        title,
+        pos=(0, 0.40),
+        size=(1, None),
+        color="black",
+        bold=True,
+        alignment="center",
+        letterHeight=0.06,
+    )
+
+
+def _make_textbox_main_text(text: str, win: Window) -> TextBox2:
+    return TextBox2(
+        win,
+        text,
+        size=(1, None),
+        pos=(0, 0),
+        color="black",
+        alignment="left",
+        letterHeight=0.03,
+    )
+
+
+def _make_textbox_countdown(text: str, win: Window) -> TextBox2:
+    return TextBox2(
+        win,
+        text,
+        size=(1, None),
+        pos=(0, -0.3),
+        color="black",
+        alignment="center",
+        letterHeight=0.2,
+    )
+
+
+def _make_window(win_type: str) -> Window:
+    return Window(fullscr=True, units="height", winType=win_type)
+
+
+def display_drawables(
+    display_time_seconds: float,
+    enter_to_skip_delay: bool,
+    show_delay_countdown: bool,
+    drawables: List[BaseVisualStim],
+    win: Window,
+    close_window_when_done: bool,
+) -> None:
+    if drawables is None:
+        drawables = []
+    remaining_display_time = int(np.ceil(display_time_seconds))
+    if enter_to_skip_delay:
+        kb = Keyboard()
+        kb.clearEvents()
+        drawables.append(_make_textbox_press_enter(win))
     else:
-        stats_df = stats_df.loc[stats_df.i_trial == i_trial]
-    drawables = make_drawables(trial_handler, display_options, stats_df, win)
-    kb.clearEvents()
-    while True:
+        kb = None
+    if show_delay_countdown:
+        countdown_textbox = _make_textbox_countdown(f"{remaining_display_time}", win)
+        drawables.append(countdown_textbox)
+    clock = Clock()
+    clock.reset()
+    while clock.getTime() < display_time_seconds:
+        if show_delay_countdown:
+            new_remaining_display_time = int(
+                np.ceil(display_time_seconds - clock.getTime())
+            )
+            if new_remaining_display_time < remaining_display_time:
+                remaining_display_time = new_remaining_display_time
+                countdown_textbox.text = f"{remaining_display_time}"
         if not draw_and_flip(win, drawables, kb, "return"):
             if close_window_when_done:
                 win.close()
             return
+    if close_window_when_done:
+        win.close()
+    return
 
 
 def splash_screen(
+    display_time_seconds: float,
+    enter_to_skip_delay: bool,
+    show_delay_countdown: bool,
     metadata: mtpmeta.MotorTaskMetadata,
     win: Optional[Window] = None,
     win_type: str = "pyglet",
 ) -> None:
     close_window_when_done = False
     if win is None:
-        win = Window(fullscr=True, units="height", winType=win_type)
+        win = _make_window(win_type)
         close_window_when_done = True
-    kb = Keyboard()
-    drawables: List[BaseVisualStim] = []
-    drawables.append(
-        TextBox2(
-            win,
-            "Press press Enter when you are ready to continue...",
-            pos=(0, -0.40),
-            color="navy",
-            alignment="center",
-            letterHeight=0.03,
-        )
-    )
-    drawables.append(
-        TextBox2(
-            win,
-            metadata["display_title"],
-            pos=(0, 0.40),
-            size=(1, None),
-            color="black",
-            bold=True,
-            alignment="center",
-            letterHeight=0.06,
-        )
-    )
+    drawables = [_make_textbox_title(metadata["display_title"], win)]
     main_text = "\n\n".join(
         [
             metadata["display_text1"],
@@ -303,20 +375,12 @@ def splash_screen(
             metadata["display_text4"],
         ]
     )
-    drawables.append(
-        TextBox2(
-            win,
-            main_text,
-            size=(1, None),
-            pos=(0, 0),
-            color="black",
-            alignment="left",
-            letterHeight=0.03,
-        )
+    drawables.append(_make_textbox_main_text(main_text, win))
+    display_drawables(
+        display_time_seconds,
+        enter_to_skip_delay,
+        show_delay_countdown,
+        drawables,
+        win,
+        close_window_when_done,
     )
-    kb.clearEvents()
-    while True:
-        if not draw_and_flip(win, drawables, kb, "return"):
-            if close_window_when_done:
-                win.close()
-            return

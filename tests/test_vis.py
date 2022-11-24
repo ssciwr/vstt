@@ -104,7 +104,7 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
 def test_splash_screen_defaults(window: Window) -> None:
     metadata = mtpmeta.default_metadata()
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.splash_screen, (metadata, window), window
+        mtpvis.splash_screen, (1000, True, False, metadata, window), window
     )
     # most pixels grey except for black main text and blue continue text
     assert 0.900 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
@@ -139,6 +139,9 @@ def test_display_results_nothing(
         screenshot = gtu.call_target_and_get_screenshot(
             mtpvis.display_results,
             (
+                60,
+                True,
+                False,
                 experiment_with_results.trial_handler_with_results,
                 experiment_with_results.display_options,
                 0,
@@ -155,6 +158,9 @@ def test_display_results_nothing(
         screenshot = gtu.call_target_and_get_screenshot(
             mtpvis.display_results,
             (
+                60,
+                True,
+                False,
                 experiment_with_results.trial_handler_with_results,
                 experiment_with_results.display_options,
                 3,
@@ -194,6 +200,9 @@ def test_display_results_everything(
         screenshot = gtu.call_target_and_get_screenshot(
             mtpvis.display_results,
             (
+                60,
+                True,
+                False,
                 experiment_with_results.trial_handler_with_results,
                 experiment_with_results.display_options,
                 0,
@@ -212,6 +221,9 @@ def test_display_results_everything(
         screenshot = gtu.call_target_and_get_screenshot(
             mtpvis.display_results,
             (
+                60,
+                True,
+                False,
                 experiment_with_results.trial_handler_with_results,
                 experiment_with_results.display_options,
                 3,
