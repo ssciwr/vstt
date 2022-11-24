@@ -119,6 +119,8 @@ def experiment_with_results() -> MotorTaskExperiment:
         to_center_timestamps = []
         to_target_mouse_positions = []
         to_center_mouse_positions = []
+        to_target_success = []
+        to_center_success = []
         target_pos = points_on_circle(
             trial["num_targets"], trial["target_distance"], include_centre=False
         )
@@ -127,21 +129,25 @@ def experiment_with_results() -> MotorTaskExperiment:
             to_target_mouse_positions.append(
                 make_mouse_positions(pos, to_target_timestamps[-1])
             )
+            to_target_success.append(True)
             if not trial["automove_cursor_to_center"]:
                 to_center_timestamps.append(make_timestamps())
                 to_center_mouse_positions.append(
                     list(reversed(make_mouse_positions(pos, to_center_timestamps[-1])))
                 )
+                to_center_success.append(True)
         trial_handler.addData("target_indices", np.array(range(len(target_pos))))
         trial_handler.addData("target_pos", np.array(target_pos))
         trial_handler.addData("to_target_timestamps", np.array(to_target_timestamps))
         trial_handler.addData(
             "to_target_mouse_positions", np.array(to_target_mouse_positions)
         )
+        trial_handler.addData("to_target_success", np.array(to_target_success))
         trial_handler.addData("to_center_timestamps", np.array(to_center_timestamps))
         trial_handler.addData(
             "to_center_mouse_positions", np.array(to_center_mouse_positions)
         )
+        trial_handler.addData("to_center_success", np.array(to_center_success))
     experiment.trial_handler_with_results = trial_handler
     experiment.has_unsaved_changes = True
     return experiment

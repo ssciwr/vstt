@@ -40,6 +40,8 @@ class MotorTaskDisplayOptions(TypedDict):
     central_target: bool
     to_target_reaction_time: bool
     to_center_reaction_time: bool
+    to_target_movement_time: bool
+    to_center_movement_time: bool
     to_target_time: bool
     to_center_time: bool
     to_target_distance: bool

@@ -6,6 +6,7 @@ from typing import Optional
 import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.stat as mtpstat
 import numpy as np
+import pandas as pd
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.types import MotorTaskDisplayOptions
 from psychopy.colors import colorNames
@@ -89,54 +90,19 @@ def draw_and_flip(
     return should_continue
 
 
-def make_txt(
-    name: str, units: str, stat: np.ndarray, index: Optional[int] = None
-) -> str:
-    if stat.shape[-1] == 0:
-        # no data available for this statistic
-        return ""
-    if index is None:
-        av = np.mean(stat)
-    else:
-        av = np.mean(stat, axis=0)[index]
-    return f"{name}: {av: .3f}{units}\n"
-
-
-def make_stats_txt(
-    display_options: MotorTaskDisplayOptions,
-    stats: mtpstat.MotorTaskStats,
-    i_target: Optional[int] = None,
-) -> str:
+def make_stats_txt(display_options: MotorTaskDisplayOptions, stats: pd.Series) -> str:
     txt_stats = ""
-    if display_options["to_target_reaction_time"]:
-        txt_stats += make_txt("Reaction", "s", stats.to_target_reaction_times, i_target)
-    if display_options["to_target_time"]:
-        txt_stats += make_txt("Movement", "s", stats.to_target_times, i_target)
-    if display_options["to_target_distance"]:
-        txt_stats += make_txt("Distance", "", stats.to_target_distances, i_target)
-    if display_options["to_target_rmse"]:
-        txt_stats += make_txt("RMSE", "", stats.to_target_rmses, i_target)
-    if display_options["to_center_reaction_time"]:
-        txt_stats += make_txt(
-            "Reaction (to center)", "s", stats.to_center_reaction_times, i_target
-        )
-    if display_options["to_center_time"]:
-        txt_stats += make_txt(
-            "Movement (to center)", "s", stats.to_center_times, i_target
-        )
-    if display_options["to_center_distance"]:
-        txt_stats += make_txt(
-            "Distance (to center)", "", stats.to_center_distances, i_target
-        )
-    if display_options["to_center_rmse"]:
-        txt_stats += make_txt("RMSE (to center)", "", stats.to_center_rmses, i_target)
+    for destination, stat_label_units in mtpstat.list_dest_stat_label_units():
+        for stat, label, unit in stat_label_units:
+            if display_options.get(stat, False):  # type: ignore
+                txt_stats += f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
     return txt_stats
 
 
 def make_drawables(
     trial_handler: TrialHandlerExt,
     display_options: MotorTaskDisplayOptions,
-    trial_indices: List[int],
+    stats_df: pd.DataFrame,
     win: Window,
 ) -> List[BaseVisualStim]:
     drawables: List[BaseVisualStim] = []
@@ -150,15 +116,12 @@ def make_drawables(
             letterHeight=0.03,
         )
     )
-    if len(trial_indices) == 0 or trial_handler is None:
+    if stats_df.shape[0] == 0:
         # no results to display
         return drawables
-    # for now assume the experiment is only repeated once
-    i_repeat = 0
-    i_condition = trial_handler.sequenceIndices[trial_indices[0]][i_repeat]
+    i_condition = stats_df.iloc[0].condition_index
     conditions = trial_handler.trialList[i_condition]
-    targets = trial_handler.data["target_pos"][trial_indices[0]][i_repeat]
-    target_indices = trial_handler.data["target_indices"][trial_indices[0]][i_repeat]
+    trial_indices = stats_df.i_trial.unique()
     drawables.append(
         TextBox2(
             win,
@@ -171,15 +134,18 @@ def make_drawables(
         )
     )
     # stats
-    stats = mtpstat.MotorTaskStats(trial_handler, trial_indices)
     letter_height = 0.015
-    for i_target, target_pos in zip(target_indices, targets):
-        color = colors[i_target]
-        txt_stats = make_stats_txt(display_options, stats, i_target)
-        if target_pos[0] > 0:
-            text_pos = target_pos[0] + 0.18, target_pos[1]
+    # split target_pos pair into two scalars so they survive the groupby.mean()
+    stats_df[["target_pos_x", "target_pos_y"]] = pd.DataFrame(
+        stats_df.target_pos.tolist(), index=stats_df.index
+    )
+    for _, row in stats_df.groupby("target_index", as_index=False).mean().iterrows():
+        color = colors[int(np.rint(row.target_index))]
+        txt_stats = make_stats_txt(display_options, row)
+        if row.target_pos_x > 0:
+            text_pos = row.target_pos_x + 0.18, row.target_pos_y
         else:
-            text_pos = target_pos[0] - 0.18, target_pos[1]
+            text_pos = row.target_pos_x - 0.18, row.target_pos_y
         n_lines = txt_stats.count("\n")
         if n_lines <= 4:
             letter_height = 0.03
@@ -198,7 +164,7 @@ def make_drawables(
             )
     # average stats
     if display_options["averages"]:
-        txt_stats = "Averages:\n" + make_stats_txt(display_options, stats)
+        txt_stats = "Averages:\n" + make_stats_txt(display_options, stats_df.mean())
         drawables.append(
             TextBox2(
                 win,
@@ -225,65 +191,51 @@ def make_drawables(
         )
     # targets
     if display_options["targets"]:
-        for i_target, target_pos in zip(target_indices, targets):
+        for _, row in stats_df.loc[stats_df.i_trial == trial_indices[0]].iterrows():
             drawables.append(
                 Circle(
                     win,
                     radius=conditions["target_size"],
-                    pos=target_pos,
-                    fillColor=colors[i_target],
+                    pos=row.target_pos,
+                    fillColor=colors[row.target_index],
                 )
             )
     # paths
-    for i_trial in trial_indices:
-        assert (
-            trial_handler.sequenceIndices[i_trial][i_repeat] == i_condition
-        ), "Trials to display should all use the same conditions"
-        target_indices = trial_handler.data["target_indices"][i_trial][i_repeat]
-        trial_mouse_positions = trial_handler.data["to_target_mouse_positions"][
-            i_trial
-        ][i_repeat]
-        trial_mouse_positions_back = trial_handler.data["to_center_mouse_positions"][
-            i_trial
-        ][i_repeat]
-        # paths to center
-        if (
-            display_options["to_center_paths"]
-            and not conditions["automove_cursor_to_center"]
-        ):
-            for target_index, mouse_positions_back in zip(
-                target_indices, trial_mouse_positions_back
-            ):
-                drawables.append(
-                    ShapeStim(
-                        win,
-                        vertices=mouse_positions_back,
-                        lineColor=colors[target_index],
-                        closeShape=False,
-                        lineWidth=3,
-                    )
+    # paths to center
+    if (
+        display_options["to_center_paths"]
+        and not conditions["automove_cursor_to_center"]
+    ):
+        for _, row in stats_df.iterrows():
+            drawables.append(
+                ShapeStim(
+                    win,
+                    vertices=row.to_center_mouse_positions,
+                    lineColor=colors[row.target_index],
+                    closeShape=False,
+                    lineWidth=3,
                 )
-        # paths to target
-        if display_options["to_target_paths"]:
-            for target_index, mouse_positions in zip(
-                target_indices, trial_mouse_positions
-            ):
-                drawables.append(
-                    ShapeStim(
-                        win,
-                        vertices=mouse_positions,
-                        lineColor=colors[target_index],
-                        closeShape=False,
-                        lineWidth=3,
-                    )
+            )
+    # paths to target
+    if display_options["to_target_paths"]:
+        for _, row in stats_df.iterrows():
+            drawables.append(
+                ShapeStim(
+                    win,
+                    vertices=row.to_target_mouse_positions,
+                    lineColor=colors[row.target_index],
+                    closeShape=False,
+                    lineWidth=3,
                 )
+            )
     return drawables
 
 
 def display_results(
     trial_handler: TrialHandlerExt,
     display_options: MotorTaskDisplayOptions,
-    trial_indices: List[int],
+    i_trial: int,
+    all_trials_for_this_condition: bool,
     win: Optional[Window] = None,
     win_type: str = "pyglet",
 ) -> None:
@@ -293,7 +245,15 @@ def display_results(
         close_window_when_done = True
     win.flip()
     kb = Keyboard()
-    drawables = make_drawables(trial_handler, display_options, trial_indices, win)
+    stats_df = mtpstat.stats_dataframe(trial_handler)
+    if all_trials_for_this_condition:
+        condition_index = stats_df.loc[
+            stats_df.i_trial == i_trial
+        ].condition_index.to_numpy()[0]
+        stats_df = stats_df.loc[stats_df.condition_index == condition_index]
+    else:
+        stats_df = stats_df.loc[stats_df.i_trial == i_trial]
+    drawables = make_drawables(trial_handler, display_options, stats_df, win)
     kb.clearEvents()
     while True:
         if not draw_and_flip(win, drawables, kb, "return"):

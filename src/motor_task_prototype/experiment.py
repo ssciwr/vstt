@@ -13,6 +13,7 @@ from motor_task_prototype.display import default_display_options
 from motor_task_prototype.display import import_display_options
 from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.meta import import_metadata
+from motor_task_prototype.stat import stats_dataframe
 from motor_task_prototype.trial import default_trial
 from motor_task_prototype.trial import import_trial
 from motor_task_prototype.trial import validate_trial
@@ -28,6 +29,7 @@ class MotorTaskExperiment:
         self.display_options = default_display_options()
         self.trial_list = [default_trial()]
         self.trial_handler_with_results: Optional[TrialHandlerExt] = None
+        self.stats: Optional[pd.DataFrame] = None
         if filename is not None:
             self.load_file(filename)
 
@@ -143,6 +145,7 @@ class MotorTaskExperiment:
             validate_trial(trial)
             self.trial_list.append(trial)
         self.trial_handler_with_results = None
+        self.stats = None
         self.has_unsaved_changes = True
         self.filename = str(pathlib.Path(filename).with_suffix(".psydat"))
 
@@ -163,5 +166,7 @@ class MotorTaskExperiment:
         )
         if trial_handler.finished:
             self.trial_handler_with_results = trial_handler
+            self.stats = stats_dataframe(trial_handler)
         else:
             self.trial_handler_with_results = None
+            self.stats = None

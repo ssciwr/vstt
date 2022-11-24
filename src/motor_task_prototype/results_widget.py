@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import DefaultDict
-from typing import Dict
-from typing import List
 from typing import Optional
 
 from motor_task_prototype.experiment import MotorTaskExperiment
@@ -23,8 +19,6 @@ class ResultsWidget(QtWidgets.QWidget):
         self._win = win
         self._win_type = win_type
         self._experiment = MotorTaskExperiment()
-        self._condition_to_trials: DefaultDict[int, List[int]] = defaultdict(list)
-        self._trial_to_condition: Dict[int, int] = dict()
 
         outer_layout = QtWidgets.QVBoxLayout()
         group_box = QtWidgets.QGroupBox("Results")
@@ -69,7 +63,8 @@ class ResultsWidget(QtWidgets.QWidget):
         display_results(
             self._experiment.trial_handler_with_results,
             self._experiment.display_options,
-            [row],
+            row,
+            False,
             win=self._win,
             win_type=self._win_type,
         )
@@ -78,11 +73,11 @@ class ResultsWidget(QtWidgets.QWidget):
         row = self._list_trials.currentRow()
         if not self._is_valid(row):
             return
-        condition = self._trial_to_condition[row]
         display_results(
             self._experiment.trial_handler_with_results,
             self._experiment.display_options,
-            self._condition_to_trials[condition],
+            row,
+            True,
             win=self._win,
             win_type=self._win_type,
         )
@@ -93,8 +88,6 @@ class ResultsWidget(QtWidgets.QWidget):
 
     @experiment.setter
     def experiment(self, experiment: MotorTaskExperiment) -> None:
-        self._trial_to_condition.clear()
-        self._condition_to_trials.clear()
         self._list_trials.clear()
         self._experiment = experiment
         if experiment.trial_handler_with_results is None:
@@ -107,5 +100,3 @@ class ResultsWidget(QtWidgets.QWidget):
             self._list_trials.addItem(
                 f"Trial {trial_index} [Condition {condition_index[rep_index]}]"
             )
-            self._condition_to_trials[condition_index[rep_index]].append(trial_index)
-            self._trial_to_condition[trial_index] = condition_index[rep_index]

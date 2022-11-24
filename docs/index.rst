@@ -15,6 +15,7 @@ motor-task-prototype
    :caption: Example jupyter notebooks
 
    notebooks/example
+   notebooks/raw_data
 
 .. toctree::
    :maxdepth: 2
