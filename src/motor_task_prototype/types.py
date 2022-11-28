@@ -31,6 +31,8 @@ class MotorTaskTrial(TypedDict):
     post_trial_display_results: bool
     post_block_delay: float
     post_block_display_results: bool
+    show_delay_countdown: bool
+    enter_to_skip_delay: bool
 
 
 class MotorTaskDisplayOptions(TypedDict):
@@ -61,3 +63,6 @@ class MotorTaskMetadata(TypedDict):
     display_text2: str
     display_text3: str
     display_text4: str
+    display_duration: float
+    show_delay_countdown: bool
+    enter_to_skip_delay: bool
