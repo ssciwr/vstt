@@ -91,6 +91,8 @@ def run_task(
         trial_to_center_success = []
         mouse_pos = (0.0, 0.0)
         target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
+        mouse.setPos((0.0, 0.0))
+        cursor.setPos((0.0, 0.0))
         if trial["target_order"] == "random":
             rng.shuffle(target_indices)
         for index in target_indices:
@@ -108,16 +110,20 @@ def run_task(
                 else:
                     cursor_path.vertices = [(0, 0)]
                     prev_cursor_path.vertices = [(0, 0)]
-                    mouse.setPos((0.0, 0.0))
-                    cursor.setPos((0.0, 0.0))
+                    if trial["automove_cursor_to_center"]:
+                        mouse_pos = (0.0, 0.0)
+                        mouse.setPos((0.0, 0.0))
+                        cursor.setPos((0.0, 0.0))
                     if not mtpvis.draw_and_flip(win, drawables, kb):
                         return _clean_up_and_return()
                     clock.reset()
                     while clock.getTime() < trial["inter_target_duration"]:
+                        if not trial["freeze_cursor_between_targets"]:
+                            mouse_pos = point_rotator(mouse.getPos())
+                            if trial["show_cursor"]:
+                                cursor.setPos(mouse_pos)
                         if not mtpvis.draw_and_flip(win, drawables, kb):
                             return _clean_up_and_return()
-                    mouse.setPos((0.0, 0.0))
-                    mouse_pos = (0.0, 0.0)
                 mtpvis.update_target_colors(
                     targets, trial["show_inactive_targets"], target_index
                 )

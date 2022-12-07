@@ -23,6 +23,7 @@ class MotorTaskTrial(TypedDict):
     show_inactive_targets: bool
     play_sound: bool
     automove_cursor_to_center: bool
+    freeze_cursor_between_targets: bool
     show_cursor: bool
     cursor_size: float
     show_cursor_path: bool
