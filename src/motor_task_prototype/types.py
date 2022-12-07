@@ -15,6 +15,8 @@ class MotorTaskTrial(TypedDict):
     num_targets: int
     target_order: Union[str, List]
     target_indices: str
+    show_target_labels: bool
+    target_labels: str
     target_duration: float
     inter_target_duration: float
     target_distance: float

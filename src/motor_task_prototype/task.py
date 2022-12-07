@@ -55,6 +55,9 @@ def run_task(
     condition_trial_indices: List[List[int]] = [[] for _ in trial_handler.trialList]
     rng = np.random.default_rng()
     for trial in trial_handler:
+        target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
+        if trial["target_order"] == "random":
+            rng.shuffle(target_indices)
         targets: ElementArrayStim = mtpvis.make_targets(
             win,
             trial["num_targets"],
@@ -62,7 +65,16 @@ def run_task(
             trial["target_size"],
             trial["central_target_size"],
         )
+        target_labels = mtpvis.make_target_labels(
+            win,
+            trial["num_targets"],
+            trial["target_distance"],
+            trial["target_size"],
+            trial["target_labels"],
+        )
         drawables: List[Union[BaseVisualStim, ElementArrayStim]] = [targets]
+        if trial["show_target_labels"]:
+            drawables.extend(target_labels)
         cursor = mtpvis.make_cursor(win, trial["cursor_size"])
         if trial["show_cursor"]:
             drawables.append(cursor)
@@ -90,11 +102,8 @@ def run_task(
         trial_to_target_success = []
         trial_to_center_success = []
         mouse_pos = (0.0, 0.0)
-        target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
         mouse.setPos((0.0, 0.0))
         cursor.setPos((0.0, 0.0))
-        if trial["target_order"] == "random":
-            rng.shuffle(target_indices)
         for index in target_indices:
             indices = [index]
             if not trial["automove_cursor_to_center"]:
@@ -103,6 +112,10 @@ def run_task(
                 mtpvis.update_target_colors(
                     targets, trial["show_inactive_targets"], None
                 )
+                if trial["show_target_labels"]:
+                    mtpvis.update_target_label_colors(
+                        target_labels, trial["show_inactive_targets"], None
+                    )
                 is_central_target = target_index == trial["num_targets"]
                 if is_central_target:
                     prev_cursor_path.vertices = cursor_path.vertices
@@ -127,6 +140,10 @@ def run_task(
                 mtpvis.update_target_colors(
                     targets, trial["show_inactive_targets"], target_index
                 )
+                if trial["show_target_labels"]:
+                    mtpvis.update_target_label_colors(
+                        target_labels, trial["show_inactive_targets"], target_index
+                    )
                 if trial["play_sound"]:
                     Sound("A", secs=0.3, blockSize=1024).play()
                 if not is_central_target:

@@ -61,6 +61,35 @@ def make_targets(
     )
 
 
+def make_target_labels(
+    window: Window,
+    n_circles: int,
+    radius: float,
+    point_radius: float,
+    labels_string: str,
+) -> List[TextBox2]:
+    text_boxes: List[TextBox2] = []
+    positions = points_on_circle(n_circles, radius, include_centre=False)
+    labels = labels_string.strip().split(" ")
+    for label, position in zip(
+        labels,
+        positions,
+    ):
+        text_boxes.append(
+            TextBox2(
+                window,
+                label,
+                anchor="center",
+                pos=position,
+                color="white",
+                bold=True,
+                alignment="center",
+                letterHeight=1.25 * point_radius,
+            )
+        )
+    return text_boxes
+
+
 def update_target_colors(
     targets: ElementArrayStim, show_inactive_targets: bool, index: Optional[int] = None
 ) -> None:
@@ -74,6 +103,21 @@ def update_target_colors(
         c[index][1] = -1
         c[index][2] = -1
     targets.setColors(c, colorSpace="rgb")
+
+
+def update_target_label_colors(
+    target_labels: List[TextBox2],
+    show_inactive_targets: bool,
+    index: Optional[int] = None,
+) -> None:
+    inactive_rgb = 0.0
+    if show_inactive_targets:
+        inactive_rgb = 0.3
+    for target_index, target_label in enumerate(target_labels):
+        if target_index == index:
+            target_label.color = (1, 1, 1)
+        else:
+            target_label.color = (inactive_rgb, inactive_rgb, inactive_rgb)
 
 
 def draw_and_flip(

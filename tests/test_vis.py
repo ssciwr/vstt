@@ -72,7 +72,7 @@ def test_make_targets(
     assert np.allclose(targets.xys, xys)
 
 
-@pytest.mark.parametrize("n_targets", [1])
+@pytest.mark.parametrize("n_targets", [1, 2, 3, 5, 12])
 def test_update_target_colors(window: Window, n_targets: int) -> None:
     for show_inactive_targets, inactive_color in [
         (True, (0.1, 0.1, 0.1)),
@@ -99,6 +99,79 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
                     assert np.allclose(targets.colors[i], red)
                 else:
                     assert np.allclose(targets.colors[i], inactive_color)
+
+
+@pytest.mark.parametrize(
+    "args,xys",
+    [
+        (
+            {
+                "n_circles": 1,
+                "radius": 0.44,
+                "point_radius": 0.1,
+            },
+            [(0, 0.44)],
+        ),
+        (
+            {
+                "n_circles": 4,
+                "radius": 0.3,
+                "point_radius": 0.05,
+            },
+            [(0, 0.3), (0.3, 0), (0, -0.3), (-0.3, 0)],
+        ),
+    ],
+)
+def test_make_target_labels(
+    window: Window, args: Dict, xys: List[Tuple[float, float]]
+) -> None:
+    # more labels than targets: label each target and ignore any extra labels
+    args["labels_string"] = "a b c d e f"
+    label_strings = ["a", "b", "c", "d", "e", "f"]
+    target_labels = mtpvis.make_target_labels(window, **args)
+    assert len(target_labels) == args["n_circles"]
+    for target_label, label_string, xy in zip(target_labels, label_strings, xys):
+        assert target_label.text == label_string
+        assert target_label.letterHeight < 2 * args["point_radius"]
+        assert np.allclose(target_label.pos, xy)
+    # equal or fewer labels than targets: just use available labels
+    args["labels_string"] = "10"
+    label_strings = ["10"]
+    target_labels = mtpvis.make_target_labels(window, **args)
+    assert len(target_labels) == 1
+    for target_label, label_string, xy in zip(target_labels, label_strings, xys):
+        assert target_label.text == label_string
+        assert target_label.letterHeight < 2 * args["point_radius"]
+        assert np.allclose(target_label.pos, xy)
+
+
+@pytest.mark.parametrize("n_targets", [1, 2, 3, 5, 12])
+def test_update_target_label_colors(window: Window, n_targets: int) -> None:
+    labels = "a b c d e f g h i j k l m n o p"
+    for show_inactive_targets, inactive_color in [
+        (True, (0.3, 0.3, 0.3)),
+        (False, (0, 0, 0)),
+    ]:
+        white = (1.0, 1.0, 1.0)
+        target_labels = mtpvis.make_target_labels(window, n_targets, 0.5, 0.05, labels)
+        # calling without specifying an index makes all elements grey
+        mtpvis.update_target_label_colors(
+            target_labels, show_inactive_targets=show_inactive_targets
+        )
+        assert len(target_labels) == n_targets
+        for target_label in target_labels:
+            assert np.allclose(target_label.color, inactive_color)
+        # calling with index makes that element red, the rest grey
+        for index in range(n_targets):
+            mtpvis.update_target_label_colors(
+                target_labels, show_inactive_targets=show_inactive_targets, index=index
+            )
+            assert len(target_labels) == n_targets
+            for i, target_label in enumerate(target_labels):
+                if i == index:
+                    assert np.allclose(target_label.color, white)
+                else:
+                    assert np.allclose(target_label.color, inactive_color)
 
 
 def test_splash_screen_defaults(window: Window) -> None:
