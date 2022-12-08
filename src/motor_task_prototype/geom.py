@@ -59,3 +59,11 @@ class PointRotator:
             self._c * point[0] - self._s * point[1],
             self._s * point[0] + self._c * point[1],
         )
+
+
+def to_target_dists(
+    pos: Tuple[float, float], target_xys: np.ndarray, target_index: int
+) -> Tuple[float, float]:
+    rms_dists = np.linalg.norm(target_xys - np.array(pos), axis=1)
+    # dist to correct target, min distance to any target (excluding center target)
+    return rms_dists[target_index], np.min(rms_dists[:-1])

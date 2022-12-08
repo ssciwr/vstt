@@ -9,9 +9,9 @@ import numpy as np
 from motor_task_prototype import vis as mtpvis
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.geom import PointRotator
+from motor_task_prototype.geom import to_target_dists
 from psychopy.clock import Clock
 from psychopy.event import Mouse
-from psychopy.event import xydist
 from psychopy.hardware.keyboard import Keyboard
 from psychopy.sound import Sound
 from psychopy.visual.basevisual import BaseVisualStim
@@ -148,7 +148,13 @@ def run_task(
                     Sound("A", secs=0.3, blockSize=1024).play()
                 if not is_central_target:
                     trial_target_pos.append(targets.xys[target_index])
-                dist = xydist(mouse_pos, targets.xys[target_index])
+                dist_correct, dist_any = to_target_dists(
+                    mouse_pos, targets.xys, target_index
+                )
+                if trial["ignore_incorrect_targets"] or is_central_target:
+                    dist = dist_correct
+                else:
+                    dist = dist_any
                 mouse_times = [0]
                 mouse_positions = [mouse_pos]
                 if not mtpvis.draw_and_flip(win, drawables, kb):
@@ -166,10 +172,19 @@ def run_task(
                     mouse_positions.append(mouse_pos)
                     if trial["show_cursor_path"]:
                         cursor_path.vertices = mouse_positions
-                    dist = xydist(mouse_pos, targets.xys[target_index])
+                    dist_correct, dist_any = to_target_dists(
+                        mouse_pos, targets.xys, target_index
+                    )
+                    if trial["ignore_incorrect_targets"] or is_central_target:
+                        dist = dist_correct
+                    else:
+                        dist = dist_any
                     if not mtpvis.draw_and_flip(win, drawables, kb):
                         return _clean_up_and_return()
-                success = clock.getTime() < trial["target_duration"]
+                success = (
+                    dist_correct <= target_size
+                    and clock.getTime() < trial["target_duration"]
+                )
                 if is_central_target:
                     trial_to_center_success.append(success)
                 else:
