@@ -61,3 +61,26 @@ def test_point_rotator() -> None:
             p1 = rp(point)
             p2 = mtpgeom.rotate_point(point, angle_radians, (0, 0))
             assert np.allclose([p1], [p2])
+
+
+def test_to_target_dists() -> None:
+    p = (0.0, 0.0)
+    xys = np.array([[1.0, 0], [0.0, 0.0]])
+    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0)
+    assert dist_correct == 1.0
+    assert dist_any == 1.0
+    #
+    p = (1.0, 0.0)
+    xys = np.array([[1.0, 1.0], [1.0, 0.0], [-1.0, 0.0], [0.0, 0.0]])
+    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0)
+    assert dist_correct == 1.0
+    assert dist_any == 0.0
+    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 1)
+    assert dist_correct == 0.0
+    assert dist_any == 0.0
+    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 2)
+    assert dist_correct == 2.0
+    assert dist_any == 0.0
+    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 3)
+    assert dist_correct == 1.0
+    assert dist_any == 0.0
