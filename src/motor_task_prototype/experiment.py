@@ -13,6 +13,7 @@ from motor_task_prototype.display import default_display_options
 from motor_task_prototype.display import import_display_options
 from motor_task_prototype.meta import default_metadata
 from motor_task_prototype.meta import import_metadata
+from motor_task_prototype.stat import append_stats_data_to_excel
 from motor_task_prototype.stat import stats_dataframe
 from motor_task_prototype.trial import default_trial
 from motor_task_prototype.trial import import_trial
@@ -107,6 +108,8 @@ class MotorTaskExperiment:
             pd.DataFrame(self.trial_list).to_excel(
                 writer, sheet_name="trial_list", index=False
             )
+            if self.stats is not None:
+                append_stats_data_to_excel(self.stats, writer)
 
     def load_excel(self, filename: str) -> None:
         dfs = pd.read_excel(filename, ["metadata", "display_options", "trial_list"])
