@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from typing import Any
 from typing import List
 from typing import Tuple
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -52,23 +54,24 @@ def _get_target_data(
     target_pos = np.array(data["target_pos"][index][i_target])
     center_pos = np.array([0.0, 0.0])
     to_target_timestamps = np.array(data["to_target_timestamps"][index][i_target])
-    to_target_mouse_positions = np.array(
-        data["to_target_mouse_positions"][index][i_target]
-    )
+    to_target_mouse_positions = np.stack(
+        np.array(data["to_target_mouse_positions"][index][i_target])
+    )  # type: ignore
     to_target_success = np.array(data["to_target_success"][index][i_target])
+    to_center_success: Union[np.ndarray, bool]
     if (
         type(data["to_center_timestamps"][index]) is np.ndarray
         and i_target < data["to_center_timestamps"][index].shape[0]
     ):
         to_center_timestamps = np.array(data["to_center_timestamps"][index][i_target])
-        to_center_mouse_positions = np.array(
-            data["to_center_mouse_positions"][index][i_target]
-        )
+        to_center_mouse_positions = np.stack(
+            np.array(data["to_center_mouse_positions"][index][i_target])
+        )  # type: ignore
         to_center_success = np.array(data["to_center_success"][index][i_target])
     else:
         to_center_timestamps = np.array([])
         to_center_mouse_positions = np.array([])
-        to_center_success = np.array([])
+        to_center_success = True
     return [
         index[0],
         index[1],
@@ -123,6 +126,47 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             axis=1,
         )
     return df
+
+
+def append_stats_data_to_excel(df: pd.DataFrame, writer: Any) -> None:
+    data_labels = [
+        "to_target_timestamps",
+        "to_target_mouse_positions",
+        "to_center_timestamps",
+        "to_center_mouse_positions",
+    ]
+    # first sheet: all statistics, exclude arrays of timestamp/position data
+    # convert columns of xy values to x column and y column of floats
+    df_stats = df.drop(columns=data_labels)
+    for label in ["target_pos", "center_pos"]:
+        column_as_2d_array = np.stack(df_stats[f"{label}"].to_numpy())
+        df_stats[f"{label}_x"] = column_as_2d_array[:, 0]
+        df_stats[f"{label}_y"] = column_as_2d_array[:, 1]
+        df_stats = df_stats.drop(columns=[label])
+    df_stats.to_excel(writer, sheet_name="statistics", index=False)
+    # add a sheet for each row with arrays of data that were excluded above
+    # transpose array to a column, and split arrays of x-y pairs into two columns
+    for row in df.itertuples():
+        df_data = pd.concat(
+            [
+                pd.DataFrame({label: getattr(row, label)})
+                for label in ["to_target_timestamps", "to_center_timestamps"]
+            ],
+            axis=1,
+        )
+        for label in ["to_target_mouse_positions", "to_center_mouse_positions"]:
+            arr = getattr(row, label)
+            if arr.shape[-1] > 0:
+                df_data = pd.concat(
+                    [
+                        df_data,
+                        pd.DataFrame(
+                            {f"{label}_x": arr[:, 0], f"{label}_y": arr[:, 1]}
+                        ),
+                    ],
+                    axis=1,
+                )
+        df_data.to_excel(writer, sheet_name=f"{row.Index}", index=False)
 
 
 def _reaction_time(

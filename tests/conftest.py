@@ -10,6 +10,7 @@ import pyautogui
 import pytest
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.geom import points_on_circle
+from motor_task_prototype.stat import stats_dataframe
 from motor_task_prototype.trial import default_trial
 from psychopy.gui.qtgui import ensureQtApp
 from psychopy.visual.window import Window
@@ -147,7 +148,10 @@ def experiment_with_results() -> MotorTaskExperiment:
         trial_handler.addData(
             "to_center_mouse_positions", np.array(to_center_mouse_positions)
         )
+        if trial["automove_cursor_to_center"]:
+            to_center_success = [True] * trial["num_targets"]
         trial_handler.addData("to_center_success", np.array(to_center_success))
     experiment.trial_handler_with_results = trial_handler
+    experiment.stats = stats_dataframe(trial_handler)
     experiment.has_unsaved_changes = True
     return experiment

@@ -10,6 +10,7 @@ from motor_task_prototype import vis as mtpvis
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.geom import PointRotator
 from motor_task_prototype.geom import to_target_dists
+from motor_task_prototype.stat import stats_dataframe
 from psychopy.clock import Clock
 from psychopy.event import Mouse
 from psychopy.hardware.keyboard import Keyboard
@@ -32,6 +33,7 @@ def run_task(
             win.close()
         if write_results_to_experiment:
             experiment.trial_handler_with_results = trial_handler
+            experiment.stats = stats_dataframe(trial_handler)
             experiment.has_unsaved_changes = True
         return write_results_to_experiment
 
@@ -211,6 +213,8 @@ def run_task(
         trial_handler.addData(
             "to_center_mouse_positions", np.array(trial_to_center_mouse_positions)
         )
+        if trial["automove_cursor_to_center"]:
+            trial_to_center_success = [True] * trial["num_targets"]
         trial_handler.addData("to_center_success", np.array(trial_to_center_success))
         if trial["post_trial_delay"] > 0:
             mtpvis.display_results(

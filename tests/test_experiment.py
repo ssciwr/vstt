@@ -4,6 +4,7 @@ import pathlib
 import pickle
 
 import numpy as np
+import pandas as pd
 import pytest
 from motor_task_prototype.display import default_display_options
 from motor_task_prototype.experiment import MotorTaskExperiment
@@ -114,6 +115,7 @@ def test_experiment_to_excel(
     # export to an Excel file
     excel_file = tmp_path / "export.xlsx"
     experiment_with_results.save_excel(str(excel_file))
+    stats: pd.DataFrame = experiment_with_results.stats
     # import this Excel file again
     exp = MotorTaskExperiment(str(excel_file))
     assert exp.metadata == experiment_with_results.metadata
@@ -122,6 +124,34 @@ def test_experiment_to_excel(
     assert exp.trial_handler_with_results is None
     assert exp.has_unsaved_changes is True
     assert exp.filename == str(excel_file.with_suffix(".psydat"))
+    # check that results sheets in Excel are consistent with stats dataframe
+    dfs = pd.read_excel(excel_file, sheet_name=None)
+    df_stats = dfs["statistics"]
+    # convert x,y columns back to single (x,y) tuple column
+    df_stats.center_pos = list(zip(df_stats.center_pos_x, df_stats.center_pos_y))
+    df_stats.drop(columns=["center_pos_x", "center_pos_y"], inplace=True)
+    df_stats.target_pos = list(zip(df_stats.target_pos_x, df_stats.target_pos_y))
+    df_stats.drop(columns=["target_pos_x", "target_pos_y"], inplace=True)
+    for name in df_stats:
+        for a, b in zip(stats[name], df_stats[name]):
+            assert np.allclose(a, b, equal_nan=True)
+    # check that excel trial data is consistent with stats dataframe
+    for i_trial in range(stats.shape[0]):
+        df_data = dfs[f"{i_trial}"]
+        for label in ["to_target_timestamps", "to_center_timestamps"]:
+            correct_values = stats[label][i_trial]
+            n = correct_values.shape[0]
+            assert np.allclose(df_data[label].to_numpy()[0:n], correct_values)
+        for label in ["to_target_mouse_positions", "to_center_mouse_positions"]:
+            correct_values = stats[label][i_trial]
+            n = correct_values.shape[0]
+            if n > 0:
+                assert np.allclose(
+                    df_data[f"{label}_x"].to_numpy()[0:n], correct_values[:, 0]
+                )
+                assert np.allclose(
+                    df_data[f"{label}_y"].to_numpy()[0:n], correct_values[:, 1]
+                )
 
 
 def test_experiment_to_json(
@@ -149,6 +179,12 @@ def test_experiment_invalid_file(tmp_path: pathlib.Path) -> None:
     file = tmp_path / "invalid.psydat"
     file.write_text("beep boop")
     with pytest.raises(pickle.PickleError):
+        MotorTaskExperiment(str(file))
+
+    # file exists and has xlsx extension but is garbage
+    file = tmp_path / "invalid.xlsx"
+    file.write_text("beep boop")
+    with pytest.raises(ValueError):
         MotorTaskExperiment(str(file))
 
 
