@@ -4,6 +4,7 @@ import logging
 from typing import Optional
 
 import click
+from motor_task_prototype import config as mtpconfig
 from motor_task_prototype.gui import MotorTaskGui
 from psychopy.gui.qtgui import ensureQtApp
 from PyQt5 import QtWidgets
@@ -24,7 +25,8 @@ def main(filename: Optional[str], win_type: str) -> None:
     ensureQtApp()
     app = QtWidgets.QApplication.instance()
     assert app is not None
-    gui = MotorTaskGui(filename=filename, win_type=win_type)
+    mtpconfig.win_type = win_type
+    gui = MotorTaskGui(filename=filename)
     gui.show()
     app.exec()
 

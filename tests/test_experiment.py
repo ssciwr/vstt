@@ -128,9 +128,9 @@ def test_experiment_to_excel(
     dfs = pd.read_excel(excel_file, sheet_name=None)
     df_stats = dfs["statistics"]
     # convert x,y columns back to single (x,y) tuple column
-    df_stats.center_pos = list(zip(df_stats.center_pos_x, df_stats.center_pos_y))
+    df_stats["center_pos"] = list(zip(df_stats.center_pos_x, df_stats.center_pos_y))
     df_stats.drop(columns=["center_pos_x", "center_pos_y"], inplace=True)
-    df_stats.target_pos = list(zip(df_stats.target_pos_x, df_stats.target_pos_y))
+    df_stats["target_pos"] = list(zip(df_stats.target_pos_x, df_stats.target_pos_y))
     df_stats.drop(columns=["target_pos_x", "target_pos_y"], inplace=True)
     for name in df_stats:
         for a, b in zip(stats[name], df_stats[name]):

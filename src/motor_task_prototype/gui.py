@@ -6,6 +6,7 @@ from typing import Callable
 from typing import Optional
 
 import motor_task_prototype as mtp
+from motor_task_prototype import config as mtpconfig
 from motor_task_prototype.display_widget import DisplayOptionsWidget
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.meta_widget import MetadataWidget
@@ -19,24 +20,16 @@ from PyQt5.QtCore import Qt
 
 
 class MotorTaskGui(QtWidgets.QMainWindow):
-    def __init__(
-        self,
-        filename: Optional[str] = None,
-        win: Optional[Window] = None,
-        win_type: str = "pyglet",
-    ):
+    def __init__(self, filename: Optional[str] = None, win: Optional[Window] = None):
         super().__init__()
         self.experiment = MotorTaskExperiment()
         self._win = win
-        self._win_type = win_type
 
         grid_layout = QtWidgets.QVBoxLayout()
         split_top_bottom = QtWidgets.QSplitter(Qt.Vertical)
 
         split_metadata_display = QtWidgets.QSplitter()
-        self.metadata_widget = MetadataWidget(
-            self, win=self._win, win_type=self._win_type
-        )
+        self.metadata_widget = MetadataWidget(self, win=self._win)
         self.metadata_widget.experiment_modified.connect(self.update_window_title)
         split_metadata_display.addWidget(self.metadata_widget)
         self.display_options_widget = DisplayOptionsWidget(self)
@@ -50,9 +43,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         self.trials_widget = TrialsWidget(self)
         self.trials_widget.experiment_modified.connect(self.reload_results)
         split_trial_results.addWidget(self.trials_widget)
-        self.results_widget = ResultsWidget(
-            self, win=self._win, win_type=self._win_type
-        )
+        self.results_widget = ResultsWidget(self, win=self._win)
         split_trial_results.addWidget(self.results_widget)
 
         split_top_bottom.addWidget(split_metadata_display)
@@ -171,8 +162,15 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             )
             if yes_no != QtWidgets.QMessageBox.Yes:
                 return
-        if run_task(self.experiment, win=self._win, win_type=self._win_type):
-            self.reload_results()
+        try:
+            if run_task(self.experiment, win=self._win):
+                self.reload_results()
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Error running task",
+                f"Error running task: {e}",
+            )
 
     def save_changes_check_continue(self) -> bool:
         if self.experiment.has_unsaved_changes:
@@ -210,7 +208,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             self,
             "About Motor Task Prototype",
             f"Motor Task Prototype {mtp.__version__}\n\n"
-            f"Psychopy backend: {self._win_type}\n\n"
+            f"Psychopy backend: {mtpconfig.win_type}\n\n"
             + "https://ssciwr.github.io/motor-task-prototype",
         )
 

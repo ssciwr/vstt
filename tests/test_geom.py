@@ -63,14 +63,71 @@ def test_point_rotator() -> None:
             assert np.allclose([p1], [p2])
 
 
+def test_joystick_point_updater_clipped() -> None:
+    for window_size in [
+        None,
+        np.array([1]),
+        np.array([800, 600]),
+        np.array([2000, 3000]),
+    ]:
+        max_h = 0.5
+        if window_size is not None and window_size.shape[-1] > 1:
+            max_w = 0.5 * window_size[0] / window_size[1]
+        else:
+            max_w = 0.5
+        jpu = mtpgeom.JoystickPointUpdater(
+            angle_degrees=0, max_speed=0.123, window_size=window_size
+        )
+        for x0 in [np.array([0, 0]), np.array([0.4, -0.7]), np.array([12, 18])]:
+            # default clipping if no window_size provided is to [-0.5, 0.5]
+            # (note: + value joystick in y direction points down!)
+            assert np.allclose(jpu(x0, (215423, 23423423)), [max_w, -max_h])
+            assert np.allclose(jpu(x0, (215423, -23423423)), [max_w, max_h])
+            assert np.allclose(jpu(x0, (-215423, 23423423)), [-max_w, -max_h])
+            assert np.allclose(jpu(x0, (-215423, -23423423)), [-max_w, max_h])
+
+
+def test_joystick_point_updater_no_clipping() -> None:
+    # low max speed to avoid clipping returned values
+    max_speed = 0.0001345112
+    window_size = np.array([800, 600])
+    for angle_radians in [0, -0.1, 0.3, 0.66, np.pi, -np.pi, 4.5]:
+        angle_degrees = 180.0 * angle_radians / np.pi
+        jpu = mtpgeom.JoystickPointUpdater(
+            angle_degrees=angle_degrees, max_speed=max_speed, window_size=window_size
+        )
+        # small initial points to avoid clipping returned values
+        for p0 in [
+            np.array([0, 0]),
+            np.array([0.002355, 0.0065334]),
+            np.array([-0.00567565, 0.005464534]),
+            np.array([-0.0046543235, -0.00124346344]),
+        ]:
+            for v in [
+                (1, 0.2),
+                (-1, 0.2),
+                (-0.7, -0.5),
+                (0.7, 0.0),
+                (0.0, 0.6),
+                (0, 0),
+            ]:
+                # invert y direction of vector to simulate joystick input (+y points down)
+                p1 = jpu(p0, (v[0], -v[1]))
+                # rotate vector, rescale, add to point
+                p2 = p0 + max_speed * np.array(
+                    mtpgeom.rotate_point((v[0], v[1]), angle_radians, (0, 0))
+                )
+                assert np.allclose(p1, p2)
+
+
 def test_to_target_dists() -> None:
-    p = (0.0, 0.0)
+    p = np.array([0.0, 0.0])
     xys = np.array([[1.0, 0], [0.0, 0.0]])
     dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0)
     assert dist_correct == 1.0
     assert dist_any == 1.0
     #
-    p = (1.0, 0.0)
+    p = np.array([1.0, 0.0])
     xys = np.array([[1.0, 1.0], [1.0, 0.0], [-1.0, 0.0], [0.0, 0.0]])
     dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0)
     assert dist_correct == 1.0

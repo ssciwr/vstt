@@ -39,6 +39,6 @@ def test_import_metadata() -> None:
     )
     assert metadata["name"] == "12"
     assert metadata["author"] == "[1, 2, 3]"
-    # unknwon keys are ignored
+    # unknown keys are ignored
     assert "data" not in metadata
     assert "whoops" not in metadata

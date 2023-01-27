@@ -31,7 +31,7 @@ def test_describe_trials() -> None:
 
 def test_default_trial() -> None:
     trial = mtptrial.default_trial()
-    assert len(trial) == 26
+    assert len(trial) == 28
     assert isinstance(trial["target_indices"], str)
     assert len(trial["target_indices"].split(" ")) == trial["num_targets"]
 
@@ -60,6 +60,8 @@ def test_import_trial() -> None:
         "show_inactive_targets": False,
         "ignore_incorrect_targets": True,
         "play_sound": True,
+        "use_joystick": True,
+        "joystick_max_speed": 0.001,
         "show_cursor": False,
         "cursor_size": 0.0123,
         "show_cursor_path": True,
