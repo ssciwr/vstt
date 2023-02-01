@@ -10,14 +10,10 @@ from PyQt5 import QtWidgets
 
 class ResultsWidget(QtWidgets.QWidget):
     def __init__(
-        self,
-        parent: Optional[QtWidgets.QWidget] = None,
-        win: Optional[Window] = None,
-        win_type: str = "pyglet",
+        self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
     ):
         super().__init__(parent)
         self._win = win
-        self._win_type = win_type
         self._experiment = MotorTaskExperiment()
 
         outer_layout = QtWidgets.QVBoxLayout()
@@ -69,7 +65,6 @@ class ResultsWidget(QtWidgets.QWidget):
             row,
             all_trials_for_this_condition,
             win=self._win,
-            win_type=self._win_type,
         )
 
     def _btn_display_trial_clicked(self) -> None:

@@ -7,6 +7,7 @@ import motor_task_prototype.meta as mtpmeta
 import motor_task_prototype.stat as mtpstat
 import numpy as np
 import pandas as pd
+from motor_task_prototype import config as mtpconfig
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.types import MotorTaskDisplayOptions
 from psychopy.clock import Clock
@@ -280,11 +281,10 @@ def display_results(
     i_trial: int,
     all_trials_for_this_condition: bool,
     win: Optional[Window] = None,
-    win_type: str = "pyglet",
 ) -> None:
     close_window_when_done = False
     if win is None:
-        win = _make_window(win_type)
+        win = _make_window()
         close_window_when_done = True
     drawables = []
     if trial_handler is not None:
@@ -355,8 +355,8 @@ def _make_textbox_countdown(text: str, win: Window) -> TextBox2:
     )
 
 
-def _make_window(win_type: str) -> Window:
-    return Window(fullscr=True, units="height", winType=win_type)
+def _make_window() -> Window:
+    return Window(fullscr=True, units="height", winType=mtpconfig.win_type)
 
 
 def display_drawables(
@@ -404,11 +404,10 @@ def splash_screen(
     show_delay_countdown: bool,
     metadata: mtpmeta.MotorTaskMetadata,
     win: Optional[Window] = None,
-    win_type: str = "pyglet",
 ) -> None:
     close_window_when_done = False
     if win is None:
-        win = _make_window(win_type)
+        win = _make_window()
         close_window_when_done = True
     drawables = [_make_textbox_title(metadata["display_title"], win)]
     main_text = "\n\n".join(

@@ -8,6 +8,7 @@ from typing import Tuple
 import numpy as np
 import pyautogui
 import pytest
+from motor_task_prototype import config as mtpconfig
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.geom import points_on_circle
 from motor_task_prototype.stat import stats_dataframe
@@ -24,6 +25,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
 # session scope means it is only called once
 # so this fixture runs once before any tests
 def tests_init() -> None:
+    # use GLFW backend for tests as it works better with Xvfb:
+    mtpconfig.win_type = "glfw"
     # opencv-python installs its own qt version and sets env vars accordingly
     # we remove these to avoid pyqt picking up their XCB QPA plugin & crashing
     for k, v in os.environ.items():
@@ -31,7 +34,7 @@ def tests_init() -> None:
             del os.environ[k]
     # ensure psychopy has initialized the qt app
     ensureQtApp()
-    # work around for PsychHID-WARNING about X11 not being initialized on linux
+    # work around for PsychHID-WARNING about X11 not being initialized on linux:
     if sys.platform == "linux":
         import ctypes
 
@@ -44,14 +47,9 @@ def tests_init() -> None:
 
 
 # fixture to create a Window for testing gui functions
-# GLFW backend used for tests as it works better with Xvfb
 @pytest.fixture(scope="session")
 def window() -> Window:
-    window = Window(
-        fullscr=True,
-        units="height",
-        winType="glfw",
-    )
+    window = Window(fullscr=True, units="height", winType=mtpconfig.win_type)
     # yield is like return except control flow returns here afterwards
     yield window
     # clean up window

@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+from typing import Optional
 from typing import Tuple
 
 import numpy as np
 
-"""
-An array of `n_points` equidistantly spaced angles in radians
-"""
-
 
 def equidistant_angles(n_points: int) -> np.ndarray:
+    """
+    An array of `n_points` equidistantly spaced angles in radians
+    """
     max_angle = 2.0 * np.pi * (n_points - 1.0) / n_points
     return np.linspace(0, max_angle, n_points)
 
@@ -26,16 +26,14 @@ def points_on_circle(
     return np.array(points)
 
 
-"""
-Rotate `point` by an angle `angle_radians` around the point `pivot_point`
-"""
-
-
 def rotate_point(
     point: Tuple[float, float],
     angle_radians: float,
     pivot_point: Tuple[float, float] = (0, 0),
 ) -> Tuple[float, float]:
+    """
+    Rotate `point` by an angle `angle_radians` around the point `pivot_point`
+    """
     s = np.sin(angle_radians)
     c = np.cos(angle_radians)
     x = point[0] - pivot_point[0]
@@ -54,15 +52,64 @@ class PointRotator:
         self._s = np.sin(angle_radians)
         self._c = np.cos(angle_radians)
 
-    def __call__(self, point: Tuple[float, float]) -> Tuple[float, float]:
-        return (
-            self._c * point[0] - self._s * point[1],
-            self._s * point[0] + self._c * point[1],
+    def __call__(self, point: Tuple[float, float]) -> np.ndarray:
+        return np.array(
+            [
+                self._c * point[0] - self._s * point[1],
+                self._s * point[0] + self._c * point[1],
+            ]
+        )
+
+
+class JoystickPointUpdater:
+    """
+    Update a point (x,y) according to a velocity vector (vx, vy), with optional rotation of the vector
+
+    vx, vy should lie in the range [-1, 1]
+
+    The returned point is given by
+
+    x -> x + `max_speed` * vx'
+    y -> y + `max_speed` * vy'
+
+    Where (vx',vy') is (vx, vy) rotated by `angle_degrees`
+
+    The returned point is clipped to lie within the screen,
+    where the screen has height 1 and (0,0) lies in the centre of the screen
+    So the y-range is always [-0.5, 0.5], and the x-range is this multiplied by (width/height)
+    """
+
+    def __init__(
+        self,
+        angle_degrees: float,
+        max_speed: float,
+        window_size: Optional[np.ndarray] = None,
+    ):
+        self.angle_degrees = angle_degrees
+        self.max_speed = max_speed
+        if window_size is not None and window_size.shape[-1] >= 2:
+            self.clip_window = 0.5 * np.array([window_size[0] / window_size[1], 1.0])
+        else:
+            self.clip_window = np.array([0.5, 0.5])
+        angle_radians = angle_degrees * np.pi / 180.0
+        self._s = self.max_speed * np.sin(angle_radians)
+        self._c = self.max_speed * np.cos(angle_radians)
+
+    def __call__(self, point: np.ndarray, velocity: Tuple[float, float]) -> np.ndarray:
+        return np.clip(
+            np.array(
+                [
+                    point[0] + self._c * velocity[0] + self._s * velocity[1],
+                    point[1] + self._s * velocity[0] - self._c * velocity[1],
+                ]
+            ),
+            -self.clip_window,
+            self.clip_window,
         )
 
 
 def to_target_dists(
-    pos: Tuple[float, float], target_xys: np.ndarray, target_index: int
+    pos: np.ndarray, target_xys: np.ndarray, target_index: int
 ) -> Tuple[float, float]:
     rms_dists = np.linalg.norm(target_xys - np.array(pos), axis=1)
     # dist to correct target, min distance to any target (excluding center target)

@@ -15,14 +15,10 @@ class TrialsWidget(QtWidgets.QWidget):
     experiment_modified = QtCore.pyqtSignal()
 
     def __init__(
-        self,
-        parent: Optional[QtWidgets.QWidget] = None,
-        win: Optional[Window] = None,
-        win_type: str = "pyglet",
+        self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
     ):
         super().__init__(parent)
         self._win = win
-        self._win_type = win_type
         self._experiment = MotorTaskExperiment()
 
         outer_layout = QtWidgets.QVBoxLayout()

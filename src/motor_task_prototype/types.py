@@ -25,11 +25,13 @@ class MotorTaskTrial(TypedDict):
     show_inactive_targets: bool
     ignore_incorrect_targets: bool
     play_sound: bool
-    automove_cursor_to_center: bool
-    freeze_cursor_between_targets: bool
+    use_joystick: bool
+    joystick_max_speed: float
     show_cursor: bool
     cursor_size: float
     show_cursor_path: bool
+    automove_cursor_to_center: bool
+    freeze_cursor_between_targets: bool
     cursor_rotation_degrees: float
     post_trial_delay: float
     post_trial_display_results: bool

@@ -18,14 +18,10 @@ class MetadataWidget(QtWidgets.QWidget):
     experiment_modified = QtCore.pyqtSignal()
 
     def __init__(
-        self,
-        parent: Optional[QtWidgets.QWidget] = None,
-        win: Optional[Window] = None,
-        win_type: str = "pyglet",
+        self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
     ):
         super().__init__(parent)
         self._win = win
-        self._win_type = win_type
         self._experiment = MotorTaskExperiment()
         self._str_widgets: Dict[str, QtWidgets.QLineEdit] = {}
         self._bool_widgets: Dict[str, QtWidgets.QCheckBox] = {}
@@ -87,7 +83,6 @@ class MetadataWidget(QtWidgets.QWidget):
             show_delay_countdown=self._experiment.metadata["show_delay_countdown"],
             metadata=self._experiment.metadata,
             win=self._win,
-            win_type=self._win_type,
         )
 
     @property
