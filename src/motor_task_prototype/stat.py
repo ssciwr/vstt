@@ -174,14 +174,14 @@ def _reaction_time(
     mouse_positions: np.ndarray,
     epsilon: float = 1e-12,
 ) -> float:
-    if mouse_times.shape[0] != mouse_positions.shape[0] or mouse_times.shape[0] <= 1:
+    if mouse_times.shape[0] != mouse_positions.shape[0] or mouse_times.shape[0] == 0:
         return np.nan
-    i = 1
+    i = 0
     while xydist(mouse_positions[0], mouse_positions[i]) < epsilon and i + 1 < len(
         mouse_times
     ):
         i += 1
-    return mouse_times[i] - mouse_times[1]
+    return mouse_times[i]
 
 
 def _distance(mouse_positions: np.ndarray) -> float:

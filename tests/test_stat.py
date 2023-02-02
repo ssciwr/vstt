@@ -68,14 +68,15 @@ def test_distance() -> None:
 def test_reaction_movement_time() -> None:
     for times in [
         [0.0, 0.1],
-        [1.0, 2.0],
+        [-1.0, -0.5],
         [0.0, 2.0, 4.0, 6.0],
+        [-0.9, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5],
         [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.1, 1.2],
     ]:
         n = len(times)
         for n_zeros in range(1, n):
             positions = [[-1e-13, 1e-14]] * n_zeros + [[1, 1]] * (n - n_zeros)
-            reaction_time = max(0.0, times[n_zeros] - times[1])
+            reaction_time = times[n_zeros]
             assert np.allclose(
                 mtpstat._reaction_time(np.array(times), np.array(positions)),
                 [reaction_time],
