@@ -124,34 +124,44 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                     mtpvis.update_target_colors(
                         targets, trial["show_inactive_targets"], None
                     )
+                    mouse_times = []
+                    mouse_positions = []
                     if trial["show_target_labels"]:
                         mtpvis.update_target_label_colors(
                             target_labels, trial["show_inactive_targets"], None
                         )
                     is_central_target = target_index == trial["num_targets"]
                     if is_central_target:
+                        mouse_times = [0]
+                        mouse_positions = [cursor_path.vertices[-1]]
                         prev_cursor_path.vertices = cursor_path.vertices
-                        cursor_path.vertices = [prev_cursor_path.vertices[-1]]
+                        cursor_path.vertices = mouse_positions
                     else:
-                        cursor_path.vertices = [(0, 0)]
-                        prev_cursor_path.vertices = [(0, 0)]
                         if trial["automove_cursor_to_center"]:
                             mouse_pos = np.array([0.0, 0.0])
                             mouse.setPos(mouse_pos)
                             cursor.setPos(mouse_pos)
-                        if not mtpvis.draw_and_flip(win, drawables, kb):
-                            return _clean_up_and_return()
+                        cursor_path.vertices = [mouse_pos]
+                        prev_cursor_path.vertices = [(0, 0)]
                         clock.reset()
                         while clock.getTime() < trial["inter_target_duration"]:
-                            if not trial["freeze_cursor_between_targets"]:
+                            if trial["freeze_cursor_between_targets"]:
+                                mouse.setPos(mouse_pos)
+                            else:
                                 if trial["use_joystick"]:
                                     mouse_pos = joystick_point_updater(
                                         mouse_pos, (js.getX(), js.getY())  # type: ignore
                                     )
                                 else:
                                     mouse_pos = point_rotator(mouse.getPos())
-                                if trial["show_cursor"]:
-                                    cursor.setPos(mouse_pos)
+                            mouse_times.append(
+                                clock.getTime() - trial["inter_target_duration"]
+                            )
+                            mouse_positions.append(mouse_pos)
+                            if trial["show_cursor"]:
+                                cursor.setPos(mouse_pos)
+                            if trial["show_cursor_path"]:
+                                cursor_path.vertices = mouse_positions
                             if not mtpvis.draw_and_flip(win, drawables, kb):
                                 return _clean_up_and_return()
                     mtpvis.update_target_colors(
@@ -172,10 +182,6 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                         dist = dist_correct
                     else:
                         dist = dist_any
-                    mouse_times = [0]
-                    mouse_positions = [mouse_pos]
-                    if not mtpvis.draw_and_flip(win, drawables, kb):
-                        return _clean_up_and_return()
                     clock.reset()
                     win.recordFrameIntervals = True
                     target_size = trial["target_size"]
