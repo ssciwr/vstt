@@ -234,19 +234,23 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
             trial_handler.addData("target_indices", np.array(target_indices))
             trial_handler.addData("target_pos", np.array(trial_target_pos))
             trial_handler.addData(
-                "to_target_timestamps", np.array(trial_to_target_timestamps)
+                "to_target_timestamps",
+                np.array(trial_to_target_timestamps, dtype=object),
             )
             trial_handler.addData(
-                "to_target_mouse_positions", np.array(trial_to_target_mouse_positions)
+                "to_target_mouse_positions",
+                np.array(trial_to_target_mouse_positions, dtype=object),
             )
             trial_handler.addData(
                 "to_target_success", np.array(trial_to_target_success)
             )
             trial_handler.addData(
-                "to_center_timestamps", np.array(trial_to_center_timestamps)
+                "to_center_timestamps",
+                np.array(trial_to_center_timestamps, dtype=object),
             )
             trial_handler.addData(
-                "to_center_mouse_positions", np.array(trial_to_center_mouse_positions)
+                "to_center_mouse_positions",
+                np.array(trial_to_center_mouse_positions, dtype=object),
             )
             if trial["automove_cursor_to_center"]:
                 trial_to_center_success = [True] * trial["num_targets"]
