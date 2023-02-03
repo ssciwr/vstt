@@ -116,6 +116,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
             mouse_pos = np.array([0.0, 0.0])
             mouse.setPos(mouse_pos)
             cursor.setPos(mouse_pos)
+            previous_target_time_taken = 0
             for index in target_indices:
                 indices = [index]
                 if not trial["automove_cursor_to_center"]:
@@ -144,7 +145,12 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                         cursor_path.vertices = [mouse_pos]
                         prev_cursor_path.vertices = [(0, 0)]
                         clock.reset()
-                        while clock.getTime() < trial["inter_target_duration"]:
+                        wait_time = trial["inter_target_duration"]
+                        if trial["fixed_target_intervals"]:
+                            wait_time = (
+                                trial["target_duration"] - previous_target_time_taken
+                            )
+                        while clock.getTime() < wait_time:
                             if trial["freeze_cursor_between_targets"]:
                                 mouse.setPos(mouse_pos)
                             else:
@@ -212,6 +218,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                             dist = dist_any
                         if not mtpvis.draw_and_flip(win, drawables, kb):
                             return _clean_up_and_return()
+                    previous_target_time_taken = clock.getTime()
                     success = (
                         dist_correct <= target_size
                         and clock.getTime() < trial["target_duration"]

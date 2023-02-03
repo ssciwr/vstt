@@ -31,7 +31,7 @@ def test_describe_trials() -> None:
 
 def test_default_trial() -> None:
     trial = mtptrial.default_trial()
-    assert len(trial) == 28
+    assert len(trial) == 29
     assert isinstance(trial["target_indices"], str)
     assert len(trial["target_indices"].split(" ")) == trial["num_targets"]
 
@@ -52,6 +52,7 @@ def test_import_trial() -> None:
         "target_indices": "0 1 2 3 4 5",
         "show_target_labels": False,
         "target_labels": "0 1 2 3 4 5",
+        "fixed_target_intervals": False,
         "target_duration": 3,
         "inter_target_duration": 0,
         "target_distance": 0.3,
