@@ -17,6 +17,7 @@ class MotorTaskTrial(TypedDict):
     target_indices: str
     show_target_labels: bool
     target_labels: str
+    fixed_target_intervals: bool
     target_duration: float
     inter_target_duration: float
     target_distance: float
