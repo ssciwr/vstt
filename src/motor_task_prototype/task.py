@@ -72,6 +72,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                 trial["num_targets"],
                 trial["target_distance"],
                 trial["target_size"],
+                trial["add_central_target"],
                 trial["central_target_size"],
             )
             target_labels = mtpvis.make_target_labels(
@@ -119,7 +120,10 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
             previous_target_time_taken = 0
             for index in target_indices:
                 indices = [index]
-                if not trial["automove_cursor_to_center"]:
+                if (
+                    trial["add_central_target"]
+                    and not trial["automove_cursor_to_center"]
+                ):
                     indices.append(trial["num_targets"])
                 for target_index in indices:
                     mtpvis.update_target_colors(
@@ -182,7 +186,10 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                     if not is_central_target:
                         trial_target_pos.append(targets.xys[target_index])
                     dist_correct, dist_any = to_target_dists(
-                        mouse_pos, targets.xys, target_index
+                        mouse_pos,
+                        targets.xys,
+                        target_index,
+                        trial["add_central_target"],
                     )
                     if trial["ignore_incorrect_targets"] or is_central_target:
                         dist = dist_correct
@@ -210,7 +217,10 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                         if trial["show_cursor_path"]:
                             cursor_path.vertices = mouse_positions
                         dist_correct, dist_any = to_target_dists(
-                            mouse_pos, targets.xys, target_index
+                            mouse_pos,
+                            targets.xys,
+                            target_index,
+                            trial["add_central_target"],
                         )
                         if trial["ignore_incorrect_targets"] or is_central_target:
                             dist = dist_correct

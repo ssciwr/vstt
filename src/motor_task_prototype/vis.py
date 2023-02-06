@@ -47,16 +47,20 @@ def make_targets(
     n_circles: int,
     radius: float,
     point_radius: float,
+    add_central_target: bool,
     center_point_radius: float,
 ) -> ElementArrayStim:
+    n_elements = n_circles + 1 if add_central_target else n_circles
+    sizes = [[2.0 * point_radius] * 2] * n_circles
+    if add_central_target:
+        sizes = sizes + [[2.0 * center_point_radius] * 2]
     return ElementArrayStim(
         window,
         units="height",
         fieldShape="circle",
-        nElements=n_circles + 1,
-        sizes=[[2.0 * point_radius] * 2] * n_circles
-        + [[2.0 * center_point_radius] * 2],
-        xys=points_on_circle(n_circles, radius, include_centre=True),
+        nElements=n_elements,
+        sizes=sizes,
+        xys=points_on_circle(n_circles, radius, include_centre=add_central_target),
         elementTex=None,
         elementMask="circle",
     )
