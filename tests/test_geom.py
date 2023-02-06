@@ -123,21 +123,27 @@ def test_joystick_point_updater_no_clipping() -> None:
 def test_to_target_dists() -> None:
     p = np.array([0.0, 0.0])
     xys = np.array([[1.0, 0], [0.0, 0.0]])
-    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0)
+    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0, has_central_target=True)
     assert dist_correct == 1.0
     assert dist_any == 1.0
+    dist_correct, dist_any = mtpgeom.to_target_dists(
+        p, xys, 0, has_central_target=False
+    )
+    assert dist_correct == 1.0
+    assert dist_any == 0.0
     #
     p = np.array([1.0, 0.0])
     xys = np.array([[1.0, 1.0], [1.0, 0.0], [-1.0, 0.0], [0.0, 0.0]])
-    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0)
-    assert dist_correct == 1.0
-    assert dist_any == 0.0
-    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 1)
-    assert dist_correct == 0.0
-    assert dist_any == 0.0
-    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 2)
-    assert dist_correct == 2.0
-    assert dist_any == 0.0
-    dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 3)
-    assert dist_correct == 1.0
-    assert dist_any == 0.0
+    for has_central_target in [True, False]:
+        dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 0, has_central_target)
+        assert dist_correct == 1.0
+        assert dist_any == 0.0
+        dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 1, has_central_target)
+        assert dist_correct == 0.0
+        assert dist_any == 0.0
+        dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 2, has_central_target)
+        assert dist_correct == 2.0
+        assert dist_any == 0.0
+        dist_correct, dist_any = mtpgeom.to_target_dists(p, xys, 3, has_central_target)
+        assert dist_correct == 1.0
+        assert dist_any == 0.0

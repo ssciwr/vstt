@@ -109,8 +109,12 @@ class JoystickPointUpdater:
 
 
 def to_target_dists(
-    pos: np.ndarray, target_xys: np.ndarray, target_index: int
+    pos: np.ndarray, target_xys: np.ndarray, target_index: int, has_central_target: bool
 ) -> Tuple[float, float]:
     rms_dists = np.linalg.norm(target_xys - np.array(pos), axis=1)
+    n_targets_excluding_central = target_xys.shape[0]
+    if has_central_target:
+        # exclude central target from "distance to any target" measure
+        n_targets_excluding_central = n_targets_excluding_central - 1
     # dist to correct target, min distance to any target (excluding center target)
-    return rms_dists[target_index], np.min(rms_dists[:-1])
+    return rms_dists[target_index], np.min(rms_dists[:n_targets_excluding_central])

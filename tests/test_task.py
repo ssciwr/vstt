@@ -71,12 +71,51 @@ def test_task_no_trials(window: Window) -> None:
     assert experiment_no_trials.trial_handler_with_results is None
 
 
-def test_task(experiment_no_results: MotorTaskExperiment, window: Window) -> None:
+def test_task_automove_to_center(
+    experiment_no_results: MotorTaskExperiment, window: Window
+) -> None:
     target_pixels = []
     experiment_no_results.has_unsaved_changes = False
     assert experiment_no_results.trial_handler_with_results is None
     for trial in experiment_no_results.trial_list:
         trial["automove_cursor_to_center"] = True
+        target_pixels.append(
+            [
+                gtu.pos_to_pixels(pos)
+                for pos in points_on_circle(
+                    trial["num_targets"],
+                    trial["target_distance"],
+                    include_centre=False,
+                )
+            ]
+        )
+    do_task_thread = launch_do_task(experiment_no_results, target_pixels)
+    success = mtptask.run_task(experiment_no_results, window)
+    do_task_thread.join()
+    # task ran successfully, updated experiment with results
+    assert success is True
+    assert experiment_no_results.has_unsaved_changes is True
+    assert experiment_no_results.trial_handler_with_results is not None
+    # check that we hit all the targets without timing out
+    for timestamps in experiment_no_results.trial_handler_with_results.data[
+        "to_target_timestamps"
+    ][0][0]:
+        assert (
+            timestamps[-1]
+            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
+        )
+
+
+def test_task_no_central_target(
+    experiment_no_results: MotorTaskExperiment, window: Window
+) -> None:
+    target_pixels = []
+    experiment_no_results.has_unsaved_changes = False
+    assert experiment_no_results.trial_handler_with_results is None
+    for trial in experiment_no_results.trial_list:
+        trial["add_central_target"] = False
+        trial["automove_cursor_to_center"] = False
+        trial["weight"] = 1
         target_pixels.append(
             [
                 gtu.pos_to_pixels(pos)

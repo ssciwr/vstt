@@ -23,6 +23,7 @@ def test_make_cursor(window: Window) -> None:
         assert np.allclose(cursor.vertices[-1][1] - cursor.vertices[-2][1], cursor_size)
 
 
+@pytest.mark.parametrize("add_central_target", [True, False])
 @pytest.mark.parametrize(
     "args,xys",
     [
@@ -56,36 +57,47 @@ def test_make_cursor(window: Window) -> None:
     ],
 )
 def test_make_targets(
-    window: Window, args: Dict, xys: List[Tuple[float, float]]
+    window: Window, args: Dict, xys: List[Tuple[float, float]], add_central_target: bool
 ) -> None:
+    args["add_central_target"] = add_central_target
     targets = mtpvis.make_targets(window, **args)
-    n_elem = args["n_circles"] + 1
+    n_elem = args["n_circles"] + (1 if add_central_target else 0)
     assert targets.nElements == n_elem
     # shape of sizes is x,y pair for each element
     assert targets.sizes.shape == (n_elem, 2)
     # size is circumference of circle in both x and y directions
     point_size = 2 * args["point_radius"]
-    for size in targets.sizes[0:-1]:
+    for size in targets.sizes[: args["n_circles"]]:
         assert np.allclose(size, [point_size, point_size])
-    center_point_size = 2 * args["center_point_radius"]
-    assert np.allclose(targets.sizes[-1], [center_point_size, center_point_size])
-    assert np.allclose(targets.xys, xys)
+    if add_central_target:
+        center_point_size = 2 * args["center_point_radius"]
+        assert np.allclose(targets.sizes[-1], [center_point_size, center_point_size])
+    assert np.allclose(targets.xys, xys[0:n_elem])
 
 
+@pytest.mark.parametrize("add_central_target", [True, False])
 @pytest.mark.parametrize("n_targets", [1, 2, 3, 5, 12])
-def test_update_target_colors(window: Window, n_targets: int) -> None:
+def test_update_target_colors(
+    window: Window, n_targets: int, add_central_target: bool
+) -> None:
     for show_inactive_targets, inactive_color in [
         (True, (0.1, 0.1, 0.1)),
         (False, (0, 0, 0)),
     ]:
         red = (1.0, -1.0, -1.0)
-        targets = mtpvis.make_targets(window, n_targets, 0.5, 0.05, 0.05)
-        n_elem = n_targets + 1
+        targets = mtpvis.make_targets(
+            window, n_targets, 0.5, 0.05, add_central_target, 0.05
+        )
+        n_elem = n_targets + (1 if add_central_target else 0)
         # calling without specifying an index makes all elements grey
         mtpvis.update_target_colors(
             targets, show_inactive_targets=show_inactive_targets
         )
-        assert targets.colors.shape == (n_elem, 3)
+        if n_elem == 1:
+            # apparently psychopy collapses (n_elem,3) shape to (3) for n_elem=1 case:
+            assert targets.colors.shape == (3,)
+        else:
+            assert targets.colors.shape == (n_elem, 3)
         for color in targets.colors:
             assert np.allclose(color, inactive_color)
         # calling with index makes that element red, the rest grey
@@ -93,10 +105,18 @@ def test_update_target_colors(window: Window, n_targets: int) -> None:
             mtpvis.update_target_colors(
                 targets, show_inactive_targets=show_inactive_targets, index=index
             )
-            assert targets.colors.shape == (n_elem, 3)
+            if n_elem == 1:
+                # apparently psychopy collapses (n_elem,3) shape to (3) for n_elem=1 case:
+                assert targets.colors.shape == (3,)
+            else:
+                assert targets.colors.shape == (n_elem, 3)
             for i in range(n_elem):
                 if i == index:
-                    assert np.allclose(targets.colors[i], red)
+                    if n_elem == 1:
+                        # apparently psychopy collapses (n_elem,3) shape to (3) for n_elem=1 case:
+                        assert np.allclose(targets.colors, red)
+                    else:
+                        assert np.allclose(targets.colors[i], red)
                 else:
                     assert np.allclose(targets.colors[i], inactive_color)
 
