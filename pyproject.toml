@@ -24,7 +24,7 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
 ]
-dependencies = ["psychopy", "numpy", "click", "PyQt5"]
+dependencies = ["psychopy", "psychopy-sounddevice", "numpy", "click", "PyQt5"]
 dynamic = ["version"]
 
 [project.scripts]
@@ -36,14 +36,21 @@ Issues = "https://github.com/ssciwr/motor-task-prototype/issues"
 Documentation = "https://ssciwr.github.io/motor-task-prototype/"
 
 [project.optional-dependencies]
-tests = ["pytest", "pytest-cov", "pyautogui", "ascii-magic", "keyboard"]
+tests = [
+  "pytest",
+  "pytest-cov",
+  "pytest-randomly",
+  "pyautogui",
+  "ascii-magic",
+  "keyboard",
+]
 docs = [
   "ipykernel",
   "matplotlib",
   "nbsphinx",
   "pandoc",
   "sphinx>=4.5.0",
-  "sphinx_rtd_theme>=1.0.0"
+  "sphinx_rtd_theme>=1.0.0",
 ]
 
 [tool.setuptools.dynamic]

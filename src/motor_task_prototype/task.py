@@ -67,7 +67,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
             )
             if trial["target_order"] == "random":
                 rng.shuffle(target_indices)
-            targets: ElementArrayStim = mtpvis.make_targets(
+            targets = mtpvis.make_targets(
                 win,
                 trial["num_targets"],
                 trial["target_distance"],
@@ -182,7 +182,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                             target_labels, trial["show_inactive_targets"], target_index
                         )
                     if trial["play_sound"]:
-                        Sound("A", secs=0.3, blockSize=1024).play()
+                        Sound("A", secs=0.3, blockSize=1024, stereo=True).play()
                     if not is_central_target:
                         trial_target_pos.append(targets.xys[target_index])
                     dist_correct, dist_any = to_target_dists(

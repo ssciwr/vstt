@@ -7,7 +7,7 @@ from time import sleep
 from typing import Callable
 from typing import Tuple
 
-import ascii_magic
+from ascii_magic import AsciiArt
 from psychopy.visual.window import Window
 
 if sys.platform.startswith("win"):
@@ -19,7 +19,7 @@ import pyautogui
 
 # print screenshot as ascii art to terminal for debugging
 def ascii_screenshot() -> None:
-    print(f"\n{ascii_magic.from_image(pyautogui.screenshot())}\n", flush=True)
+    AsciiArt(pyautogui.screenshot()).to_terminal()
 
 
 # simulate user pressing Enter key
@@ -63,7 +63,7 @@ def get_screenshot_when_ready(
     screenshot_before: np.ndarray,
     screenshot_queue: queue.Queue,
     min_rms_diff: float = 0.1,
-    delay_between_screenshots: float = 0.5,
+    delay_between_screenshots: float = 0.2,
 ) -> None:
     s0 = np.asarray(screenshot_before)
     sleep(delay_between_screenshots)
@@ -85,7 +85,7 @@ def get_screenshot_when_ready(
             print("Stuck waiting for screen to be ready", flush=True)
             print(f"Mean pixel: {np.mean(s1)}", flush=True)
             ascii_screenshot()
-    print(f"\n{ascii_magic.from_image(img)}\n", flush=True)
+    AsciiArt(img).to_terminal()
     screenshot_queue.put(s1)
     # press enter to close screen
     press_enter()

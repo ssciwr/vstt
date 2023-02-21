@@ -25,8 +25,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
 # session scope means it is only called once
 # so this fixture runs once before any tests
 def tests_init() -> None:
-    # use GLFW backend for tests as it works better with Xvfb:
-    mtpconfig.win_type = "glfw"
     # opencv-python installs its own qt version and sets env vars accordingly
     # we remove these to avoid pyqt picking up their XCB QPA plugin & crashing
     for k, v in os.environ.items():
@@ -79,9 +77,11 @@ def experiment_no_results() -> MotorTaskExperiment:
     trial0["target_duration"] = 30.0
     trial0["inter_target_duration"] = 0.0
     trial0["post_block_display_results"] = False
+    trial0["post_block_delay"] = 0.1
     trial1 = copy.deepcopy(trial0)
     trial1["weight"] = 2
     trial1["num_targets"] = 3
+    trial1["post_block_delay"] = 0.1
     experiment.trial_list = [trial0, trial1]
     experiment.metadata["name"] = "Experiment with no results"
     experiment.metadata["author"] = "experiment_no_results @pytest.fixture"
