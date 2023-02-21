@@ -16,12 +16,12 @@ from psychopy.visual.window import Window
 def move_mouse_to_target(
     target_pixel: Tuple[float, float],
     target_color: Tuple[int, int, int] = (255, 0, 0),
-    movement_time: float = 0.2,
+    movement_time: float = 0.1,
 ) -> None:
     # wait until target is activated
     attempts = 0
     while not gtu.pixel_color(target_pixel, target_color):
-        sleep(0.2)
+        sleep(0.1)
         # press Enter in case we are looking at a splash / display_results screen
         gtu.press_enter()
         attempts += 1

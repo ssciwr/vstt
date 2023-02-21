@@ -39,6 +39,8 @@ def _updated_joystick() -> joystick.Joystick:
 
 def get_joystick() -> Optional[joystick.Joystick]:
     global js
+    if joystick.getNumJoysticks() == 0:
+        return None
     try:
         js = _updated_joystick()
     except Exception as e:
