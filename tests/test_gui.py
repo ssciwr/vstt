@@ -11,6 +11,7 @@ import qt_test_utils as qtu
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.gui import MotorTaskGui
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QInputDialog
 from pytest import MonkeyPatch
 
 
@@ -119,7 +120,7 @@ def test_gui_import_excel(
     tmp_path: pathlib.Path, experiment_with_results: MotorTaskExperiment
 ) -> None:
     filepath = tmp_path / "experiment.xlsx"
-    experiment_with_results.save_excel(str(filepath))
+    experiment_with_results.save_excel(str(filepath), "trial")
     gui = MotorTaskGui(filename=str(filepath))
     assert gui.experiment.metadata == experiment_with_results.metadata
     assert gui.experiment.display_options == experiment_with_results.display_options
@@ -152,19 +153,26 @@ def test_gui_import_export(
 ) -> None:
     filepath = tmp_path / "experiment.psydat"
     experiment_with_results.save_psydat(str(filepath))
-    for suffix, filter in [
-        (".xlsx", "Excel file (*.xlsx)"),
-        (".json", "JSON file (*.json)"),
+    for output_file, filter, data_option in [
+        ("t1.xlsx", "Excel file (*.xlsx)", "One page for each trial (default)"),
+        ("t2.xlsx", "Excel file (*.xlsx)", "One page for each target"),
+        ("t3.json", "JSON file (*.json)", ""),
     ]:
-        export_filepath = filepath.with_suffix(suffix)
+        export_filepath = filepath.parent / output_file
         assert not export_filepath.is_file()
 
-        # mwt doesn't yet fully work with file save dialog
-        # instead we monkey patch QFileDialog.getSaveFileName to return desired output
+        # monkey patch QFileDialog.getSaveFileName to just return desired filename
         def mock_getSaveFileName(*args: Any, **kwargs: Any) -> Tuple[str, str]:
             return str(export_filepath), filter
 
         monkeypatch.setattr(QFileDialog, "getSaveFileName", mock_getSaveFileName)
+
+        # monkey patch QInputDialog.getItem to just return desired option
+        def mock_getItem(*args: Any, **kwargs: Any) -> Tuple[str, bool]:
+            return data_option, True
+
+        monkeypatch.setattr(QInputDialog, "getItem", mock_getItem)
+
         gui = MotorTaskGui(filename=str(filepath))
         assert gui.experiment.metadata == experiment_with_results.metadata
         assert gui.experiment.display_options == experiment_with_results.display_options
@@ -181,7 +189,7 @@ def test_gui_import_export(
         assert exp.trial_list == experiment_with_results.trial_list
         assert exp.trial_handler_with_results is None
         assert exp.has_unsaved_changes is True
-        assert exp.filename == str(filepath)
+        assert exp.filename == str(export_filepath.with_suffix(".psydat"))
 
 
 def test_gui_invalid_file(tmp_path: pathlib.Path) -> None:

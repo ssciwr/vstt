@@ -1,7 +1,9 @@
 Running an experiment
 =====================
 
-To run an experiment, got to Experiment -> Run, or press ``Ctrl+R``, or click on the circular green toolbar button
+To run an experiment, got to Experiment -> Run,
+or press ``Ctrl+R``,
+or click on the circular green toolbar button.
 
 Splash screen
 -------------

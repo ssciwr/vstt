@@ -9,6 +9,7 @@ motor-task-prototype
    quickstart/create-experiment
    quickstart/run-experiment
    quickstart/display-results
+   quickstart/share-experiment
 
 .. toctree::
    :maxdepth: 2

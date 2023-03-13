@@ -95,7 +95,12 @@ class MotorTaskExperiment:
         self.filename = filename
         self.has_unsaved_changes = False
 
-    def save_excel(self, filename: str) -> None:
+    def save_excel(self, filename: str, data_format: str) -> None:
+        """
+        data_format can be
+        - "trial": one sheet of data exported per trial
+        - "target: one sheet of data exported per target
+        """
         if not filename.endswith(".xlsx"):
             filename += ".xlsx"
         with pd.ExcelWriter(filename) as writer:
@@ -109,7 +114,7 @@ class MotorTaskExperiment:
                 writer, sheet_name="trial_list", index=False
             )
             if self.stats is not None:
-                append_stats_data_to_excel(self.stats, writer)
+                append_stats_data_to_excel(self.stats, writer, data_format)
 
     def load_excel(self, filename: str) -> None:
         dfs = pd.read_excel(filename, ["metadata", "display_options", "trial_list"])
