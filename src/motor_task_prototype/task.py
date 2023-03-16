@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Union
@@ -22,6 +23,13 @@ from psychopy.visual.basevisual import BaseVisualStim
 from psychopy.visual.elementarray import ElementArrayStim
 from psychopy.visual.shape import ShapeStim
 from psychopy.visual.window import Window
+
+
+def make_target_indices(trial: Dict, rng: np.random.Generator) -> np.ndarray:
+    target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
+    if trial["target_order"] == "random":
+        rng.shuffle(target_indices)
+    return target_indices
 
 
 def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> bool:
@@ -62,11 +70,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                 raise RuntimeError(
                     "Use joystick option is enabled, but no joystick found."
                 )
-            target_indices = np.fromstring(
-                trial["target_indices"], dtype="int", sep=" "
-            )
-            if trial["target_order"] == "random":
-                rng.shuffle(target_indices)
+            target_indices = make_target_indices(trial, rng)
             targets = mtpvis.make_targets(
                 win,
                 trial["num_targets"],
@@ -117,8 +121,10 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
             mouse_pos = np.array([0.0, 0.0])
             mouse.setPos(mouse_pos)
             cursor.setPos(mouse_pos)
-            previous_target_time_taken = 0
+            current_target_time_taken = 0
             for index in target_indices:
+                previous_target_time_taken = current_target_time_taken
+                current_target_time_taken = 0
                 indices = [index]
                 if (
                     trial["add_central_target"]
@@ -126,6 +132,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                 ):
                     indices.append(trial["num_targets"])
                 for target_index in indices:
+                    # no target displayed
                     mtpvis.update_target_colors(
                         targets, trial["show_inactive_targets"], None
                     )
@@ -174,6 +181,7 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                                 cursor_path.vertices = mouse_positions
                             if not mtpvis.draw_and_flip(win, drawables, kb):
                                 return _clean_up_and_return()
+                    # display current target
                     mtpvis.update_target_colors(
                         targets, trial["show_inactive_targets"], target_index
                     )
@@ -200,10 +208,10 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                     target_size = trial["target_size"]
                     if is_central_target:
                         target_size = trial["central_target_size"]
-                    while (
-                        dist > target_size
-                        and clock.getTime() < trial["target_duration"]
-                    ):
+                    max_time = trial["target_duration"]
+                    if trial["fixed_target_intervals"]:
+                        max_time -= current_target_time_taken
+                    while dist > target_size and clock.getTime() < max_time:
                         if trial["use_joystick"]:
                             mouse_pos = joystick_point_updater(
                                 mouse_pos, (js.getX(), js.getY())  # type: ignore
@@ -228,11 +236,8 @@ def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> b
                             dist = dist_any
                         if not mtpvis.draw_and_flip(win, drawables, kb):
                             return _clean_up_and_return()
-                    previous_target_time_taken = clock.getTime()
-                    success = (
-                        dist_correct <= target_size
-                        and clock.getTime() < trial["target_duration"]
-                    )
+                    current_target_time_taken += clock.getTime()
+                    success = dist_correct <= target_size and clock.getTime() < max_time
                     if is_central_target:
                         trial_to_center_success.append(success)
                     else:

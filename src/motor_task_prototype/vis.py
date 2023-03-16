@@ -314,7 +314,7 @@ def display_results(
 def _make_textbox_press_enter(win: Window) -> TextBox2:
     return TextBox2(
         win,
-        "Press press Enter when you are ready to continue...",
+        "Please press Enter when you are ready to continue...",
         pos=(0, -0.47),
         color="navy",
         alignment="center",
