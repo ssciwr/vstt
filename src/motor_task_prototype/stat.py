@@ -128,7 +128,14 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
     return df
 
 
-def append_stats_data_to_excel(df: pd.DataFrame, writer: Any) -> None:
+def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) -> None:
+    """
+    data_format can be
+    - "trial": one sheet of data exported per trial
+    - "target: one sheet of data exported per target
+    """
+    if data_format not in ["trial", "target"]:
+        raise RuntimeError(f"data_format '{data_format}' not supported")
     data_labels = [
         "to_target_timestamps",
         "to_target_mouse_positions",
@@ -144,29 +151,94 @@ def append_stats_data_to_excel(df: pd.DataFrame, writer: Any) -> None:
         df_stats[f"{label}_y"] = column_as_2d_array[:, 1]
         df_stats = df_stats.drop(columns=[label])
     df_stats.to_excel(writer, sheet_name="statistics", index=False)
-    # add a sheet for each row with arrays of data that were excluded above
-    # transpose array to a column, and split arrays of x-y pairs into two columns
-    for row in df.itertuples():
-        df_data = pd.concat(
-            [
-                pd.DataFrame({label: getattr(row, label)})
-                for label in ["to_target_timestamps", "to_center_timestamps"]
-            ],
-            axis=1,
-        )
-        for label in ["to_target_mouse_positions", "to_center_mouse_positions"]:
-            arr = getattr(row, label)
-            if arr.shape[-1] > 0:
-                df_data = pd.concat(
-                    [
-                        df_data,
-                        pd.DataFrame(
-                            {f"{label}_x": arr[:, 0], f"{label}_y": arr[:, 1]}
-                        ),
-                    ],
-                    axis=1,
-                )
-        df_data.to_excel(writer, sheet_name=f"{row.Index}", index=False)
+    # add timestamp/mouse position arrays
+    if data_format == "target":
+        # one sheet for each row (target) in df, with arrays of time/position data.
+        # arrays transposed to columns, x-y pairs are split into two columns.
+        # 6 columns:
+        #   - to_target_timestamps (negative until target displayed)
+        #   - to_center_timestamps (negative until target displayed)
+        #   - to_target_mouse_positions_x
+        #   - to_target_mouse_positions_y
+        #   - to_center_mouse_positions_x
+        #   - to_center_mouse_positions_y
+        for row in df.itertuples():
+            df_data = pd.concat(
+                [
+                    pd.DataFrame({label: getattr(row, label)})
+                    for label in ["to_target_timestamps", "to_center_timestamps"]
+                ],
+                axis=1,
+            )
+            for label in ["to_target_mouse_positions", "to_center_mouse_positions"]:
+                arr = getattr(row, label)
+                if arr.shape[-1] > 0:
+                    df_data = pd.concat(
+                        [
+                            df_data,
+                            pd.DataFrame(
+                                {f"{label}_x": arr[:, 0], f"{label}_y": arr[:, 1]}
+                            ),
+                        ],
+                        axis=1,
+                    )
+            df_data.to_excel(writer, sheet_name=f"{row.Index}", index=False)
+    else:
+        # one sheet per trial: all targets for a trial are concatenated
+        # 6 columns:
+        #   - timestamps (start from zero, increases throughout the trial)
+        #   - mouse_x
+        #   - mouse_y
+        #   - target_index (-1 if no target is currently displayed)
+        #   - target_x (-1 if no target is currently displayed)
+        #   - target_y (-1 if no target is currently displayed)
+        for i_trial in df.i_trial.unique():
+            t0 = 0.0
+            times = np.array([])
+            x_positions = np.array([])
+            y_positions = np.array([])
+            i_targets = np.array([], dtype=np.int64)
+            x_targets = np.array([])
+            y_targets = np.array([])
+            for row in df.loc[df.i_trial == i_trial].itertuples():
+                for dest in ["target", "center"]:
+                    raw_times = getattr(row, f"to_{dest}_timestamps")
+                    if raw_times.shape[-1] > 0:
+                        times = np.append(times, raw_times - raw_times[0] + t0)
+                        points = getattr(row, f"to_{dest}_mouse_positions")
+                        x_positions = np.append(x_positions, points[:, 0])
+                        y_positions = np.append(y_positions, points[:, 1])
+                        # set target info for all timestamps
+                        if dest == "center":
+                            pos = (0.0, 0.0)
+                            i_target = -1  # give center target the special index -1
+                        else:
+                            pos = row.target_pos
+                            i_target = row.i_target
+                        target_i = np.full_like(raw_times, i_target, dtype=np.int64)
+                        target_x = np.full_like(raw_times, pos[0])
+                        target_y = np.full_like(raw_times, pos[1])
+                        # set these to -99 if no target is visible (i.e. raw time is negative)
+                        target_i[raw_times < 0] = -99
+                        target_x[raw_times < 0] = -99
+                        target_y[raw_times < 0] = -99
+                        i_targets = np.append(i_targets, target_i)
+                        x_targets = np.append(x_targets, target_x)
+                        y_targets = np.append(y_targets, target_y)
+                        t0 = (
+                            times[-1] + 1.0 / 60.0
+                        )  # add a single window flip between targets (?)
+            df_data = pd.DataFrame(
+                {
+                    "timestamps": times,
+                    "mouse_positions_x": x_positions,
+                    "mouse_positions_y": y_positions,
+                    "i_target": i_targets,
+                    "target_x": x_targets,
+                    "target_y": y_targets,
+                }
+            )
+            df_data.to_excel(writer, sheet_name=f"{i_trial}", index=False)
 
 
 def _reaction_time(

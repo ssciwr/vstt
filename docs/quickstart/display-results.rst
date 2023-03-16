@@ -7,7 +7,7 @@ You can also display all the trials with the same conditions with "Display Condi
 .. figure:: images/results-list.png
    :alt: Results
 
-   Results: a list of trials which can be displayed
+   Results: a list of trials which can be displayed.
 
 
 Display options
@@ -18,7 +18,7 @@ You can choose which results and statistics to display in the Display Options se
 .. figure:: images/display-options.png
    :alt: Display Options
 
-   Display Options: select which results and statistics to display
+   Display Options: select which results and statistics to display.
 
 
 Results

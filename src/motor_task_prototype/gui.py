@@ -131,13 +131,27 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             return False
         try:
             if selected_filter == "Excel file (*.xlsx)":
-                self.experiment.save_excel(filename)
+                options = [
+                    "One page for each trial (default)",
+                    "One page for each target",
+                ]
+                option, ok = QtWidgets.QInputDialog.getItem(
+                    self,
+                    "Data export options",
+                    "Data export option:",
+                    options,
+                    editable=False,
+                )
+                if ok is False:
+                    return False
+                data_format = "target" if "target" in option else "trial"
+                self.experiment.save_excel(filename, data_format=data_format)
             elif selected_filter == "JSON file (*.json)":
                 self.experiment.save_json(filename)
             else:
                 raise RuntimeError(f"Selected filter {selected_filter} is not valid.")
         except Exception as e:
-            logging.warning(f"Failed to export to file {filename}: {e}")
+            logging.exception(e)
             QtWidgets.QMessageBox.critical(
                 self,
                 "File export error",

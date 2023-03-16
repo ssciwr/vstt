@@ -57,4 +57,4 @@ repos:
       - id: flake8
         args:
           - "--max-line-length=88"
-          - "--ignore=E501,W503"
+          - "--ignore=E501,W503,E203"

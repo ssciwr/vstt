@@ -33,7 +33,11 @@ If you already have a Python environment and git you can install using pip:
 ``pip install git+https://github.com/ssciwr/motor-task-prototype``
 
 .. note::
-   Note this also installs psychopy with pip, which may need additional
+   On linux you will also need to give your Python executable permission
+   to set its own priority: ``sudo setcap cap_sys_nice=eip /path/to/python/binary``.
+
+.. note::
+   This method also installs the psychopy library with pip, which may need additional
    system libraries and configuration steps to work properly,
    which is probably why they provide standalone installers for
    Psychopy on Windows and Mac which bundle all the requirements.
