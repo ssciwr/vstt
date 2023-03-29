@@ -7,6 +7,8 @@ from typing import Tuple
 
 import gui_test_utils as gtu
 import motor_task_prototype.task as mtptask
+import motor_task_prototype.trial as mtptrial
+import numpy as np
 import pyautogui
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.geom import points_on_circle
@@ -64,7 +66,8 @@ def test_task_no_trials(window: Window) -> None:
     experiment_no_trials.has_unsaved_changes = False
     assert experiment_no_trials.trial_handler_with_results is None
     do_task_thread = launch_do_task(experiment_no_trials, [])
-    success = mtptask.run_task(experiment_no_trials, window)
+    task = mtptask.MotorTask(experiment_no_trials, window)
+    success = task.run()
     do_task_thread.join()
     assert success is False
     assert experiment_no_trials.has_unsaved_changes is False
@@ -90,7 +93,8 @@ def test_task_automove_to_center(
             ]
         )
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    success = mtptask.run_task(experiment_no_results, window)
+    task = mtptask.MotorTask(experiment_no_results, window)
+    success = task.run()
     do_task_thread.join()
     # task ran successfully, updated experiment with results
     assert success is True
@@ -127,7 +131,8 @@ def test_task_no_central_target(
             ]
         )
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    success = mtptask.run_task(experiment_no_results, window)
+    task = mtptask.MotorTask(experiment_no_results, window)
+    success = task.run()
     do_task_thread.join()
     # task ran successfully, updated experiment with results
     assert success is True
@@ -162,7 +167,8 @@ def test_task_no_automove_to_center(
             tp.append(gtu.pos_to_pixels((0, 0)))
         target_pixels.append(tp)
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    success = mtptask.run_task(experiment_no_results, window)
+    task = mtptask.MotorTask(experiment_no_results, window)
+    success = task.run()
     do_task_thread.join()
     # task ran successfully, updated experiment with results
     assert success is True
@@ -185,3 +191,46 @@ def test_task_no_automove_to_center(
             to_center_timestamps[-1]
             < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
         )
+
+
+def test_task_fixed_intervals_no_user_input(window: Window) -> None:
+    experiment = MotorTaskExperiment()
+    experiment.metadata["display_duration"] = 0.0
+    target_duration = 1.0
+    trial = mtptrial.default_trial()
+    trial["num_targets"] = 3
+    trial["target_order"] = "random"
+    trial["show_target_labels"] = True
+    trial["fixed_target_intervals"] = True
+    trial["target_duration"] = target_duration
+    trial["automove_cursor_to_center"] = False
+    trial["freeze_cursor_between_targets"] = False
+    trial["post_block_delay"] = 0.0
+    trial["play_sound"] = False
+    experiment.trial_list = [trial]
+    assert experiment.trial_handler_with_results is None
+    task = mtptask.MotorTask(experiment, window)
+    # run task without moving mouse, which will stay in center for entire experiment
+    assert task.run() is True
+    # task ran successfully, updated experiment with results
+    assert experiment.has_unsaved_changes is True
+    assert experiment.trial_handler_with_results is not None
+    # check that we failed to hit all targets
+    expected_success = np.full((trial["num_targets"],), False)
+    for success_name in ["to_target_success", "to_center_success"]:
+        assert np.all(
+            experiment.trial_handler_with_results.data[success_name][0][0]
+            == expected_success
+        )
+    # first to_target timestamps should start at approx -target_duration,
+    # at 0 the first target is displayed for target_duration secs, so it should end at approx target_duration
+    # subsequent ones should start at approx 0.0 since previous target is not reached, and end at approx target_duration
+    all_to_target_timestamps = experiment.trial_handler_with_results.data[
+        "to_target_timestamps"
+    ][0][0]
+    delta = 0.05 * target_duration
+    assert abs(all_to_target_timestamps[0][0] + target_duration) < delta
+    assert abs(all_to_target_timestamps[0][-1] - target_duration) < delta
+    for to_target_timestamps in all_to_target_timestamps[1:]:
+        assert abs(to_target_timestamps[0]) < delta
+        assert abs(to_target_timestamps[-1] - target_duration) < delta

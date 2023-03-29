@@ -125,19 +125,21 @@ def update_target_label_colors(
             target_label.color = (inactive_rgb, inactive_rgb, inactive_rgb)
 
 
+class MotorTaskCancelledByUser(Exception):
+    pass
+
+
 def draw_and_flip(
     win: Window,
     drawables: List[BaseVisualStim],
     kb: Optional[Keyboard],
     kb_stop_key: str = "escape",
-) -> bool:
-    should_continue = True
+) -> None:
     for drawable in drawables:
         drawable.draw()
-    if kb is not None and kb.getKeys([kb_stop_key]):
-        should_continue = False
     win.flip()
-    return should_continue
+    if kb is not None and kb.getKeys([kb_stop_key]):
+        raise MotorTaskCancelledByUser
 
 
 def _make_stats_txt(display_options: MotorTaskDisplayOptions, stats: pd.Series) -> str:
@@ -393,7 +395,9 @@ def display_drawables(
             if new_remaining_display_time < remaining_display_time:
                 remaining_display_time = new_remaining_display_time
                 countdown_textbox.text = f"{remaining_display_time}"
-        if not draw_and_flip(win, drawables, kb, "return"):
+        try:
+            draw_and_flip(win, drawables, kb, "return")
+        except MotorTaskCancelledByUser:
             if close_window_when_done:
                 win.close()
             return

@@ -11,7 +11,7 @@ from motor_task_prototype.display_widget import DisplayOptionsWidget
 from motor_task_prototype.experiment import MotorTaskExperiment
 from motor_task_prototype.meta_widget import MetadataWidget
 from motor_task_prototype.results_widget import ResultsWidget
-from motor_task_prototype.task import run_task
+from motor_task_prototype.task import MotorTask
 from motor_task_prototype.trials_widget import TrialsWidget
 from psychopy.visual.window import Window
 from PyQt5 import QtGui
@@ -177,7 +177,8 @@ class MotorTaskGui(QtWidgets.QMainWindow):
             if yes_no != QtWidgets.QMessageBox.Yes:
                 return
         try:
-            if run_task(self.experiment, win=self._win):
+            task = MotorTask(self.experiment, win=self._win)
+            if task.run():
                 self.reload_results()
         except Exception as e:
             QtWidgets.QMessageBox.warning(

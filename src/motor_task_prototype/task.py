@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+from typing import Any
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Union
@@ -16,6 +18,7 @@ from motor_task_prototype.geom import PointRotator
 from motor_task_prototype.geom import to_target_dists
 from motor_task_prototype.stat import stats_dataframe
 from psychopy.clock import Clock
+from psychopy.data import TrialHandlerExt
 from psychopy.event import Mouse
 from psychopy.hardware.keyboard import Keyboard
 from psychopy.sound import Sound
@@ -25,290 +28,315 @@ from psychopy.visual.shape import ShapeStim
 from psychopy.visual.window import Window
 
 
-def make_target_indices(trial: Dict, rng: np.random.Generator) -> np.ndarray:
-    target_indices = np.fromstring(trial["target_indices"], dtype="int", sep=" ")
-    if trial["target_order"] == "random":
-        rng.shuffle(target_indices)
-    return target_indices
+def _get_target_indices(outer_target_index: int, trial: Dict[str, Any]) -> List[int]:
+    # always include outer target index
+    indices = [outer_target_index]
+    if trial["add_central_target"] and not trial["automove_cursor_to_center"]:
+        # add central target index
+        indices.append(trial["num_targets"])
+    return indices
 
 
-def run_task(experiment: MotorTaskExperiment, win: Optional[Window] = None) -> bool:
-    def _clean_up_and_return(
-        write_results_to_experiment: bool = False,
-    ) -> bool:
-        if win is not None and close_window_when_done:
-            win.close()
-        if write_results_to_experiment:
-            experiment.trial_handler_with_results = trial_handler
-            experiment.stats = stats_dataframe(trial_handler)
-            experiment.has_unsaved_changes = True
-        return write_results_to_experiment
+class TrialData:
+    """Stores the data from the trial that will be stored in the psychopy trial_handler"""
 
-    close_window_when_done = False
-    try:
-        if not experiment.trial_list:
-            return _clean_up_and_return()
-        trial_handler = experiment.create_trialhandler()
+    def __init__(self, trial: Dict[str, Any], rng: np.random.Generator):
+        self.target_indices = np.fromstring(
+            trial["target_indices"], dtype="int", sep=" "
+        )
+        if trial["target_order"] == "random":
+            rng.shuffle(self.target_indices)
+        self.target_pos: List[np.ndarray] = []
+        self.to_target_timestamps: List[np.ndarray] = []
+        self.to_center_timestamps: List[np.ndarray] = []
+        self.to_target_mouse_positions: List[np.ndarray] = []
+        self.to_center_mouse_positions: List[np.ndarray] = []
+        self.to_target_success: List[bool] = []
+        self.to_center_success: List[bool] = []
+
+
+class TrialManager:
+    """Stores the drawable elements and other objects needed during a trial"""
+
+    def __init__(self, win: Window, trial: Dict[str, Any], rng: np.random.Generator):
+        self.data = TrialData(trial, rng)
+        self.targets = mtpvis.make_targets(
+            win,
+            trial["num_targets"],
+            trial["target_distance"],
+            trial["target_size"],
+            trial["add_central_target"],
+            trial["central_target_size"],
+        )
+        self.target_labels = mtpvis.make_target_labels(
+            win,
+            trial["num_targets"],
+            trial["target_distance"],
+            trial["target_size"],
+            trial["target_labels"],
+        )
+        self.drawables: List[Union[BaseVisualStim, ElementArrayStim]] = [self.targets]
+        if trial["show_target_labels"]:
+            self.drawables.extend(self.target_labels)
+        self.cursor = mtpvis.make_cursor(win, trial["cursor_size"])
+        self.cursor.setPos(np.array([0.0, 0.0]))
+        if trial["show_cursor"]:
+            self.drawables.append(self.cursor)
+        self.point_rotator = PointRotator(trial["cursor_rotation_degrees"])
+        self.joystick_point_updater = JoystickPointUpdater(
+            trial["cursor_rotation_degrees"], trial["joystick_max_speed"], win.size
+        )
+        self.cursor_path = ShapeStim(
+            win, vertices=[(0, 0)], lineColor="white", closeShape=False
+        )
+        self.prev_cursor_path = ShapeStim(
+            win, vertices=[(0, 0)], lineColor="white", closeShape=False
+        )
+        if trial["show_cursor_path"]:
+            self.drawables.append(self.cursor_path)
+            self.drawables.append(self.prev_cursor_path)
+
+
+def _contains_mixed_length_numpy_arrays(items: Iterable) -> bool:
+    return (
+        len(set([item.shape if isinstance(item, np.ndarray) else 1 for item in items]))
+        > 1
+    )
+
+
+def add_trial_data_to_trial_handler(
+    trial_data: TrialData, trial_handler: TrialHandlerExt
+) -> None:
+    for name, value in vars(trial_data).items():
+        dtype = object if _contains_mixed_length_numpy_arrays(value) else None
+        trial_handler.addData(name, np.array(value, dtype=dtype))
+
+
+class MotorTask:
+    def __init__(self, experiment: MotorTaskExperiment, win: Optional[Window] = None):
+        self.close_window_when_done = False
+        self.experiment = experiment
         if win is None:
             win = Window(fullscr=True, units="height", winType=mtpconfig.win_type)
-            close_window_when_done = True
-        mouse = Mouse(visible=False, win=win)
-        clock = Clock()
-        kb = Keyboard()
-        js = joystick_wrapper.get_joystick()
-        mtpvis.splash_screen(
-            display_time_seconds=experiment.metadata["display_duration"],
-            enter_to_skip_delay=experiment.metadata["enter_to_skip_delay"],
-            show_delay_countdown=experiment.metadata["show_delay_countdown"],
-            metadata=experiment.metadata,
-            win=win,
-        )
-        condition_trial_indices: List[List[int]] = [[] for _ in trial_handler.trialList]
-        rng = np.random.default_rng()
-        for trial in trial_handler:
-            if trial["use_joystick"] and js is None:
-                raise RuntimeError(
-                    "Use joystick option is enabled, but no joystick found."
-                )
-            target_indices = make_target_indices(trial, rng)
-            targets = mtpvis.make_targets(
-                win,
-                trial["num_targets"],
-                trial["target_distance"],
-                trial["target_size"],
-                trial["add_central_target"],
-                trial["central_target_size"],
-            )
-            target_labels = mtpvis.make_target_labels(
-                win,
-                trial["num_targets"],
-                trial["target_distance"],
-                trial["target_size"],
-                trial["target_labels"],
-            )
-            drawables: List[Union[BaseVisualStim, ElementArrayStim]] = [targets]
-            if trial["show_target_labels"]:
-                drawables.extend(target_labels)
-            cursor = mtpvis.make_cursor(win, trial["cursor_size"])
-            if trial["show_cursor"]:
-                drawables.append(cursor)
-            point_rotator = PointRotator(trial["cursor_rotation_degrees"])
-            joystick_point_updater = JoystickPointUpdater(
-                trial["cursor_rotation_degrees"], trial["joystick_max_speed"], win.size
-            )
-            cursor_path = ShapeStim(
-                win, vertices=[(0, 0)], lineColor="white", closeShape=False
-            )
-            prev_cursor_path = ShapeStim(
-                win, vertices=[(0, 0)], lineColor="white", closeShape=False
-            )
-            if trial["show_cursor_path"]:
-                drawables.append(cursor_path)
-                drawables.append(prev_cursor_path)
-            condition_trial_indices[trial_handler.thisIndex].append(
-                trial_handler.thisTrialN
-            )
-            is_final_trial_of_block = (
-                len(condition_trial_indices[trial_handler.thisIndex]) == trial["weight"]
-            )
-            trial_target_pos = []
-            trial_to_target_timestamps = []
-            trial_to_center_timestamps = []
-            trial_to_target_mouse_positions = []
-            trial_to_center_mouse_positions = []
-            trial_to_target_success = []
-            trial_to_center_success = []
-            mouse_pos = np.array([0.0, 0.0])
-            mouse.setPos(mouse_pos)
-            cursor.setPos(mouse_pos)
-            current_target_time_taken = 0
-            for index in target_indices:
-                previous_target_time_taken = current_target_time_taken
-                current_target_time_taken = 0
-                indices = [index]
-                if (
-                    trial["add_central_target"]
-                    and not trial["automove_cursor_to_center"]
-                ):
-                    indices.append(trial["num_targets"])
-                for target_index in indices:
-                    # no target displayed
-                    mtpvis.update_target_colors(
-                        targets, trial["show_inactive_targets"], None
-                    )
-                    mouse_times = []
-                    mouse_positions = []
-                    if trial["show_target_labels"]:
-                        mtpvis.update_target_label_colors(
-                            target_labels, trial["show_inactive_targets"], None
-                        )
-                    is_central_target = target_index == trial["num_targets"]
-                    if is_central_target:
-                        mouse_times = [0]
-                        mouse_positions = [cursor_path.vertices[-1]]
-                        prev_cursor_path.vertices = cursor_path.vertices
-                        cursor_path.vertices = mouse_positions
-                    else:
-                        if trial["automove_cursor_to_center"]:
-                            mouse_pos = np.array([0.0, 0.0])
-                            mouse.setPos(mouse_pos)
-                            cursor.setPos(mouse_pos)
-                        cursor_path.vertices = [mouse_pos]
-                        prev_cursor_path.vertices = [(0, 0)]
-                        clock.reset()
-                        wait_time = trial["inter_target_duration"]
-                        if trial["fixed_target_intervals"]:
-                            wait_time = (
-                                trial["target_duration"] - previous_target_time_taken
-                            )
-                        while clock.getTime() < wait_time:
-                            if trial["freeze_cursor_between_targets"]:
-                                mouse.setPos(mouse_pos)
-                            else:
-                                if trial["use_joystick"]:
-                                    mouse_pos = joystick_point_updater(
-                                        mouse_pos, (js.getX(), js.getY())  # type: ignore
-                                    )
-                                else:
-                                    mouse_pos = point_rotator(mouse.getPos())
-                            mouse_times.append(
-                                clock.getTime() - trial["inter_target_duration"]
-                            )
-                            mouse_positions.append(mouse_pos)
-                            if trial["show_cursor"]:
-                                cursor.setPos(mouse_pos)
-                            if trial["show_cursor_path"]:
-                                cursor_path.vertices = mouse_positions
-                            if not mtpvis.draw_and_flip(win, drawables, kb):
-                                return _clean_up_and_return()
-                    # display current target
-                    mtpvis.update_target_colors(
-                        targets, trial["show_inactive_targets"], target_index
-                    )
-                    if trial["show_target_labels"]:
-                        mtpvis.update_target_label_colors(
-                            target_labels, trial["show_inactive_targets"], target_index
-                        )
-                    if trial["play_sound"]:
-                        Sound("A", secs=0.3, blockSize=1024, stereo=True).play()
-                    if not is_central_target:
-                        trial_target_pos.append(targets.xys[target_index])
-                    dist_correct, dist_any = to_target_dists(
-                        mouse_pos,
-                        targets.xys,
-                        target_index,
-                        trial["add_central_target"],
-                    )
-                    if trial["ignore_incorrect_targets"] or is_central_target:
-                        dist = dist_correct
-                    else:
-                        dist = dist_any
-                    clock.reset()
-                    win.recordFrameIntervals = True
-                    target_size = trial["target_size"]
-                    if is_central_target:
-                        target_size = trial["central_target_size"]
-                    max_time = trial["target_duration"]
-                    if trial["fixed_target_intervals"]:
-                        max_time -= current_target_time_taken
-                    while dist > target_size and clock.getTime() < max_time:
-                        if trial["use_joystick"]:
-                            mouse_pos = joystick_point_updater(
-                                mouse_pos, (js.getX(), js.getY())  # type: ignore
-                            )
-                        else:
-                            mouse_pos = point_rotator(mouse.getPos())
-                        if trial["show_cursor"]:
-                            cursor.setPos(mouse_pos)
-                        mouse_times.append(clock.getTime())
-                        mouse_positions.append(mouse_pos)
-                        if trial["show_cursor_path"]:
-                            cursor_path.vertices = mouse_positions
-                        dist_correct, dist_any = to_target_dists(
-                            mouse_pos,
-                            targets.xys,
-                            target_index,
-                            trial["add_central_target"],
-                        )
-                        if trial["ignore_incorrect_targets"] or is_central_target:
-                            dist = dist_correct
-                        else:
-                            dist = dist_any
-                        if not mtpvis.draw_and_flip(win, drawables, kb):
-                            return _clean_up_and_return()
-                    current_target_time_taken += clock.getTime()
-                    success = dist_correct <= target_size and clock.getTime() < max_time
-                    if is_central_target:
-                        trial_to_center_success.append(success)
-                    else:
-                        trial_to_target_success.append(success)
-                    win.recordFrameIntervals = False
-                    if is_central_target:
-                        trial_to_center_timestamps.append(np.array(mouse_times))
-                        trial_to_center_mouse_positions.append(
-                            np.array(mouse_positions)
-                        )
-                    else:
-                        trial_to_target_timestamps.append(np.array(mouse_times))
-                        trial_to_target_mouse_positions.append(
-                            np.array(mouse_positions)
-                        )
-            trial_handler.addData("target_indices", np.array(target_indices))
-            trial_handler.addData("target_pos", np.array(trial_target_pos))
-            trial_handler.addData(
-                "to_target_timestamps",
-                np.array(trial_to_target_timestamps, dtype=object),
-            )
-            trial_handler.addData(
-                "to_target_mouse_positions",
-                np.array(trial_to_target_mouse_positions, dtype=object),
-            )
-            trial_handler.addData(
-                "to_target_success", np.array(trial_to_target_success)
-            )
-            trial_handler.addData(
-                "to_center_timestamps",
-                np.array(trial_to_center_timestamps, dtype=object),
-            )
-            trial_handler.addData(
-                "to_center_mouse_positions",
-                np.array(trial_to_center_mouse_positions, dtype=object),
-            )
-            if trial["automove_cursor_to_center"]:
-                trial_to_center_success = [True] * trial["num_targets"]
-            trial_handler.addData(
-                "to_center_success", np.array(trial_to_center_success)
-            )
-            if trial["post_trial_delay"] > 0:
-                mtpvis.display_results(
-                    trial["post_trial_delay"],
-                    trial["enter_to_skip_delay"],
-                    trial["show_delay_countdown"],
-                    trial_handler if trial["post_trial_display_results"] else None,
-                    experiment.display_options,
-                    trial_handler.thisTrialN,
-                    False,
-                    win,
-                )
-            if is_final_trial_of_block and trial["post_block_delay"] > 0:
-                mtpvis.display_results(
-                    trial["post_block_delay"],
-                    trial["enter_to_skip_delay"],
-                    trial["show_delay_countdown"],
-                    trial_handler if trial["post_block_display_results"] else None,
-                    experiment.display_options,
-                    trial_handler.thisTrialN,
-                    True,
-                    win,
-                )
-        if win.nDroppedFrames > 0:
-            logging.warning(f"Dropped {win.nDroppedFrames} frames")
-    except Exception as e:
-        logging.warning(f"Run task failed with exception {e}")
-        logging.exception(e)
-        # clean up window before re-raising the exception
-        if win is not None and close_window_when_done:
-            win.close()
-        raise
+            self.close_window_when_done = True
+        self.win = win
+        if not experiment.trial_list:
+            return
+        self.trial_handler = experiment.create_trialhandler()
+        self.mouse = Mouse(visible=False, win=win)
+        self.kb = Keyboard()
+        self.js = joystick_wrapper.get_joystick()
+        self.rng = np.random.default_rng()
 
-    return _clean_up_and_return(True)
+    def run(self) -> bool:
+        if not self.experiment.trial_list:
+            return self._clean_up_and_return(False)
+        try:
+            self._do_trials()
+            self.experiment.trial_handler_with_results = self.trial_handler
+            self.experiment.stats = stats_dataframe(self.trial_handler)
+            self.experiment.has_unsaved_changes = True
+            return self._clean_up_and_return(True)
+        except mtpvis.MotorTaskCancelledByUser:
+            return self._clean_up_and_return(False)
+        except Exception as e:
+            logging.warning(f"Run task failed with exception {e}")
+            logging.exception(e)
+            # clean up window before re-raising the exception
+            if self.win is not None and self.close_window_when_done:
+                self.win.close()
+            raise
+
+    def _do_trials(self) -> None:
+        self._do_splash_screen()
+        condition_trial_indices: List[List[int]] = [
+            [] for _ in self.trial_handler.trialList
+        ]
+        for trial in self.trial_handler:
+            self._do_trial(trial, condition_trial_indices)
+        if self.win.nDroppedFrames > 0:
+            logging.warning(f"Dropped {self.win.nDroppedFrames} frames")
+
+    def _do_splash_screen(self) -> None:
+        mtpvis.splash_screen(
+            display_time_seconds=self.experiment.metadata["display_duration"],
+            enter_to_skip_delay=self.experiment.metadata["enter_to_skip_delay"],
+            show_delay_countdown=self.experiment.metadata["show_delay_countdown"],
+            metadata=self.experiment.metadata,
+            win=self.win,
+        )
+
+    def _do_trial(
+        self, trial: Dict[str, Any], condition_trial_indices: List[List[int]]
+    ) -> None:
+        if trial["use_joystick"] and self.js is None:
+            raise RuntimeError("Use joystick option is enabled, but no joystick found.")
+        tom = TrialManager(self.win, trial, self.rng)
+        condition_trial_indices[self.trial_handler.thisIndex].append(
+            self.trial_handler.thisTrialN
+        )
+        is_final_trial_of_block = (
+            len(condition_trial_indices[self.trial_handler.thisIndex])
+            == trial["weight"]
+        )
+        self.mouse.setPos(tom.cursor.pos)
+        previous_target_time_taken = 0.0
+        for index in tom.data.target_indices:
+            previous_target_time_taken = self._do_target(
+                trial, index, tom, previous_target_time_taken
+            )
+
+        if trial["automove_cursor_to_center"]:
+            tom.data.to_center_success = [True] * trial["num_targets"]
+        add_trial_data_to_trial_handler(tom.data, self.trial_handler)
+        if trial["post_trial_delay"] > 0:
+            mtpvis.display_results(
+                trial["post_trial_delay"],
+                trial["enter_to_skip_delay"],
+                trial["show_delay_countdown"],
+                self.trial_handler if trial["post_trial_display_results"] else None,
+                self.experiment.display_options,
+                self.trial_handler.thisTrialN,
+                False,
+                self.win,
+            )
+        if is_final_trial_of_block and trial["post_block_delay"] > 0:
+            mtpvis.display_results(
+                trial["post_block_delay"],
+                trial["enter_to_skip_delay"],
+                trial["show_delay_countdown"],
+                self.trial_handler if trial["post_block_display_results"] else None,
+                self.experiment.display_options,
+                self.trial_handler.thisTrialN,
+                True,
+                self.win,
+            )
+
+    def _do_target(
+        self,
+        trial: Dict[str, Any],
+        index: int,
+        tm: TrialManager,
+        previous_target_time_taken: float,
+    ) -> float:
+        clock = Clock()
+        mouse_pos = tm.cursor.pos
+        current_target_time_taken = 0
+        for target_index in _get_target_indices(index, trial):
+            # no target displayed
+            mtpvis.update_target_colors(
+                tm.targets, trial["show_inactive_targets"], None
+            )
+            if trial["show_target_labels"]:
+                mtpvis.update_target_label_colors(
+                    tm.target_labels, trial["show_inactive_targets"], None
+                )
+            mouse_times = []
+            mouse_positions = []
+            is_central_target = target_index == trial["num_targets"]
+            if is_central_target:
+                mouse_times = [0]
+                mouse_positions = [tm.cursor_path.vertices[-1]]
+                tm.prev_cursor_path.vertices = tm.cursor_path.vertices
+                tm.cursor_path.vertices = mouse_positions
+            else:
+                if trial["automove_cursor_to_center"]:
+                    mouse_pos = np.array([0.0, 0.0])
+                    self.mouse.setPos(mouse_pos)
+                    tm.cursor.setPos(mouse_pos)
+                tm.cursor_path.vertices = [mouse_pos]
+                tm.prev_cursor_path.vertices = [(0, 0)]
+                clock.reset()
+                wait_time = trial["inter_target_duration"]
+                if trial["fixed_target_intervals"]:
+                    wait_time = trial["target_duration"] - previous_target_time_taken
+                while clock.getTime() < wait_time:
+                    if trial["freeze_cursor_between_targets"]:
+                        self.mouse.setPos(mouse_pos)
+                    else:
+                        if trial["use_joystick"]:
+                            mouse_pos = tm.joystick_point_updater(
+                                mouse_pos, (self.js.getX(), self.js.getY())  # type: ignore
+                            )
+                        else:
+                            mouse_pos = tm.point_rotator(self.mouse.getPos())
+                    mouse_times.append(clock.getTime() - wait_time)
+                    mouse_positions.append(mouse_pos)
+                    if trial["show_cursor"]:
+                        tm.cursor.setPos(mouse_pos)
+                    if trial["show_cursor_path"]:
+                        tm.cursor_path.vertices = mouse_positions
+                    mtpvis.draw_and_flip(self.win, tm.drawables, self.kb)
+            # display current target
+            mtpvis.update_target_colors(
+                tm.targets, trial["show_inactive_targets"], target_index
+            )
+            if trial["show_target_labels"]:
+                mtpvis.update_target_label_colors(
+                    tm.target_labels, trial["show_inactive_targets"], target_index
+                )
+            if trial["play_sound"]:
+                Sound("A", secs=0.3, blockSize=1024, stereo=True).play()
+            if not is_central_target:
+                tm.data.target_pos.append(tm.targets.xys[target_index])
+            dist_correct, dist_any = to_target_dists(
+                mouse_pos,
+                tm.targets.xys,
+                target_index,
+                trial["add_central_target"],
+            )
+            if trial["ignore_incorrect_targets"] or is_central_target:
+                dist = dist_correct
+            else:
+                dist = dist_any
+            clock.reset()
+            self.win.recordFrameIntervals = True
+            target_size = trial["target_size"]
+            if is_central_target:
+                target_size = trial["central_target_size"]
+            max_time = trial["target_duration"]
+            if trial["fixed_target_intervals"]:
+                max_time -= current_target_time_taken
+            while dist > target_size and clock.getTime() < max_time:
+                if trial["use_joystick"]:
+                    mouse_pos = tm.joystick_point_updater(
+                        mouse_pos, (self.js.getX(), self.js.getY())  # type: ignore
+                    )
+                else:
+                    mouse_pos = tm.point_rotator(self.mouse.getPos())
+                if trial["show_cursor"]:
+                    tm.cursor.setPos(mouse_pos)
+                mouse_times.append(clock.getTime())
+                mouse_positions.append(mouse_pos)
+                if trial["show_cursor_path"]:
+                    tm.cursor_path.vertices = mouse_positions
+                dist_correct, dist_any = to_target_dists(
+                    mouse_pos,
+                    tm.targets.xys,
+                    target_index,
+                    trial["add_central_target"],
+                )
+                if trial["ignore_incorrect_targets"] or is_central_target:
+                    dist = dist_correct
+                else:
+                    dist = dist_any
+                mtpvis.draw_and_flip(self.win, tm.drawables, self.kb)
+            current_target_time_taken += clock.getTime()
+            self.win.recordFrameIntervals = False
+            success = dist_correct <= target_size and clock.getTime() < max_time
+            if is_central_target:
+                tm.data.to_center_success.append(success)
+            else:
+                tm.data.to_target_success.append(success)
+            if is_central_target:
+                tm.data.to_center_timestamps.append(np.array(mouse_times))
+                tm.data.to_center_mouse_positions.append(np.array(mouse_positions))
+            else:
+                tm.data.to_target_timestamps.append(np.array(mouse_times))
+                tm.data.to_target_mouse_positions.append(np.array(mouse_positions))
+        return current_target_time_taken
+
+    def _clean_up_and_return(self, return_value: bool) -> bool:
+        if self.win is not None and self.close_window_when_done:
+            self.win.close()
+        return return_value
