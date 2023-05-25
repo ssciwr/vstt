@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.vis import display_results
 from psychopy.visual.window import Window
 from PyQt5 import QtWidgets
+from vstt.experiment import Experiment
+from vstt.vis import display_results
 
 
 class ResultsWidget(QtWidgets.QWidget):
@@ -14,7 +14,7 @@ class ResultsWidget(QtWidgets.QWidget):
     ):
         super().__init__(parent)
         self._win = win
-        self._experiment = MotorTaskExperiment()
+        self._experiment = Experiment()
 
         outer_layout = QtWidgets.QVBoxLayout()
         group_box = QtWidgets.QGroupBox("Results")
@@ -74,11 +74,11 @@ class ResultsWidget(QtWidgets.QWidget):
         self._display_results(True)
 
     @property
-    def experiment(self) -> MotorTaskExperiment:
+    def experiment(self) -> Experiment:
         return self._experiment
 
     @experiment.setter
-    def experiment(self, experiment: MotorTaskExperiment) -> None:
+    def experiment(self, experiment: Experiment) -> None:
         self._list_trials.clear()
         self._experiment = experiment
         if experiment.trial_handler_with_results is None:

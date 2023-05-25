@@ -3,13 +3,8 @@ from __future__ import annotations
 from typing import List
 from typing import Optional
 
-import motor_task_prototype.meta as mtpmeta
-import motor_task_prototype.stat as mtpstat
 import numpy as np
 import pandas as pd
-from motor_task_prototype import config as mtpconfig
-from motor_task_prototype.geom import points_on_circle
-from motor_task_prototype.types import MotorTaskDisplayOptions
 from psychopy.clock import Clock
 from psychopy.colors import colorNames
 from psychopy.data import TrialHandlerExt
@@ -20,6 +15,11 @@ from psychopy.visual.elementarray import ElementArrayStim
 from psychopy.visual.shape import ShapeStim
 from psychopy.visual.textbox2 import TextBox2
 from psychopy.visual.window import Window
+from vstt.geom import points_on_circle
+from vstt.stat import list_dest_stat_label_units
+from vstt.stat import stats_dataframe
+from vstt.types import DisplayOptions
+from vstt.types import Metadata
 
 colorNames.pop("none")
 colors = list(colorNames.values())
@@ -142,9 +142,9 @@ def draw_and_flip(
         raise MotorTaskCancelledByUser
 
 
-def _make_stats_txt(display_options: MotorTaskDisplayOptions, stats: pd.Series) -> str:
+def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
     txt_stats = ""
-    for destination, stat_label_units in mtpstat.list_dest_stat_label_units():
+    for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             if display_options.get(stat, False):  # type: ignore
                 txt_stats += f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
@@ -153,7 +153,7 @@ def _make_stats_txt(display_options: MotorTaskDisplayOptions, stats: pd.Series) 
 
 def _make_stats_drawables(
     trial_handler: TrialHandlerExt,
-    display_options: MotorTaskDisplayOptions,
+    display_options: DisplayOptions,
     stats_df: pd.DataFrame,
     win: Window,
 ) -> List[BaseVisualStim]:
@@ -283,7 +283,7 @@ def display_results(
     enter_to_skip_delay: bool,
     show_delay_countdown: bool,
     trial_handler: Optional[TrialHandlerExt],
-    display_options: MotorTaskDisplayOptions,
+    display_options: DisplayOptions,
     i_trial: int,
     all_trials_for_this_condition: bool,
     win: Optional[Window] = None,
@@ -294,7 +294,7 @@ def display_results(
         close_window_when_done = True
     drawables = []
     if trial_handler is not None:
-        stats_df = mtpstat.stats_dataframe(trial_handler)
+        stats_df = stats_dataframe(trial_handler)
         if all_trials_for_this_condition:
             condition_index = stats_df.loc[
                 stats_df.i_trial == i_trial
@@ -362,7 +362,7 @@ def _make_textbox_countdown(text: str, win: Window) -> TextBox2:
 
 
 def _make_window() -> Window:
-    return Window(fullscr=True, units="height", winType=mtpconfig.win_type)
+    return Window(fullscr=True, units="height")
 
 
 def display_drawables(
@@ -410,7 +410,7 @@ def splash_screen(
     display_time_seconds: float,
     enter_to_skip_delay: bool,
     show_delay_countdown: bool,
-    metadata: mtpmeta.MotorTaskMetadata,
+    metadata: Metadata,
     win: Optional[Window] = None,
 ) -> None:
     close_window_when_done = False

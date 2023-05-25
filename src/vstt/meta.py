@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import Dict
 
-import motor_task_prototype.common as mtpcommon
-from motor_task_prototype.types import MotorTaskMetadata
+import vstt
 
 
-def default_metadata() -> MotorTaskMetadata:
+def default_metadata() -> vstt.types.Metadata:
     return {
         "name": "Experiment",
         "subject": "Joe Smith",
@@ -42,5 +41,5 @@ def metadata_labels() -> Dict:
     }
 
 
-def import_metadata(metadata_dict: dict) -> MotorTaskMetadata:
-    return mtpcommon.import_typed_dict(metadata_dict, default_metadata())
+def import_metadata(metadata_dict: dict) -> vstt.types.Metadata:
+    return vstt.common.import_typed_dict(metadata_dict, default_metadata())

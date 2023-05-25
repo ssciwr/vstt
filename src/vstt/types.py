@@ -10,7 +10,7 @@ else:
     from typing_extensions import TypedDict
 
 
-class MotorTaskTrial(TypedDict):
+class Trial(TypedDict):
     weight: int
     num_targets: int
     target_order: Union[str, List]
@@ -43,7 +43,7 @@ class MotorTaskTrial(TypedDict):
     enter_to_skip_delay: bool
 
 
-class MotorTaskDisplayOptions(TypedDict):
+class DisplayOptions(TypedDict):
     to_target_paths: bool
     to_center_paths: bool
     targets: bool
@@ -61,7 +61,7 @@ class MotorTaskDisplayOptions(TypedDict):
     averages: bool
 
 
-class MotorTaskMetadata(TypedDict):
+class Metadata(TypedDict):
     name: str
     subject: str
     date: str

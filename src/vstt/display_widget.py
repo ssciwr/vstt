@@ -4,11 +4,11 @@ from typing import Callable
 from typing import Dict
 from typing import Optional
 
-from motor_task_prototype.display import display_options_labels
-from motor_task_prototype.experiment import MotorTaskExperiment
 from psychopy.visual.window import Window
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from vstt.display import display_options_labels
+from vstt.experiment import Experiment
 
 
 class DisplayOptionsWidget(QtWidgets.QWidget):
@@ -19,7 +19,7 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
     ):
         super().__init__(parent)
         self._win = win
-        self._experiment: MotorTaskExperiment = MotorTaskExperiment()
+        self._experiment: Experiment = Experiment()
         self._widgets: Dict[str, QtWidgets.QCheckBox] = {}
 
         outer_layout = QtWidgets.QVBoxLayout()
@@ -44,11 +44,11 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
         return _update_value
 
     @property
-    def experiment(self) -> MotorTaskExperiment:
+    def experiment(self) -> Experiment:
         return self._experiment
 
     @experiment.setter
-    def experiment(self, experiment: MotorTaskExperiment) -> None:
+    def experiment(self, experiment: Experiment) -> None:
         self._experiment = experiment
         for key, widget in self._widgets.items():
             widget.setChecked(self._experiment.display_options[key])  # type: ignore

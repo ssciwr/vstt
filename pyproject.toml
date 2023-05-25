@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "motor_task_prototype"
-description = "Motor task prototype"
+name = "vstt"
+description = "Visuomotor Serial Targeting Task (VSTT)"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Liam Keegan", email = "ssc@iwr.uni-heidelberg.de" }]
@@ -28,12 +28,12 @@ dependencies = ["psychopy", "psychopy-sounddevice", "numpy", "click", "PyQt5"]
 dynamic = ["version"]
 
 [project.scripts]
-motor_task_prototype = "motor_task_prototype.__main__:main"
+vstt = "vstt.__main__:main"
 
 [project.urls]
-Github = "https://github.com/ssciwr/motor-task-prototype"
-Issues = "https://github.com/ssciwr/motor-task-prototype/issues"
-Documentation = "https://ssciwr.github.io/motor-task-prototype/"
+Github = "https://github.com/ssciwr/vstt"
+Issues = "https://github.com/ssciwr/vstt/issues"
+Documentation = "https://ssciwr.github.io/vstt/"
 
 [project.optional-dependencies]
 tests = [
@@ -54,7 +54,7 @@ docs = [
 ]
 
 [tool.setuptools.dynamic]
-version = { attr = "motor_task_prototype.__version__" }
+version = { attr = "vstt.__version__" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

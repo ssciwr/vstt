@@ -5,13 +5,14 @@ from typing import Dict
 from typing import Optional
 from typing import Union
 
-import motor_task_prototype.meta as mtpmeta
-import motor_task_prototype.vis as mtpvis
-from motor_task_prototype.experiment import MotorTaskExperiment
 from psychopy.visual.window import Window
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
+from vstt.experiment import Experiment
+from vstt.meta import default_metadata
+from vstt.meta import metadata_labels
+from vstt.vis import splash_screen
 
 
 class MetadataWidget(QtWidgets.QWidget):
@@ -22,7 +23,7 @@ class MetadataWidget(QtWidgets.QWidget):
     ):
         super().__init__(parent)
         self._win = win
-        self._experiment = MotorTaskExperiment()
+        self._experiment = Experiment()
         self._str_widgets: Dict[str, QtWidgets.QLineEdit] = {}
         self._bool_widgets: Dict[str, QtWidgets.QCheckBox] = {}
         self._float_widgets: Dict[str, QtWidgets.QDoubleSpinBox] = {}
@@ -35,8 +36,8 @@ class MetadataWidget(QtWidgets.QWidget):
         fields_layout = QtWidgets.QGridLayout()
         fields = QtWidgets.QWidget()
         fields.setLayout(fields_layout)
-        labels = mtpmeta.metadata_labels()
-        for row_index, (key, value) in enumerate(mtpmeta.default_metadata().items()):
+        labels = metadata_labels()
+        for row_index, (key, value) in enumerate(default_metadata().items()):
             if isinstance(value, str):
                 lbl = QtWidgets.QLabel(f"{labels[key]}:", self)
                 lbl.setAlignment(Qt.AlignRight)
@@ -77,7 +78,7 @@ class MetadataWidget(QtWidgets.QWidget):
         return _update_value
 
     def _btn_preview_metadata_clicked(self) -> None:
-        mtpvis.splash_screen(
+        splash_screen(
             display_time_seconds=self._experiment.metadata["display_duration"],
             enter_to_skip_delay=self._experiment.metadata["enter_to_skip_delay"],
             show_delay_countdown=self._experiment.metadata["show_delay_countdown"],
@@ -86,11 +87,11 @@ class MetadataWidget(QtWidgets.QWidget):
         )
 
     @property
-    def experiment(self) -> MotorTaskExperiment:
+    def experiment(self) -> Experiment:
         return self._experiment
 
     @experiment.setter
-    def experiment(self, experiment: MotorTaskExperiment) -> None:
+    def experiment(self, experiment: Experiment) -> None:
         self._experiment = experiment
         for key, str_widget in self._str_widgets.items():
             str_widget.setText(self._experiment.metadata[key])  # type: ignore

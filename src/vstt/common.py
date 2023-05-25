@@ -7,13 +7,15 @@ from typing import Dict
 from typing import Type
 from typing import TypeVar
 
-import motor_task_prototype.types as mtptypes
+from vstt.types import DisplayOptions
+from vstt.types import Metadata
+from vstt.types import Trial
 
-MtpTypedDict = TypeVar(
-    "MtpTypedDict",
-    mtptypes.MotorTaskTrial,
-    mtptypes.MotorTaskMetadata,
-    mtptypes.MotorTaskDisplayOptions,
+VsttTypedDict = TypeVar(
+    "VsttTypedDict",
+    Trial,
+    Metadata,
+    DisplayOptions,
 )
 
 
@@ -28,8 +30,8 @@ def _has_valid_type(var: Any, correct_type: Type) -> bool:
 
 
 def import_typed_dict(
-    input_dict: Dict, default_typed_dict: MtpTypedDict
-) -> MtpTypedDict:
+    input_dict: Dict, default_typed_dict: VsttTypedDict
+) -> VsttTypedDict:
     # start with a valid typed dict with default values
     output_dict = copy.deepcopy(default_typed_dict)
     for key, default_value in output_dict.items():

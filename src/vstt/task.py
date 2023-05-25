@@ -9,14 +9,6 @@ from typing import Optional
 from typing import Union
 
 import numpy as np
-from motor_task_prototype import config as mtpconfig
-from motor_task_prototype import joystick_wrapper
-from motor_task_prototype import vis as mtpvis
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.geom import JoystickPointUpdater
-from motor_task_prototype.geom import PointRotator
-from motor_task_prototype.geom import to_target_dists
-from motor_task_prototype.stat import stats_dataframe
 from psychopy.clock import Clock
 from psychopy.data import TrialHandlerExt
 from psychopy.event import Mouse
@@ -26,6 +18,13 @@ from psychopy.visual.basevisual import BaseVisualStim
 from psychopy.visual.elementarray import ElementArrayStim
 from psychopy.visual.shape import ShapeStim
 from psychopy.visual.window import Window
+from vstt import joystick_wrapper
+from vstt import vis
+from vstt.experiment import Experiment
+from vstt.geom import JoystickPointUpdater
+from vstt.geom import PointRotator
+from vstt.geom import to_target_dists
+from vstt.stat import stats_dataframe
 
 
 def _get_target_indices(outer_target_index: int, trial: Dict[str, Any]) -> List[int]:
@@ -60,7 +59,7 @@ class TrialManager:
 
     def __init__(self, win: Window, trial: Dict[str, Any], rng: np.random.Generator):
         self.data = TrialData(trial, rng)
-        self.targets = mtpvis.make_targets(
+        self.targets = vis.make_targets(
             win,
             trial["num_targets"],
             trial["target_distance"],
@@ -68,7 +67,7 @@ class TrialManager:
             trial["add_central_target"],
             trial["central_target_size"],
         )
-        self.target_labels = mtpvis.make_target_labels(
+        self.target_labels = vis.make_target_labels(
             win,
             trial["num_targets"],
             trial["target_distance"],
@@ -78,7 +77,7 @@ class TrialManager:
         self.drawables: List[Union[BaseVisualStim, ElementArrayStim]] = [self.targets]
         if trial["show_target_labels"]:
             self.drawables.extend(self.target_labels)
-        self.cursor = mtpvis.make_cursor(win, trial["cursor_size"])
+        self.cursor = vis.make_cursor(win, trial["cursor_size"])
         self.cursor.setPos(np.array([0.0, 0.0]))
         if trial["show_cursor"]:
             self.drawables.append(self.cursor)
@@ -113,11 +112,11 @@ def add_trial_data_to_trial_handler(
 
 
 class MotorTask:
-    def __init__(self, experiment: MotorTaskExperiment, win: Optional[Window] = None):
+    def __init__(self, experiment: Experiment, win: Optional[Window] = None):
         self.close_window_when_done = False
         self.experiment = experiment
         if win is None:
-            win = Window(fullscr=True, units="height", winType=mtpconfig.win_type)
+            win = Window(fullscr=True, units="height")
             self.close_window_when_done = True
         self.win = win
         if not experiment.trial_list:
@@ -137,7 +136,7 @@ class MotorTask:
             self.experiment.stats = stats_dataframe(self.trial_handler)
             self.experiment.has_unsaved_changes = True
             return self._clean_up_and_return(True)
-        except mtpvis.MotorTaskCancelledByUser:
+        except vis.MotorTaskCancelledByUser:
             return self._clean_up_and_return(False)
         except Exception as e:
             logging.warning(f"Run task failed with exception {e}")
@@ -158,7 +157,7 @@ class MotorTask:
             logging.warning(f"Dropped {self.win.nDroppedFrames} frames")
 
     def _do_splash_screen(self) -> None:
-        mtpvis.splash_screen(
+        vis.splash_screen(
             display_time_seconds=self.experiment.metadata["display_duration"],
             enter_to_skip_delay=self.experiment.metadata["enter_to_skip_delay"],
             show_delay_countdown=self.experiment.metadata["show_delay_countdown"],
@@ -190,7 +189,7 @@ class MotorTask:
             tom.data.to_center_success = [True] * trial["num_targets"]
         add_trial_data_to_trial_handler(tom.data, self.trial_handler)
         if trial["post_trial_delay"] > 0:
-            mtpvis.display_results(
+            vis.display_results(
                 trial["post_trial_delay"],
                 trial["enter_to_skip_delay"],
                 trial["show_delay_countdown"],
@@ -201,7 +200,7 @@ class MotorTask:
                 self.win,
             )
         if is_final_trial_of_block and trial["post_block_delay"] > 0:
-            mtpvis.display_results(
+            vis.display_results(
                 trial["post_block_delay"],
                 trial["enter_to_skip_delay"],
                 trial["show_delay_countdown"],
@@ -224,11 +223,9 @@ class MotorTask:
         current_target_time_taken = 0
         for target_index in _get_target_indices(index, trial):
             # no target displayed
-            mtpvis.update_target_colors(
-                tm.targets, trial["show_inactive_targets"], None
-            )
+            vis.update_target_colors(tm.targets, trial["show_inactive_targets"], None)
             if trial["show_target_labels"]:
-                mtpvis.update_target_label_colors(
+                vis.update_target_label_colors(
                     tm.target_labels, trial["show_inactive_targets"], None
                 )
             mouse_times = []
@@ -266,13 +263,13 @@ class MotorTask:
                         tm.cursor.setPos(mouse_pos)
                     if trial["show_cursor_path"]:
                         tm.cursor_path.vertices = mouse_positions
-                    mtpvis.draw_and_flip(self.win, tm.drawables, self.kb)
+                    vis.draw_and_flip(self.win, tm.drawables, self.kb)
             # display current target
-            mtpvis.update_target_colors(
+            vis.update_target_colors(
                 tm.targets, trial["show_inactive_targets"], target_index
             )
             if trial["show_target_labels"]:
-                mtpvis.update_target_label_colors(
+                vis.update_target_label_colors(
                     tm.target_labels, trial["show_inactive_targets"], target_index
                 )
             if trial["play_sound"]:
@@ -320,7 +317,7 @@ class MotorTask:
                     dist = dist_correct
                 else:
                     dist = dist_any
-                mtpvis.draw_and_flip(self.win, tm.drawables, self.kb)
+                vis.draw_and_flip(self.win, tm.drawables, self.kb)
             current_target_time_taken += clock.getTime()
             self.win.recordFrameIntervals = False
             success = dist_correct <= target_size and clock.getTime() < max_time

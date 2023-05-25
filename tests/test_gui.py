@@ -4,19 +4,17 @@ import pathlib
 from typing import Any
 from typing import Tuple
 
-import motor_task_prototype.display as mtpdisplay
-import motor_task_prototype.meta as mtpmeta
-import motor_task_prototype.trial as mtptrial
 import qt_test_utils as qtu
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.gui import MotorTaskGui
+import vstt
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QInputDialog
 from pytest import MonkeyPatch
+from vstt.experiment import Experiment
+from vstt.gui import Gui
 
 
 def test_gui_run_no_trials() -> None:
-    gui = MotorTaskGui(filename=None)
+    gui = Gui(filename=None)
     # remove trial conditions
     qtu.press_up_key(gui.trials_widget._widget_list_trials)
     qtu.click(gui.trials_widget._btn_remove)
@@ -34,7 +32,7 @@ def test_gui_run_no_trials() -> None:
 
 
 def test_gui_new_file() -> None:
-    gui = MotorTaskGui(filename=None)
+    gui = Gui(filename=None)
     # initially uses default metadata, display options and trials - no results, no unsaved changes
     assert gui.experiment.has_unsaved_changes is False
     assert "*" not in gui.windowTitle()
@@ -56,11 +54,11 @@ def test_gui_new_file() -> None:
 
 
 def test_gui_no_file() -> None:
-    gui = MotorTaskGui(filename=None)
+    gui = Gui(filename=None)
     # initially uses default metadata, display options and trials - no results, no unsaved changes
-    assert gui.experiment.metadata == mtpmeta.default_metadata()
-    assert gui.experiment.display_options == mtpdisplay.default_display_options()
-    assert gui.experiment.trial_list == [mtptrial.default_trial()]
+    assert gui.experiment.metadata == vstt.meta.default_metadata()
+    assert gui.experiment.display_options == vstt.display.default_display_options()
+    assert gui.experiment.trial_list == [vstt.trial.default_trial()]
     assert gui.experiment.trial_handler_with_results is None
     assert gui.experiment.has_unsaved_changes is False
     assert "*" not in gui.windowTitle()
@@ -98,11 +96,11 @@ def test_gui_no_file() -> None:
 
 
 def test_gui_file_with_results(
-    tmp_path: pathlib.Path, experiment_with_results: MotorTaskExperiment
+    tmp_path: pathlib.Path, experiment_with_results: Experiment
 ) -> None:
     filename = str(tmp_path / "experiment.psydat")
     experiment_with_results.save_psydat(filename)
-    gui = MotorTaskGui(filename=filename)
+    gui = Gui(filename=filename)
     assert gui.experiment.metadata == experiment_with_results.metadata
     assert gui.experiment.display_options == experiment_with_results.display_options
     assert len(gui.experiment.trial_list) == len(experiment_with_results.trial_list)
@@ -117,11 +115,11 @@ def test_gui_file_with_results(
 
 
 def test_gui_import_excel(
-    tmp_path: pathlib.Path, experiment_with_results: MotorTaskExperiment
+    tmp_path: pathlib.Path, experiment_with_results: Experiment
 ) -> None:
     filepath = tmp_path / "experiment.xlsx"
     experiment_with_results.save_excel(str(filepath), "trial")
-    gui = MotorTaskGui(filename=str(filepath))
+    gui = Gui(filename=str(filepath))
     assert gui.experiment.metadata == experiment_with_results.metadata
     assert gui.experiment.display_options == experiment_with_results.display_options
     assert len(gui.experiment.trial_list) == len(experiment_with_results.trial_list)
@@ -132,11 +130,11 @@ def test_gui_import_excel(
 
 
 def test_gui_import_json(
-    tmp_path: pathlib.Path, experiment_with_results: MotorTaskExperiment
+    tmp_path: pathlib.Path, experiment_with_results: Experiment
 ) -> None:
     filepath = tmp_path / "experiment.json"
     experiment_with_results.save_json(str(filepath))
-    gui = MotorTaskGui(filename=str(filepath))
+    gui = Gui(filename=str(filepath))
     assert gui.experiment.metadata == experiment_with_results.metadata
     assert gui.experiment.display_options == experiment_with_results.display_options
     assert len(gui.experiment.trial_list) == len(experiment_with_results.trial_list)
@@ -148,7 +146,7 @@ def test_gui_import_json(
 
 def test_gui_import_export(
     tmp_path: pathlib.Path,
-    experiment_with_results: MotorTaskExperiment,
+    experiment_with_results: Experiment,
     monkeypatch: MonkeyPatch,
 ) -> None:
     filepath = tmp_path / "experiment.psydat"
@@ -173,7 +171,7 @@ def test_gui_import_export(
 
         monkeypatch.setattr(QInputDialog, "getItem", mock_getItem)
 
-        gui = MotorTaskGui(filename=str(filepath))
+        gui = Gui(filename=str(filepath))
         assert gui.experiment.metadata == experiment_with_results.metadata
         assert gui.experiment.display_options == experiment_with_results.display_options
         assert len(gui.experiment.trial_list) == len(experiment_with_results.trial_list)
@@ -183,7 +181,7 @@ def test_gui_import_export(
         export_action.trigger()
         assert export_filepath.is_file()
         # re-import exported file
-        exp = MotorTaskExperiment(str(export_filepath))
+        exp = Experiment(str(export_filepath))
         assert exp.metadata == experiment_with_results.metadata
         assert exp.display_options == experiment_with_results.display_options
         assert exp.trial_list == experiment_with_results.trial_list
@@ -199,7 +197,7 @@ def test_gui_invalid_file(tmp_path: pathlib.Path) -> None:
         # mwt to click ok when failed to open file message box is shown
         mwt = qtu.ModalWidgetTimer(["Enter"])
         mwt.start()
-        gui = MotorTaskGui(filename=str(file))
+        gui = Gui(filename=str(file))
         assert mwt.widget_type == "QMessageBox"
         assert "Could not read file" in mwt.widget_text
         assert extension in mwt.widget_text
@@ -210,7 +208,7 @@ def test_gui_nonexistent_file() -> None:
     # mwt to click ok when failed to open file message box is shown
     mwt = qtu.ModalWidgetTimer(["Enter"])
     mwt.start()
-    gui = MotorTaskGui(filename="I dont exist")
+    gui = Gui(filename="I dont exist")
     assert mwt.widget_type == "QMessageBox"
     assert "Could not read file" in mwt.widget_text
     gui.close()

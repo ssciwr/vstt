@@ -1,22 +1,22 @@
 from __future__ import annotations
 
-import motor_task_prototype.display as mtpdisplay
 import qt_test_utils as qtu
-from motor_task_prototype.display_widget import DisplayOptionsWidget
-from motor_task_prototype.experiment import MotorTaskExperiment
+import vstt
 from psychopy.visual.window import Window
+from vstt.display_widget import DisplayOptionsWidget
+from vstt.experiment import Experiment
 
 
 def test_display_options_widget(window: Window) -> None:
     widget = DisplayOptionsWidget(parent=None, win=window)
     signal_received = qtu.SignalReceived(widget.experiment_modified)
     # initially has default experiment with default display options
-    assert widget.experiment.display_options == mtpdisplay.default_display_options()
+    assert widget.experiment.display_options == vstt.display.default_display_options()
     assert widget.experiment.has_unsaved_changes is False
     assert not signal_received
     # set an experiment with all options set to false
-    experiment = MotorTaskExperiment()
-    all_false = mtpdisplay.default_display_options()
+    experiment = Experiment()
+    all_false = vstt.display.default_display_options()
     for key in all_false:
         all_false[key] = False  # type: ignore
     experiment.display_options = all_false

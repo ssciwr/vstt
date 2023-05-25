@@ -47,7 +47,7 @@ jobs:
           # see Qt debug output when loading plugins
           echo "QT_DEBUG_PLUGINS=1" >> $GITHUB_ENV
       - run: pip install -e .[tests,docs] --verbose
-      - run: python -m pytest --cov=motor_task_prototype --cov-report=xml -v -s -x
+      - run: python -m pytest --cov=vstt --cov-report=xml -v -s -x
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
