@@ -6,13 +6,13 @@ from typing import List
 from typing import Tuple
 
 import gui_test_utils as gtu
-import motor_task_prototype.task as mtptask
-import motor_task_prototype.trial as mtptrial
 import numpy as np
 import pyautogui
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.geom import points_on_circle
+import vstt
 from psychopy.visual.window import Window
+from vstt.experiment import Experiment
+from vstt.geom import points_on_circle
+from vstt.task import MotorTask
 
 
 def move_mouse_to_target(
@@ -36,7 +36,7 @@ def move_mouse_to_target(
 
 
 def do_task(
-    experiment: MotorTaskExperiment, target_pixels: List[List[Tuple[float, float]]]
+    experiment: Experiment, target_pixels: List[List[Tuple[float, float]]]
 ) -> None:
     gtu.ascii_screenshot()
     for target_pixels_block, trial in zip(target_pixels, experiment.trial_list):
@@ -46,7 +46,7 @@ def do_task(
 
 
 def launch_do_task(
-    experiment: MotorTaskExperiment, target_pixels: List[List[Tuple[float, float]]]
+    experiment: Experiment, target_pixels: List[List[Tuple[float, float]]]
 ) -> threading.Thread:
     thread = threading.Thread(
         target=do_task,
@@ -61,12 +61,12 @@ def launch_do_task(
 
 
 def test_task_no_trials(window: Window) -> None:
-    experiment_no_trials = MotorTaskExperiment()
+    experiment_no_trials = Experiment()
     experiment_no_trials.trial_list = []
     experiment_no_trials.has_unsaved_changes = False
     assert experiment_no_trials.trial_handler_with_results is None
     do_task_thread = launch_do_task(experiment_no_trials, [])
-    task = mtptask.MotorTask(experiment_no_trials, window)
+    task = MotorTask(experiment_no_trials, window)
     success = task.run()
     do_task_thread.join()
     assert success is False
@@ -75,7 +75,7 @@ def test_task_no_trials(window: Window) -> None:
 
 
 def test_task_automove_to_center(
-    experiment_no_results: MotorTaskExperiment, window: Window
+    experiment_no_results: Experiment, window: Window
 ) -> None:
     target_pixels = []
     experiment_no_results.has_unsaved_changes = False
@@ -93,7 +93,7 @@ def test_task_automove_to_center(
             ]
         )
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    task = mtptask.MotorTask(experiment_no_results, window)
+    task = MotorTask(experiment_no_results, window)
     success = task.run()
     do_task_thread.join()
     # task ran successfully, updated experiment with results
@@ -111,7 +111,7 @@ def test_task_automove_to_center(
 
 
 def test_task_no_central_target(
-    experiment_no_results: MotorTaskExperiment, window: Window
+    experiment_no_results: Experiment, window: Window
 ) -> None:
     target_pixels = []
     experiment_no_results.has_unsaved_changes = False
@@ -131,7 +131,7 @@ def test_task_no_central_target(
             ]
         )
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    task = mtptask.MotorTask(experiment_no_results, window)
+    task = MotorTask(experiment_no_results, window)
     success = task.run()
     do_task_thread.join()
     # task ran successfully, updated experiment with results
@@ -149,7 +149,7 @@ def test_task_no_central_target(
 
 
 def test_task_no_automove_to_center(
-    experiment_no_results: MotorTaskExperiment, window: Window
+    experiment_no_results: Experiment, window: Window
 ) -> None:
     experiment_no_results.has_unsaved_changes = False
     assert experiment_no_results.trial_handler_with_results is None
@@ -167,7 +167,7 @@ def test_task_no_automove_to_center(
             tp.append(gtu.pos_to_pixels((0, 0)))
         target_pixels.append(tp)
     do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    task = mtptask.MotorTask(experiment_no_results, window)
+    task = vstt.task.MotorTask(experiment_no_results, window)
     success = task.run()
     do_task_thread.join()
     # task ran successfully, updated experiment with results
@@ -194,10 +194,10 @@ def test_task_no_automove_to_center(
 
 
 def test_task_fixed_intervals_no_user_input(window: Window) -> None:
-    experiment = MotorTaskExperiment()
+    experiment = Experiment()
     experiment.metadata["display_duration"] = 0.0
     target_duration = 1.0
-    trial = mtptrial.default_trial()
+    trial = vstt.trial.default_trial()
     trial["num_targets"] = 3
     trial["target_order"] = "random"
     trial["show_target_labels"] = True
@@ -209,7 +209,7 @@ def test_task_fixed_intervals_no_user_input(window: Window) -> None:
     trial["play_sound"] = False
     experiment.trial_list = [trial]
     assert experiment.trial_handler_with_results is None
-    task = mtptask.MotorTask(experiment, window)
+    task = vstt.task.MotorTask(experiment, window)
     # run task without moving mouse, which will stay in center for entire experiment
     assert task.run() is True
     # task ran successfully, updated experiment with results

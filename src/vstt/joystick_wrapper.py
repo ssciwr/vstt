@@ -10,7 +10,6 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from motor_task_prototype import config as mtpconfig
 from psychopy.hardware import joystick
 from pyglet.input import DeviceOpenException
 
@@ -29,7 +28,6 @@ def _close_open_device() -> None:
 
 
 def _updated_joystick() -> joystick.Joystick:
-    joystick.backend = mtpconfig.win_type
     try:
         return joystick.Joystick(0)
     except DeviceOpenException:

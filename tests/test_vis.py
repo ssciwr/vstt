@@ -5,17 +5,16 @@ from typing import List
 from typing import Tuple
 
 import gui_test_utils as gtu
-import motor_task_prototype.meta as mtpmeta
-import motor_task_prototype.vis as mtpvis
 import numpy as np
 import pytest
-from motor_task_prototype.experiment import MotorTaskExperiment
+import vstt
 from psychopy.visual.window import Window
+from vstt.experiment import Experiment
 
 
 def test_make_cursor(window: Window) -> None:
     for cursor_size in [0.01, 0.02235457]:
-        cursor = mtpvis.make_cursor(window, cursor_size)
+        cursor = vstt.vis.make_cursor(window, cursor_size)
         assert np.allclose(cursor.pos, [0, 0])
         # x size:
         assert np.allclose(cursor.vertices[1][0] - cursor.vertices[0][0], cursor_size)
@@ -60,7 +59,7 @@ def test_make_targets(
     window: Window, args: Dict, xys: List[Tuple[float, float]], add_central_target: bool
 ) -> None:
     args["add_central_target"] = add_central_target
-    targets = mtpvis.make_targets(window, **args)
+    targets = vstt.vis.make_targets(window, **args)
     n_elem = args["n_circles"] + (1 if add_central_target else 0)
     assert targets.nElements == n_elem
     # shape of sizes is x,y pair for each element
@@ -85,12 +84,12 @@ def test_update_target_colors(
         (False, (0, 0, 0)),
     ]:
         red = (1.0, -1.0, -1.0)
-        targets = mtpvis.make_targets(
+        targets = vstt.vis.make_targets(
             window, n_targets, 0.5, 0.05, add_central_target, 0.05
         )
         n_elem = n_targets + (1 if add_central_target else 0)
         # calling without specifying an index makes all elements grey
-        mtpvis.update_target_colors(
+        vstt.vis.update_target_colors(
             targets, show_inactive_targets=show_inactive_targets
         )
         if n_elem == 1:
@@ -102,7 +101,7 @@ def test_update_target_colors(
             assert np.allclose(color, inactive_color)
         # calling with index makes that element red, the rest grey
         for index in range(n_elem):
-            mtpvis.update_target_colors(
+            vstt.vis.update_target_colors(
                 targets, show_inactive_targets=show_inactive_targets, index=index
             )
             if n_elem == 1:
@@ -148,7 +147,7 @@ def test_make_target_labels(
     # more labels than targets: label each target and ignore any extra labels
     args["labels_string"] = "a b c d e f"
     label_strings = ["a", "b", "c", "d", "e", "f"]
-    target_labels = mtpvis.make_target_labels(window, **args)
+    target_labels = vstt.vis.make_target_labels(window, **args)
     assert len(target_labels) == args["n_circles"]
     for target_label, label_string, xy in zip(target_labels, label_strings, xys):
         assert target_label.text == label_string
@@ -157,7 +156,7 @@ def test_make_target_labels(
     # equal or fewer labels than targets: just use available labels
     args["labels_string"] = "10"
     label_strings = ["10"]
-    target_labels = mtpvis.make_target_labels(window, **args)
+    target_labels = vstt.vis.make_target_labels(window, **args)
     assert len(target_labels) == 1
     for target_label, label_string, xy in zip(target_labels, label_strings, xys):
         assert target_label.text == label_string
@@ -173,9 +172,11 @@ def test_update_target_label_colors(window: Window, n_targets: int) -> None:
         (False, (0, 0, 0)),
     ]:
         white = (1.0, 1.0, 1.0)
-        target_labels = mtpvis.make_target_labels(window, n_targets, 0.5, 0.05, labels)
+        target_labels = vstt.vis.make_target_labels(
+            window, n_targets, 0.5, 0.05, labels
+        )
         # calling without specifying an index makes all elements grey
-        mtpvis.update_target_label_colors(
+        vstt.vis.update_target_label_colors(
             target_labels, show_inactive_targets=show_inactive_targets
         )
         assert len(target_labels) == n_targets
@@ -183,7 +184,7 @@ def test_update_target_label_colors(window: Window, n_targets: int) -> None:
             assert np.allclose(target_label.color, inactive_color)
         # calling with index makes that element red, the rest grey
         for index in range(n_targets):
-            mtpvis.update_target_label_colors(
+            vstt.vis.update_target_label_colors(
                 target_labels, show_inactive_targets=show_inactive_targets, index=index
             )
             assert len(target_labels) == n_targets
@@ -195,9 +196,9 @@ def test_update_target_label_colors(window: Window, n_targets: int) -> None:
 
 
 def test_splash_screen_defaults(window: Window) -> None:
-    metadata = mtpmeta.default_metadata()
+    metadata = vstt.meta.default_metadata()
     screenshot = gtu.call_target_and_get_screenshot(
-        mtpvis.splash_screen, (1000, True, False, metadata, window), window
+        vstt.vis.splash_screen, (1000, True, False, metadata, window), window
     )
     # most pixels grey except for black main text and blue continue text
     assert 0.900 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
@@ -208,7 +209,7 @@ def test_splash_screen_defaults(window: Window) -> None:
 
 
 def test_display_results_nothing(
-    experiment_with_results: MotorTaskExperiment, window: Window
+    experiment_with_results: Experiment, window: Window
 ) -> None:
     experiment_with_results.display_options = {
         "to_target_paths": False,
@@ -230,7 +231,7 @@ def test_display_results_nothing(
     for all_trials_for_this_condition in [False, True]:
         # trial 0: 0,1,2 are trials without auto-move to center
         screenshot = gtu.call_target_and_get_screenshot(
-            mtpvis.display_results,
+            vstt.vis.display_results,
             (
                 60,
                 True,
@@ -249,7 +250,7 @@ def test_display_results_nothing(
         assert gtu.pixel_color_fraction(screenshot, (240, 248, 255)) == 0.000
         # trial 3: with auto-move to center
         screenshot = gtu.call_target_and_get_screenshot(
-            mtpvis.display_results,
+            vstt.vis.display_results,
             (
                 60,
                 True,
@@ -269,7 +270,7 @@ def test_display_results_nothing(
 
 
 def test_display_results_everything(
-    experiment_with_results: MotorTaskExperiment, window: Window
+    experiment_with_results: Experiment, window: Window
 ) -> None:
     experiment_with_results.display_options = {
         "to_target_paths": True,
@@ -291,7 +292,7 @@ def test_display_results_everything(
     for all_trials_for_this_condition in [False, True]:
         # trial 0: 0,1,2 are trials without auto-move to center
         screenshot = gtu.call_target_and_get_screenshot(
-            mtpvis.display_results,
+            vstt.vis.display_results,
             (
                 60,
                 True,
@@ -312,7 +313,7 @@ def test_display_results_everything(
         assert 0.002 < off_white_pixels < 0.100
         # trial 3: with auto-move to center
         screenshot = gtu.call_target_and_get_screenshot(
-            mtpvis.display_results,
+            vstt.vis.display_results,
             (
                 60,
                 True,

@@ -1,11 +1,11 @@
-# motor-task-prototype
+# Visuomotor Serial Targeting Task (VSTT)
 
-[![CI](https://github.com/ssciwr/motor-task-prototype/actions/workflows/ci.yml/badge.svg)](https://github.com/ssciwr/motor-task-prototype/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/ssciwr/motor-task-prototype/branch/main/graph/badge.svg?token=sjsAdTyLH1)](https://codecov.io/gh/ssciwr/motor-task-prototype)
+[![CI](https://github.com/ssciwr/vstt/actions/workflows/ci.yml/badge.svg)](https://github.com/ssciwr/vstt/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ssciwr/vstt/branch/main/graph/badge.svg?token=sjsAdTyLH1)](https://codecov.io/gh/ssciwr/vstt)
 
-Prototype for motor task application
+Visuomotor Serial Targeting Task (VSTT)
 
-Documentation: [ssciwr.github.io/motor-task-prototype](https://ssciwr.github.io/motor-task-prototype/)
+Documentation: [ssciwr.github.io/vstt](https://ssciwr.github.io/vstt/)
 
-![screenshot](https://raw.githubusercontent.com/ssciwr/motor-task-prototype/main/docs/quickstart/images/gui.png)
-![screenshot](https://raw.githubusercontent.com/ssciwr/motor-task-prototype/main/docs/quickstart/images/results.png)
+![screenshot](https://raw.githubusercontent.com/ssciwr/vstt/main/docs/quickstart/images/gui.png)
+![screenshot](https://raw.githubusercontent.com/ssciwr/vstt/main/docs/quickstart/images/results.png)

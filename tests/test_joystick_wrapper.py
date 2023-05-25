@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from motor_task_prototype import joystick_wrapper
 from psychopy.hardware import joystick
 from psychopy.visual.window import Window
+from vstt import joystick_wrapper
 
 
 def test_joystick_wrapper(window: Window) -> None:

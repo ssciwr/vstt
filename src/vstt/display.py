@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import Dict
 
-import motor_task_prototype.common as mtpcommon
-from motor_task_prototype.types import MotorTaskDisplayOptions
+import vstt
 
 
-def default_display_options() -> MotorTaskDisplayOptions:
+def default_display_options() -> vstt.types.DisplayOptions:
     return {
         "to_target_paths": True,
         "to_center_paths": False,
@@ -46,5 +45,7 @@ def display_options_labels() -> Dict[str, str]:
     }
 
 
-def import_display_options(display_options_dict: dict) -> MotorTaskDisplayOptions:
-    return mtpcommon.import_typed_dict(display_options_dict, default_display_options())
+def import_display_options(display_options_dict: dict) -> vstt.types.DisplayOptions:
+    return vstt.common.import_typed_dict(
+        display_options_dict, default_display_options()
+    )

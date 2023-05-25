@@ -8,13 +8,12 @@ from typing import Tuple
 import numpy as np
 import pyautogui
 import pytest
-from motor_task_prototype import config as mtpconfig
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.geom import points_on_circle
-from motor_task_prototype.stat import stats_dataframe
-from motor_task_prototype.trial import default_trial
 from psychopy.gui.qtgui import ensureQtApp
 from psychopy.visual.window import Window
+from vstt.experiment import Experiment
+from vstt.geom import points_on_circle
+from vstt.stat import stats_dataframe
+from vstt.trial import default_trial
 
 # add tests helpers package location to path so tests can import gui_test_utils
 sys.path.append(os.path.join(os.path.dirname(__file__), "helpers"))
@@ -47,7 +46,7 @@ def tests_init() -> None:
 # fixture to create a Window for testing gui functions
 @pytest.fixture(scope="session")
 def window() -> Window:
-    window = Window(fullscr=True, units="height", winType=mtpconfig.win_type)
+    window = Window(fullscr=True, units="height")
     # yield is like return except control flow returns here afterwards
     yield window
     # clean up window
@@ -69,8 +68,8 @@ def make_timestamps(n_min: int = 8, n_max: int = 20) -> np.ndarray:
 
 
 @pytest.fixture
-def experiment_no_results() -> MotorTaskExperiment:
-    experiment = MotorTaskExperiment()
+def experiment_no_results() -> Experiment:
+    experiment = Experiment()
     trial0 = default_trial()
     trial0["num_targets"] = 4
     trial0["play_sound"] = False
@@ -92,8 +91,8 @@ def experiment_no_results() -> MotorTaskExperiment:
 
 
 @pytest.fixture
-def experiment_with_results() -> MotorTaskExperiment:
-    experiment = MotorTaskExperiment()
+def experiment_with_results() -> Experiment:
+    experiment = Experiment()
     # trial without auto-move to center, 3 reps, 8 targets
     trial0 = default_trial()
     # disable sounds due to issues with sounds within tests on linux

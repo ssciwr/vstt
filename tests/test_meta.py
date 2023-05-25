@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import motor_task_prototype.meta as mtpmeta
+import vstt
 
 
 def test_metadata_labels() -> None:
-    metadata = mtpmeta.default_metadata()
-    labels = mtpmeta.metadata_labels()
+    metadata = vstt.meta.default_metadata()
+    labels = vstt.meta.metadata_labels()
     assert len(metadata) == len(labels)
     assert metadata.keys() == labels.keys()
 
@@ -26,15 +26,15 @@ def test_import_metadata() -> None:
         "show_delay_countdown": False,
         "enter_to_skip_delay": False,
     }
-    metadata = mtpmeta.import_metadata(valid_dict)
+    metadata = vstt.meta.import_metadata(valid_dict)
     assert metadata == valid_dict
     # all keys missing -> replaced with defaults
-    metadata = mtpmeta.import_metadata({})
-    assert metadata == mtpmeta.default_metadata()
+    metadata = vstt.meta.import_metadata({})
+    assert metadata == vstt.meta.default_metadata()
     # valid keys present but values have wrong type:
     #   - coerced to correct type if legal to do so
     #   - otherwise replaced with defaults
-    metadata = mtpmeta.import_metadata(
+    metadata = vstt.meta.import_metadata(
         {"name": 12, "data": 2.4, "author": [1, 2, 3], "whoops": "ok"}
     )
     assert metadata["name"] == "12"
