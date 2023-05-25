@@ -52,16 +52,6 @@ jobs:
         if: failure()
         with:
           path: "*.*"
-      - name: Build documentation
-        if: runner.os == 'Linux'
-        run: cd docs && make && touch _build/html/.nojekyll
-      - name: Deploy documentation
-        uses: JamesIves/github-pages-deploy-action@v4
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && runner.os == 'Linux' && matrix.python-version == '3.8'
-        with:
-          branch: gh-pages
-          folder: docs/_build/html
-          single-commit: true
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
