@@ -1,0 +1,56 @@
+## NOTE: the environment variable DISPLAY=:0 is set in the readthedocs web user interface!
+## This is required for pyglet to work with xvfb, and apparently cannot be set here
+
+version: 2
+
+build:
+  os: "ubuntu-22.04"
+  tools:
+    python: "3.9"
+  apt_packages:
+    # system dependencies of wxPython wheel
+    - libnotify-dev
+    - libsdl2-dev
+    # xvfb to run a virtual display
+    - xvfb
+    # mesa drivers for opengl
+    - mesa-common-dev
+    - mesa-utils
+    # system sound driver for sounddevice
+    - libportaudio2
+  jobs:
+    pre_install:
+      # install pre-built ubuntu/gtk3 wxPython wheel
+      - python -m pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/ wxPython
+      # check if any required system libs are missing by trying to import it
+      - python -c "import wx"
+      # create virtual display for pyglet
+      - echo $DISPLAY
+      - Xvfb -ac +extension GLX +render -screen 0 1024x768x24 $DISPLAY &
+      # check xvfb is working
+      - xdpyinfo -display $DISPLAY
+      # check opengl is working
+      - LIBGL_DEBUG=verbose glxinfo -v -B
+    post_install:
+      # psychtoolbox is installed by psychopy but is actually optional and only used if available
+      # it requires python to have permission to set its priority level otherwise it exits with an error
+      # since this requires sudo we instead remove psychtoolbox
+      - python -m pip uninstall -yy psychtoolbox
+      # check pyglet is working
+      - python -m pyglet.info
+      # check we can import vstt
+      - python -c "import vstt; print(vstt.__version__)"
+sphinx:
+  builder: html
+  configuration: docs/conf.py
+  fail_on_warning: true
+
+formats:
+  - pdf
+
+python:
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
