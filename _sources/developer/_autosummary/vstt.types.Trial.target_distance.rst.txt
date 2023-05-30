@@ -1,0 +1,6 @@
+vstt.types.Trial.target\_distance
+=================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.target_distance

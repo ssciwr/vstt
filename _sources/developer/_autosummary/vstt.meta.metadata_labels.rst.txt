@@ -1,0 +1,6 @@
+vstt.meta.metadata\_labels
+==========================
+
+.. currentmodule:: vstt.meta
+
+.. autofunction:: metadata_labels

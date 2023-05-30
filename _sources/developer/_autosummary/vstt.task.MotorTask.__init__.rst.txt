@@ -1,0 +1,6 @@
+vstt.task.MotorTask.\_\_init\_\_
+================================
+
+.. currentmodule:: vstt.task
+
+.. automethod:: MotorTask.__init__

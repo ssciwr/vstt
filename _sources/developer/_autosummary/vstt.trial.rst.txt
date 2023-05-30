@@ -1,0 +1,36 @@
+﻿vstt.trial
+==========
+
+.. automodule:: vstt.trial
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      default_trial
+      describe_trial
+      describe_trials
+      get_trial_from_user
+      import_trial
+      trial_labels
+      validate_trial
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

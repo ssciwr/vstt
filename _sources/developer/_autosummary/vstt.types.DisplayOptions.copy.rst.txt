@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.copy
+==============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.copy

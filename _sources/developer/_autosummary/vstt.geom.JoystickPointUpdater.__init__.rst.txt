@@ -1,0 +1,6 @@
+vstt.geom.JoystickPointUpdater.\_\_init\_\_
+===========================================
+
+.. currentmodule:: vstt.geom
+
+.. automethod:: JoystickPointUpdater.__init__

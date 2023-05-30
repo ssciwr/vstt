@@ -1,0 +1,32 @@
+﻿vstt.meta
+=========
+
+.. automodule:: vstt.meta
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      default_metadata
+      import_metadata
+      metadata_labels
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

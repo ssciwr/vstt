@@ -1,0 +1,6 @@
+vstt.task.TrialData.\_\_init\_\_
+================================
+
+.. currentmodule:: vstt.task
+
+.. automethod:: TrialData.__init__

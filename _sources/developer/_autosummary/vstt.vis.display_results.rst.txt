@@ -1,0 +1,6 @@
+vstt.vis.display\_results
+=========================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: display_results

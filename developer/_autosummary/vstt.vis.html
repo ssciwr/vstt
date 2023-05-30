@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vstt.vis &mdash; Visuomotor Serial Targeting Task  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="vstt.vis.display_drawables" href="vstt.vis.display_drawables.html" />
+    <link rel="prev" title="vstt.types.Trial.enter_to_skip_delay" href="vstt.types.Trial.enter_to_skip_delay.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Visuomotor Serial Targeting Task
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/create-experiment.html">Creating a new experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/run-experiment.html">Running an experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/display-results.html">Displaying results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/share-experiment.html">Sharing experiments</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Example jupyter notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/example.html">Analysing your results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/raw_data.html">Working directly with psydat files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Developer installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vstt.common.html">vstt.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.display.html">vstt.display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.experiment.html">vstt.experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.geom.html">vstt.geom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.meta.html">vstt.meta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.stat.html">vstt.stat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.task.html">vstt.task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.trial.html">vstt.trial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.types.html">vstt.types</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">vstt.vis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.display_drawables.html">vstt.vis.display_drawables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.display_results.html">vstt.vis.display_results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.draw_and_flip.html">vstt.vis.draw_and_flip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.make_cursor.html">vstt.vis.make_cursor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.make_target_labels.html">vstt.vis.make_target_labels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.make_targets.html">vstt.vis.make_targets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.splash_screen.html">vstt.vis.splash_screen</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.update_target_colors.html">vstt.vis.update_target_colors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.update_target_label_colors.html">vstt.vis.update_target_label_colors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.vis.MotorTaskCancelledByUser.html">vstt.vis.MotorTaskCancelledByUser</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Visuomotor Serial Targeting Task</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Reference</a></li>
+      <li class="breadcrumb-item active">vstt.vis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/developer/_autosummary/vstt.vis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-vstt.vis">
+<span id="vstt-vis"></span><h1>vstt.vis<a class="headerlink" href="#module-vstt.vis" title="Permalink to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="vstt.vis.display_drawables.html#vstt.vis.display_drawables" title="vstt.vis.display_drawables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_drawables</span></code></a>(display_time_seconds, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="vstt.vis.display_results.html#vstt.vis.display_results" title="vstt.vis.display_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_results</span></code></a>(display_time_seconds, ...[, win])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="vstt.vis.draw_and_flip.html#vstt.vis.draw_and_flip" title="vstt.vis.draw_and_flip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_and_flip</span></code></a>(win, drawables, kb[, kb_stop_key])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="vstt.vis.make_cursor.html#vstt.vis.make_cursor" title="vstt.vis.make_cursor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_cursor</span></code></a>(window, cursor_size)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="vstt.vis.make_target_labels.html#vstt.vis.make_target_labels" title="vstt.vis.make_target_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_target_labels</span></code></a>(window, n_circles, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="vstt.vis.make_targets.html#vstt.vis.make_targets" title="vstt.vis.make_targets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_targets</span></code></a>(window, n_circles, radius, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="vstt.vis.splash_screen.html#vstt.vis.splash_screen" title="vstt.vis.splash_screen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">splash_screen</span></code></a>(display_time_seconds, ...[, win])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="vstt.vis.update_target_colors.html#vstt.vis.update_target_colors" title="vstt.vis.update_target_colors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_target_colors</span></code></a>(targets, ...[, index])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="vstt.vis.update_target_label_colors.html#vstt.vis.update_target_label_colors" title="vstt.vis.update_target_label_colors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_target_label_colors</span></code></a>(target_labels, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Exceptions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="vstt.vis.MotorTaskCancelledByUser.html#vstt.vis.MotorTaskCancelledByUser" title="vstt.vis.MotorTaskCancelledByUser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotorTaskCancelledByUser</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vstt.types.Trial.enter_to_skip_delay.html" class="btn btn-neutral float-left" title="vstt.types.Trial.enter_to_skip_delay" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vstt.vis.display_drawables.html" class="btn btn-neutral float-right" title="vstt.vis.display_drawables" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

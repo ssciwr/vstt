@@ -1,0 +1,6 @@
+vstt.types.Metadata.fromkeys
+============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.fromkeys

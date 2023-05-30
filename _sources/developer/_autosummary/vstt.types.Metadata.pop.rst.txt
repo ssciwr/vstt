@@ -1,0 +1,6 @@
+vstt.types.Metadata.pop
+=======================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.pop

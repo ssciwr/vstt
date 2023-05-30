@@ -1,0 +1,6 @@
+vstt.types.Trial.use\_joystick
+==============================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.use_joystick

@@ -1,0 +1,6 @@
+vstt.vis.display\_drawables
+===========================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: display_drawables

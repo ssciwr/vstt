@@ -1,0 +1,6 @@
+vstt.types.Metadata.date
+========================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Metadata.date

@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.update
+================================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.update

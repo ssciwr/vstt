@@ -1,0 +1,6 @@
+vstt.vis.MotorTaskCancelledByUser
+=================================
+
+.. currentmodule:: vstt.vis
+
+.. autoexception:: MotorTaskCancelledByUser

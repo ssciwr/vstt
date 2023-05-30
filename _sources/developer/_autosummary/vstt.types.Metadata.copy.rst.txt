@@ -1,0 +1,6 @@
+vstt.types.Metadata.copy
+========================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.copy

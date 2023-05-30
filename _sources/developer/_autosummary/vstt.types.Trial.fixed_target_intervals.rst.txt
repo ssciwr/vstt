@@ -1,0 +1,6 @@
+vstt.types.Trial.fixed\_target\_intervals
+=========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.fixed_target_intervals

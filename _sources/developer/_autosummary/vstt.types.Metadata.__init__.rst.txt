@@ -1,0 +1,6 @@
+vstt.types.Metadata.\_\_init\_\_
+================================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.__init__

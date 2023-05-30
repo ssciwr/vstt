@@ -1,0 +1,6 @@
+vstt.trial.describe\_trials
+===========================
+
+.. currentmodule:: vstt.trial
+
+.. autofunction:: describe_trials

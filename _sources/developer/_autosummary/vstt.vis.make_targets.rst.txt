@@ -1,0 +1,6 @@
+vstt.vis.make\_targets
+======================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: make_targets

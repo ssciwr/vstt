@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.items
+===============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.items

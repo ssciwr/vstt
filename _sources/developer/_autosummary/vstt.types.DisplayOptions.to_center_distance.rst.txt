@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.to\_center\_distance
+==============================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.to_center_distance

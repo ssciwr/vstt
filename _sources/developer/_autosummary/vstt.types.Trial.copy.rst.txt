@@ -1,0 +1,6 @@
+vstt.types.Trial.copy
+=====================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.copy

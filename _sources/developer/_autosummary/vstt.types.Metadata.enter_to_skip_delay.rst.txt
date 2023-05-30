@@ -1,0 +1,6 @@
+vstt.types.Metadata.enter\_to\_skip\_delay
+==========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Metadata.enter_to_skip_delay

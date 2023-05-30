@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.save\_psydat
+=======================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.save_psydat

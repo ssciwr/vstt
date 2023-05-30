@@ -1,0 +1,41 @@
+﻿vstt.geom
+=========
+
+.. automodule:: vstt.geom
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      equidistant_angles
+      points_on_circle
+      rotate_point
+      to_target_dists
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      JoystickPointUpdater
+      PointRotator
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.to\_target\_paths
+===========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.to_target_paths

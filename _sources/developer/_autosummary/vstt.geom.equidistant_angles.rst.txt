@@ -1,0 +1,6 @@
+vstt.geom.equidistant\_angles
+=============================
+
+.. currentmodule:: vstt.geom
+
+.. autofunction:: equidistant_angles

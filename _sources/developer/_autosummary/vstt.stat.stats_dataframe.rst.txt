@@ -1,0 +1,6 @@
+vstt.stat.stats\_dataframe
+==========================
+
+.. currentmodule:: vstt.stat
+
+.. autofunction:: stats_dataframe

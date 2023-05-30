@@ -1,0 +1,6 @@
+vstt.types.Metadata.display\_text2
+==================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Metadata.display_text2

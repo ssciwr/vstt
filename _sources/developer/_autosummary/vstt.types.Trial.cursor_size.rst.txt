@@ -1,0 +1,6 @@
+vstt.types.Trial.cursor\_size
+=============================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.cursor_size

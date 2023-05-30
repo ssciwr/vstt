@@ -1,0 +1,6 @@
+vstt.common.import\_typed\_dict
+===============================
+
+.. currentmodule:: vstt.common
+
+.. autofunction:: import_typed_dict

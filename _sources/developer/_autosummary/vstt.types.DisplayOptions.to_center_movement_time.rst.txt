@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.to\_center\_movement\_time
+====================================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.to_center_movement_time

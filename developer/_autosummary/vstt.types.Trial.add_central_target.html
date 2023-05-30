@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vstt.types.Trial.add_central_target &mdash; Visuomotor Serial Targeting Task  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="vstt.types.Trial.show_target_labels" href="vstt.types.Trial.show_target_labels.html" />
+    <link rel="prev" title="vstt.types.Trial.target_indices" href="vstt.types.Trial.target_indices.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Visuomotor Serial Targeting Task
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/create-experiment.html">Creating a new experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/run-experiment.html">Running an experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/display-results.html">Displaying results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/share-experiment.html">Sharing experiments</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Example jupyter notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/example.html">Analysing your results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/raw_data.html">Working directly with psydat files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Developer installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vstt.common.html">vstt.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.display.html">vstt.display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.experiment.html">vstt.experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.geom.html">vstt.geom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.meta.html">vstt.meta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.stat.html">vstt.stat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.task.html">vstt.task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.trial.html">vstt.trial</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="vstt.types.html">vstt.types</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="vstt.types.DisplayOptions.html">vstt.types.DisplayOptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.types.Metadata.html">vstt.types.Metadata</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="vstt.types.Trial.html">vstt.types.Trial</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.html#vstt.types.Trial"><code class="docutils literal notranslate"><span class="pre">Trial</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.__init__.html">vstt.types.Trial.__init__</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.clear.html">vstt.types.Trial.clear</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.copy.html">vstt.types.Trial.copy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.fromkeys.html">vstt.types.Trial.fromkeys</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.get.html">vstt.types.Trial.get</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.items.html">vstt.types.Trial.items</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.keys.html">vstt.types.Trial.keys</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.pop.html">vstt.types.Trial.pop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.popitem.html">vstt.types.Trial.popitem</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.setdefault.html">vstt.types.Trial.setdefault</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.update.html">vstt.types.Trial.update</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.values.html">vstt.types.Trial.values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.weight.html">vstt.types.Trial.weight</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.num_targets.html">vstt.types.Trial.num_targets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.target_order.html">vstt.types.Trial.target_order</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.target_indices.html">vstt.types.Trial.target_indices</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">vstt.types.Trial.add_central_target</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.show_target_labels.html">vstt.types.Trial.show_target_labels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.target_labels.html">vstt.types.Trial.target_labels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.fixed_target_intervals.html">vstt.types.Trial.fixed_target_intervals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.target_duration.html">vstt.types.Trial.target_duration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.inter_target_duration.html">vstt.types.Trial.inter_target_duration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.target_distance.html">vstt.types.Trial.target_distance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.target_size.html">vstt.types.Trial.target_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.central_target_size.html">vstt.types.Trial.central_target_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.show_inactive_targets.html">vstt.types.Trial.show_inactive_targets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.ignore_incorrect_targets.html">vstt.types.Trial.ignore_incorrect_targets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.play_sound.html">vstt.types.Trial.play_sound</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.use_joystick.html">vstt.types.Trial.use_joystick</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.joystick_max_speed.html">vstt.types.Trial.joystick_max_speed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.show_cursor.html">vstt.types.Trial.show_cursor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.cursor_size.html">vstt.types.Trial.cursor_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.show_cursor_path.html">vstt.types.Trial.show_cursor_path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.automove_cursor_to_center.html">vstt.types.Trial.automove_cursor_to_center</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.freeze_cursor_between_targets.html">vstt.types.Trial.freeze_cursor_between_targets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.cursor_rotation_degrees.html">vstt.types.Trial.cursor_rotation_degrees</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.post_trial_delay.html">vstt.types.Trial.post_trial_delay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.post_trial_display_results.html">vstt.types.Trial.post_trial_display_results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.post_block_delay.html">vstt.types.Trial.post_block_delay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.post_block_display_results.html">vstt.types.Trial.post_block_display_results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.show_delay_countdown.html">vstt.types.Trial.show_delay_countdown</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vstt.types.Trial.enter_to_skip_delay.html">vstt.types.Trial.enter_to_skip_delay</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.vis.html">vstt.vis</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Visuomotor Serial Targeting Task</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="vstt.types.html">vstt.types</a></li>
+          <li class="breadcrumb-item"><a href="vstt.types.Trial.html">vstt.types.Trial</a></li>
+      <li class="breadcrumb-item active">vstt.types.Trial.add_central_target</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/developer/_autosummary/vstt.types.Trial.add_central_target.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vstt-types-trial-add-central-target">
+<h1>vstt.types.Trial.add_central_target<a class="headerlink" href="#vstt-types-trial-add-central-target" title="Permalink to this heading"></a></h1>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vstt.types.Trial.add_central_target">
+<span class="sig-prename descclassname"><span class="pre">Trial.</span></span><span class="sig-name descname"><span class="pre">add_central_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#vstt.types.Trial.add_central_target" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vstt.types.Trial.target_indices.html" class="btn btn-neutral float-left" title="vstt.types.Trial.target_indices" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vstt.types.Trial.show_target_labels.html" class="btn btn-neutral float-right" title="vstt.types.Trial.show_target_labels" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

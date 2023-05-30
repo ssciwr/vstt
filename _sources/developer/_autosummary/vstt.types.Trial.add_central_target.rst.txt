@@ -1,0 +1,6 @@
+vstt.types.Trial.add\_central\_target
+=====================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.add_central_target

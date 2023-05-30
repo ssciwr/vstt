@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.get
+=============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.get

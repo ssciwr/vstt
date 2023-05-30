@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.create\_trialhandler
+===============================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.create_trialhandler

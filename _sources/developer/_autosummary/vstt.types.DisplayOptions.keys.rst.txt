@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.keys
+==============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.keys

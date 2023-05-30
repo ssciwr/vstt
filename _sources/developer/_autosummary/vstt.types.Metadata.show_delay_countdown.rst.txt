@@ -1,0 +1,6 @@
+vstt.types.Metadata.show\_delay\_countdown
+==========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Metadata.show_delay_countdown

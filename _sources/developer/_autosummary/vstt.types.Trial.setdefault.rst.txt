@@ -1,0 +1,6 @@
+vstt.types.Trial.setdefault
+===========================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.setdefault

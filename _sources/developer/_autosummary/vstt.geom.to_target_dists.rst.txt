@@ -1,0 +1,6 @@
+vstt.geom.to\_target\_dists
+===========================
+
+.. currentmodule:: vstt.geom
+
+.. autofunction:: to_target_dists

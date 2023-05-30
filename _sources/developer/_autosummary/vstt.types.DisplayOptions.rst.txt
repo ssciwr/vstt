@@ -1,0 +1,54 @@
+vstt.types.DisplayOptions
+=========================
+
+.. currentmodule:: vstt.types
+
+.. autoclass:: DisplayOptions
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~DisplayOptions.__init__
+      ~DisplayOptions.clear
+      ~DisplayOptions.copy
+      ~DisplayOptions.fromkeys
+      ~DisplayOptions.get
+      ~DisplayOptions.items
+      ~DisplayOptions.keys
+      ~DisplayOptions.pop
+      ~DisplayOptions.popitem
+      ~DisplayOptions.setdefault
+      ~DisplayOptions.update
+      ~DisplayOptions.values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      ~DisplayOptions.to_target_paths
+      ~DisplayOptions.to_center_paths
+      ~DisplayOptions.targets
+      ~DisplayOptions.central_target
+      ~DisplayOptions.to_target_reaction_time
+      ~DisplayOptions.to_center_reaction_time
+      ~DisplayOptions.to_target_movement_time
+      ~DisplayOptions.to_center_movement_time
+      ~DisplayOptions.to_target_time
+      ~DisplayOptions.to_center_time
+      ~DisplayOptions.to_target_distance
+      ~DisplayOptions.to_center_distance
+      ~DisplayOptions.to_target_rmse
+      ~DisplayOptions.to_center_rmse
+      ~DisplayOptions.averages
+   
+   

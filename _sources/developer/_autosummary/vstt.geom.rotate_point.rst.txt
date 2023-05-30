@@ -1,0 +1,6 @@
+vstt.geom.rotate\_point
+=======================
+
+.. currentmodule:: vstt.geom
+
+.. autofunction:: rotate_point

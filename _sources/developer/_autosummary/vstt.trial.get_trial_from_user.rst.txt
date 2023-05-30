@@ -1,0 +1,6 @@
+vstt.trial.get\_trial\_from\_user
+=================================
+
+.. currentmodule:: vstt.trial
+
+.. autofunction:: get_trial_from_user

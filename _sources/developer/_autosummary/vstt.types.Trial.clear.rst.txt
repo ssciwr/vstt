@@ -1,0 +1,6 @@
+vstt.types.Trial.clear
+======================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.clear

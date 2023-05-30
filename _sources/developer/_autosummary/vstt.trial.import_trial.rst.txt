@@ -1,0 +1,6 @@
+vstt.trial.import\_trial
+========================
+
+.. currentmodule:: vstt.trial
+
+.. autofunction:: import_trial

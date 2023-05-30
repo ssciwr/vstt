@@ -1,0 +1,6 @@
+vstt.types.Metadata.display\_duration
+=====================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Metadata.display_duration

@@ -1,0 +1,6 @@
+vstt.types.Trial.automove\_cursor\_to\_center
+=============================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.automove_cursor_to_center

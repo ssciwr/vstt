@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.to\_center\_paths
+===========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.to_center_paths

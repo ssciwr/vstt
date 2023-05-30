@@ -1,0 +1,6 @@
+vstt.meta.import\_metadata
+==========================
+
+.. currentmodule:: vstt.meta
+
+.. autofunction:: import_metadata

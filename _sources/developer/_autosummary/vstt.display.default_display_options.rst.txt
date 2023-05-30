@@ -1,0 +1,6 @@
+vstt.display.default\_display\_options
+======================================
+
+.. currentmodule:: vstt.display
+
+.. autofunction:: default_display_options

@@ -1,0 +1,6 @@
+vstt.types.Trial.popitem
+========================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.popitem

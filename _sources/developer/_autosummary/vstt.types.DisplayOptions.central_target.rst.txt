@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.central\_target
+=========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.central_target

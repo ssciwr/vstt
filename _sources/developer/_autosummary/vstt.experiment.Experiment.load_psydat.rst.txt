@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.load\_psydat
+=======================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.load_psydat

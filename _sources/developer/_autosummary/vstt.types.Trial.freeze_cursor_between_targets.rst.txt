@@ -1,0 +1,6 @@
+vstt.types.Trial.freeze\_cursor\_between\_targets
+=================================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.freeze_cursor_between_targets

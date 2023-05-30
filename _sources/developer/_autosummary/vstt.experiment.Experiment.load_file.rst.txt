@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.load\_file
+=====================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.load_file

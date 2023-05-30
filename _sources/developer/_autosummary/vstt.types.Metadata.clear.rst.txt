@@ -1,0 +1,6 @@
+vstt.types.Metadata.clear
+=========================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.clear

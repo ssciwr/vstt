@@ -1,0 +1,6 @@
+vstt.stat.append\_stats\_data\_to\_excel
+========================================
+
+.. currentmodule:: vstt.stat
+
+.. autofunction:: append_stats_data_to_excel

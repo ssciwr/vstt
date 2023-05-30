@@ -1,0 +1,6 @@
+vstt.types.Trial.cursor\_rotation\_degrees
+==========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.cursor_rotation_degrees

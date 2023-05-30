@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.targets
+=================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.targets

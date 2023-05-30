@@ -1,0 +1,6 @@
+vstt.types.Trial.pop
+====================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.pop

@@ -1,0 +1,6 @@
+vstt.types.Trial.play\_sound
+============================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.play_sound

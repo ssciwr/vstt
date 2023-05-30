@@ -1,0 +1,6 @@
+vstt.task.TrialManager.\_\_init\_\_
+===================================
+
+.. currentmodule:: vstt.task
+
+.. automethod:: TrialManager.__init__

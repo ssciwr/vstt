@@ -1,0 +1,6 @@
+vstt.vis.update\_target\_label\_colors
+======================================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: update_target_label_colors

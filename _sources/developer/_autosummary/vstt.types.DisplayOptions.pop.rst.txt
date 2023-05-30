@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.pop
+=============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.pop

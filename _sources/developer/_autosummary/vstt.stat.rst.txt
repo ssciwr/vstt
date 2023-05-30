@@ -1,0 +1,32 @@
+﻿vstt.stat
+=========
+
+.. automodule:: vstt.stat
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      append_stats_data_to_excel
+      list_dest_stat_label_units
+      stats_dataframe
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

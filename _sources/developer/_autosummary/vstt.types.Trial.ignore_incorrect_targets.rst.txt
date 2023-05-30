@@ -1,0 +1,6 @@
+vstt.types.Trial.ignore\_incorrect\_targets
+===========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.ignore_incorrect_targets

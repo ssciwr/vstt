@@ -1,0 +1,6 @@
+vstt.types.Metadata.subject
+===========================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Metadata.subject

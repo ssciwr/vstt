@@ -1,0 +1,6 @@
+vstt.types.Trial.joystick\_max\_speed
+=====================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.joystick_max_speed

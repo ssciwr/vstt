@@ -1,0 +1,6 @@
+vstt.types.Trial.target\_duration
+=================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.target_duration

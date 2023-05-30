@@ -1,0 +1,22 @@
+vstt.task.TrialData
+===================
+
+.. currentmodule:: vstt.task
+
+.. autoclass:: TrialData
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~TrialData.__init__
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+vstt.types.Metadata.setdefault
+==============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.setdefault

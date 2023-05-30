@@ -1,0 +1,6 @@
+vstt.types.Metadata.values
+==========================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.values

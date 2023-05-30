@@ -1,0 +1,32 @@
+﻿vstt.types
+==========
+
+.. automodule:: vstt.types
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      DisplayOptions
+      Metadata
+      Trial
+   
+   
+
+   
+   
+   
+
+
+

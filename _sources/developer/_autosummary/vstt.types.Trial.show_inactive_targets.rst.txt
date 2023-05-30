@@ -1,0 +1,6 @@
+vstt.types.Trial.show\_inactive\_targets
+========================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.show_inactive_targets

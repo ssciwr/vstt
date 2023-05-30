@@ -1,0 +1,6 @@
+vstt.meta.default\_metadata
+===========================
+
+.. currentmodule:: vstt.meta
+
+.. autofunction:: default_metadata

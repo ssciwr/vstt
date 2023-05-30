@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.clear\_results
+=========================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.clear_results

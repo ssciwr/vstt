@@ -1,0 +1,22 @@
+vstt.task.TrialManager
+======================
+
+.. currentmodule:: vstt.task
+
+.. autoclass:: TrialManager
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~TrialManager.__init__
+   
+   
+
+   
+   
+   

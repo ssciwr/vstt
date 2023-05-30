@@ -1,0 +1,45 @@
+﻿vstt.vis
+========
+
+.. automodule:: vstt.vis
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      display_drawables
+      display_results
+      draw_and_flip
+      make_cursor
+      make_target_labels
+      make_targets
+      splash_screen
+      update_target_colors
+      update_target_label_colors
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+      :toctree:
+   
+      MotorTaskCancelledByUser
+   
+   
+
+
+

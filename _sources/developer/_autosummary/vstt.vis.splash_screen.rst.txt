@@ -1,0 +1,6 @@
+vstt.vis.splash\_screen
+=======================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: splash_screen

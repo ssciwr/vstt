@@ -1,0 +1,6 @@
+vstt.types.Metadata.author
+==========================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Metadata.author

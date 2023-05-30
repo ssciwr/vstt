@@ -1,0 +1,6 @@
+vstt.stat.list\_dest\_stat\_label\_units
+========================================
+
+.. currentmodule:: vstt.stat
+
+.. autofunction:: list_dest_stat_label_units

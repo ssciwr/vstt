@@ -1,0 +1,6 @@
+vstt.types.Trial.post\_trial\_delay
+===================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.post_trial_delay

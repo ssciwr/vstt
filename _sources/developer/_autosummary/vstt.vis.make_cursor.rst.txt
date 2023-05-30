@@ -1,0 +1,6 @@
+vstt.vis.make\_cursor
+=====================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: make_cursor

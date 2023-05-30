@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.\_\_init\_\_
+======================================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.__init__

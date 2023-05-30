@@ -1,0 +1,6 @@
+vstt.task.add\_trial\_data\_to\_trial\_handler
+==============================================
+
+.. currentmodule:: vstt.task
+
+.. autofunction:: add_trial_data_to_trial_handler

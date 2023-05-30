@@ -1,0 +1,6 @@
+vstt.vis.update\_target\_colors
+===============================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: update_target_colors

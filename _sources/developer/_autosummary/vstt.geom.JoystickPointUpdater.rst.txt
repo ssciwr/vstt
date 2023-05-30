@@ -1,0 +1,22 @@
+vstt.geom.JoystickPointUpdater
+==============================
+
+.. currentmodule:: vstt.geom
+
+.. autoclass:: JoystickPointUpdater
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~JoystickPointUpdater.__init__
+   
+   
+
+   
+   
+   

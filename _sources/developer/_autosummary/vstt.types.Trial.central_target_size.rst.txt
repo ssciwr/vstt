@@ -1,0 +1,6 @@
+vstt.types.Trial.central\_target\_size
+======================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.central_target_size

@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.averages
+==================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.averages

@@ -1,0 +1,6 @@
+vstt.display.display\_options\_labels
+=====================================
+
+.. currentmodule:: vstt.display
+
+.. autofunction:: display_options_labels

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysing your results &mdash; Visuomotor Serial Targeting Task  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/nbsphinx-code-cells.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Working directly with psydat files" href="raw_data.html" />
+    <link rel="prev" title="Sharing experiments" href="../quickstart/share-experiment.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Visuomotor Serial Targeting Task
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/create-experiment.html">Creating a new experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/run-experiment.html">Running an experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/display-results.html">Displaying results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart/share-experiment.html">Sharing experiments</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Example jupyter notebooks</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Analysing your results</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Import">Import</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Conditions">Conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Results">Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Plot-statistics">Plot statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="raw_data.html">Working directly with psydat files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developer/install.html">Developer installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer/api.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Visuomotor Serial Targeting Task</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Analysing your results</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notebooks/example.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Analysing-your-results">
+<h1>Analysing your results<a class="headerlink" href="#Analysing-your-results" title="Permalink to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">vstt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<section id="Import">
+<h2>Import<a class="headerlink" href="#Import" title="Permalink to this heading"></a></h2>
+<p>To import an experiment from a psydat file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">experiment</span> <span class="o">=</span> <span class="n">vstt</span><span class="o">.</span><span class="n">Experiment</span><span class="p">(</span><span class="s2">&quot;example.psydat&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+WARNING:root:Key &#39;display_duration&#39; missing, using default &#39;60&#39;
+WARNING:root:Key &#39;show_delay_countdown&#39; missing, using default &#39;True&#39;
+WARNING:root:Key &#39;enter_to_skip_delay&#39; missing, using default &#39;True&#39;
+</pre></div></div>
+</div>
+</section>
+<section id="Conditions">
+<h2>Conditions<a class="headerlink" href="#Conditions" title="Permalink to this heading"></a></h2>
+<p>The trial conditions are in <code class="docutils literal notranslate"><span class="pre">trial_list</span></code>, each element in this list is a dict of trial conditions that defines a trial:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">experiment</span><span class="o">.</span><span class="n">trial_list</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;weight&#39;: 2,
+  &#39;num_targets&#39;: 8,
+  &#39;target_order&#39;: &#39;clockwise&#39;,
+  &#39;target_indices&#39;: &#39;0 1 2 3 4 5 6 7&#39;,
+  &#39;target_duration&#39;: 5.0,
+  &#39;inter_target_duration&#39;: 0.0,
+  &#39;target_distance&#39;: 0.4,
+  &#39;target_size&#39;: 0.04,
+  &#39;central_target_size&#39;: 0.02,
+  &#39;show_inactive_targets&#39;: True,
+  &#39;play_sound&#39;: True,
+  &#39;show_cursor&#39;: True,
+  &#39;cursor_size&#39;: 0.02,
+  &#39;show_cursor_path&#39;: True,
+  &#39;automove_cursor_to_center&#39;: False,
+  &#39;cursor_rotation_degrees&#39;: 0.0,
+  &#39;post_trial_delay&#39;: 0.0,
+  &#39;post_trial_display_results&#39;: False,
+  &#39;post_block_delay&#39;: 0.0,
+  &#39;post_block_display_results&#39;: True},
+ {&#39;weight&#39;: 2,
+  &#39;num_targets&#39;: 6,
+  &#39;target_order&#39;: &#39;random&#39;,
+  &#39;target_indices&#39;: &#39;2 5 0 4 1 3&#39;,
+  &#39;target_duration&#39;: 5.0,
+  &#39;inter_target_duration&#39;: 0.0,
+  &#39;target_distance&#39;: 0.4,
+  &#39;target_size&#39;: 0.04,
+  &#39;central_target_size&#39;: 0.02,
+  &#39;show_inactive_targets&#39;: True,
+  &#39;play_sound&#39;: True,
+  &#39;show_cursor&#39;: True,
+  &#39;cursor_size&#39;: 0.02,
+  &#39;show_cursor_path&#39;: True,
+  &#39;automove_cursor_to_center&#39;: True,
+  &#39;cursor_rotation_degrees&#39;: 0.0,
+  &#39;post_trial_delay&#39;: 0.0,
+  &#39;post_trial_display_results&#39;: False,
+  &#39;post_block_delay&#39;: 0.0,
+  &#39;post_block_display_results&#39;: True}]
+</pre></div></div>
+</div>
+<p>This can be more easily viewed if converted to a pandas DataFrame:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">trial_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weight</th>
+      <th>num_targets</th>
+      <th>target_order</th>
+      <th>target_indices</th>
+      <th>target_duration</th>
+      <th>inter_target_duration</th>
+      <th>target_distance</th>
+      <th>target_size</th>
+      <th>central_target_size</th>
+      <th>show_inactive_targets</th>
+      <th>play_sound</th>
+      <th>show_cursor</th>
+      <th>cursor_size</th>
+      <th>show_cursor_path</th>
+      <th>automove_cursor_to_center</th>
+      <th>cursor_rotation_degrees</th>
+      <th>post_trial_delay</th>
+      <th>post_trial_display_results</th>
+      <th>post_block_delay</th>
+      <th>post_block_display_results</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>8</td>
+      <td>clockwise</td>
+      <td>0 1 2 3 4 5 6 7</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>0.4</td>
+      <td>0.04</td>
+      <td>0.02</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>0.02</td>
+      <td>True</td>
+      <td>False</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+      <td>0.0</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>6</td>
+      <td>random</td>
+      <td>2 5 0 4 1 3</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>0.4</td>
+      <td>0.04</td>
+      <td>0.02</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>0.02</td>
+      <td>True</td>
+      <td>True</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+      <td>0.0</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">weight</span></code> of a trial is how many times it should be repeated.</p>
+</section>
+<section id="Results">
+<h2>Results<a class="headerlink" href="#Results" title="Permalink to this heading"></a></h2>
+<p>The results of the trials are in <code class="docutils literal notranslate"><span class="pre">stats</span></code> which provides both the raw data and calculated statistics as a pandas DataFrame:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">stats</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>i_trial</th>
+      <th>i_rep</th>
+      <th>i_target</th>
+      <th>condition_index</th>
+      <th>target_index</th>
+      <th>target_pos</th>
+      <th>to_target_timestamps</th>
+      <th>to_target_mouse_positions</th>
+      <th>to_target_success</th>
+      <th>center_pos</th>
+      <th>...</th>
+      <th>to_target_distance</th>
+      <th>to_target_reaction_time</th>
+      <th>to_target_time</th>
+      <th>to_target_movement_time</th>
+      <th>to_target_rmse</th>
+      <th>to_center_distance</th>
+      <th>to_center_reaction_time</th>
+      <th>to_center_time</th>
+      <th>to_center_movement_time</th>
+      <th>to_center_rmse</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>[0.0, 0.4]</td>
+      <td>[0.0, 0.0001590251922607422, 0.010089159011840...</td>
+      <td>[[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0...</td>
+      <td>True</td>
+      <td>[0.0, 0.0]</td>
+      <td>...</td>
+      <td>0.411747</td>
+      <td>0.298838</td>
+      <td>0.924759</td>
+      <td>0.625921</td>
+      <td>0.011987</td>
+      <td>0.523959</td>
+      <td>0.000184</td>
+      <td>0.525745</td>
+      <td>0.525561</td>
+      <td>0.023938</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>[0.282842712474619, 0.28284271247461906]</td>
+      <td>[0.0, 0.00019407272338867188, 0.01045894622802...</td>
+      <td>[[0.0, 0.0], [0.0, 0.0], [-0.00092592592592592...</td>
+      <td>True</td>
+      <td>[0.0, 0.0]</td>
+      <td>...</td>
+      <td>0.384438</td>
+      <td>0.010459</td>
+      <td>0.409134</td>
+      <td>0.398675</td>
+      <td>0.025578</td>
+      <td>0.407386</td>
+      <td>0.000178</td>
+      <td>0.494182</td>
+      <td>0.494004</td>
+      <td>0.031541</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>[0.4, 2.4492935982947065e-17]</td>
+      <td>[0.0, 0.0002090930938720703, 0.010582923889160...</td>
+      <td>[[0.0, 0.0], [0.0, 0.0], [-0.00277777777777777...</td>
+      <td>True</td>
+      <td>[0.0, 0.0]</td>
+      <td>...</td>
+      <td>0.384725</td>
+      <td>0.010583</td>
+      <td>0.323711</td>
+      <td>0.313128</td>
+      <td>0.012188</td>
+      <td>0.514236</td>
+      <td>0.000178</td>
+      <td>0.438579</td>
+      <td>0.438401</td>
+      <td>0.036397</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>3</td>
+      <td>[0.28284271247461906, -0.282842712474619]</td>
+      <td>[0.0, 0.00017309188842773438, 0.01132202148437...</td>
+      <td>[[0.0, 0.0], [0.0, 0.0], [-0.00925925925925925...</td>
+      <td>True</td>
+      <td>[0.0, 0.0]</td>
+      <td>...</td>
+      <td>0.413905</td>
+      <td>0.011322</td>
+      <td>0.349227</td>
+      <td>0.337905</td>
+      <td>0.023649</td>
+      <td>0.437470</td>
+      <td>0.000173</td>
+      <td>0.534803</td>
+      <td>0.534630</td>
+      <td>0.015697</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>4</td>
+      <td>0</td>
+      <td>4</td>
+      <td>[4.898587196589413e-17, -0.4]</td>
+      <td>[0.0, 0.00017595291137695312, 0.01025795936584...</td>
+      <td>[[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0...</td>
+      <td>True</td>
+      <td>[0.0, 0.0]</td>
+      <td>...</td>
+      <td>0.382848</td>
+      <td>0.070822</td>
+      <td>0.461818</td>
+      <td>0.390996</td>
+      <td>0.027531</td>
+      <td>0.403142</td>
+      <td>0.000169</td>
+      <td>0.468244</td>
+      <td>0.468075</td>
+      <td>0.013810</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 23 columns</p>
+</div></div>
+</div>
+<ul class="simple">
+<li><p>each row in this DataFrame contains the data from a single movement to a target (and optionally back to the center)</p></li>
+<li><p>they are in the order that they were shown in the experiment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">condition_index</span></code> is the index of the corresponding trial conditions in <code class="docutils literal notranslate"><span class="pre">trial_index</span></code></p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>i_trial</th>
+      <th>i_rep</th>
+      <th>i_target</th>
+      <th>condition_index</th>
+      <th>target_index</th>
+      <th>to_target_distance</th>
+      <th>to_target_reaction_time</th>
+      <th>to_target_time</th>
+      <th>to_target_movement_time</th>
+      <th>to_target_rmse</th>
+      <th>to_center_distance</th>
+      <th>to_center_reaction_time</th>
+      <th>to_center_time</th>
+      <th>to_center_movement_time</th>
+      <th>to_center_rmse</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>28.000000</td>
+      <td>28.0</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>28.000000</td>
+      <td>16.000000</td>
+      <td>16.000000</td>
+      <td>16.000000</td>
+      <td>16.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>1.357143</td>
+      <td>0.0</td>
+      <td>3.071429</td>
+      <td>0.428571</td>
+      <td>3.071429</td>
+      <td>0.438758</td>
+      <td>0.052600</td>
+      <td>0.510267</td>
+      <td>0.457667</td>
+      <td>0.035591</td>
+      <td>0.256364</td>
+      <td>0.000174</td>
+      <td>0.479244</td>
+      <td>0.479070</td>
+      <td>0.021105</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>1.129218</td>
+      <td>0.0</td>
+      <td>2.159022</td>
+      <td>0.503953</td>
+      <td>2.159022</td>
+      <td>0.101572</td>
+      <td>0.094003</td>
+      <td>0.224884</td>
+      <td>0.205535</td>
+      <td>0.036838</td>
+      <td>0.228045</td>
+      <td>0.000014</td>
+      <td>0.051588</td>
+      <td>0.051592</td>
+      <td>0.012684</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.365861</td>
+      <td>0.000189</td>
+      <td>0.219320</td>
+      <td>0.167035</td>
+      <td>0.002466</td>
+      <td>0.000000</td>
+      <td>0.000134</td>
+      <td>0.367237</td>
+      <td>0.367079</td>
+      <td>0.005543</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>1.000000</td>
+      <td>0.000000</td>
+      <td>1.000000</td>
+      <td>0.382445</td>
+      <td>0.010280</td>
+      <td>0.336458</td>
+      <td>0.307856</td>
+      <td>0.013773</td>
+      <td>0.000000</td>
+      <td>0.000169</td>
+      <td>0.444702</td>
+      <td>0.444525</td>
+      <td>0.014123</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>1.000000</td>
+      <td>0.0</td>
+      <td>3.000000</td>
+      <td>0.000000</td>
+      <td>3.000000</td>
+      <td>0.396148</td>
+      <td>0.010531</td>
+      <td>0.448075</td>
+      <td>0.411260</td>
+      <td>0.024440</td>
+      <td>0.409229</td>
+      <td>0.000175</td>
+      <td>0.484292</td>
+      <td>0.484108</td>
+      <td>0.017945</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>2.000000</td>
+      <td>0.0</td>
+      <td>5.000000</td>
+      <td>1.000000</td>
+      <td>5.000000</td>
+      <td>0.427404</td>
+      <td>0.026416</td>
+      <td>0.688938</td>
+      <td>0.576150</td>
+      <td>0.033464</td>
+      <td>0.441702</td>
+      <td>0.000184</td>
+      <td>0.526041</td>
+      <td>0.525861</td>
+      <td>0.025839</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>3.000000</td>
+      <td>0.0</td>
+      <td>7.000000</td>
+      <td>1.000000</td>
+      <td>7.000000</td>
+      <td>0.750078</td>
+      <td>0.392244</td>
+      <td>1.054031</td>
+      <td>1.043825</td>
+      <td>0.140773</td>
+      <td>0.523959</td>
+      <td>0.000192</td>
+      <td>0.542130</td>
+      <td>0.541954</td>
+      <td>0.050884</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Plot-statistics">
+<h2>Plot statistics<a class="headerlink" href="#Plot-statistics" title="Permalink to this heading"></a></h2>
+<p>Here we plot a few of the calculated statics for each target, identifying each set of conditions with a different color:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">statistic</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+    <span class="n">axs</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;to_target_reaction_time&quot;</span><span class="p">,</span> <span class="s2">&quot;to_target_movement_time&quot;</span><span class="p">,</span> <span class="s2">&quot;to_target_distance&quot;</span><span class="p">]</span>
+<span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">statistic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">condition_index</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;condition_index&quot;</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">statistic</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Condition </span><span class="si">{</span><span class="n">condition_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_example_15_0.png" src="../_images/notebooks_example_15_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../quickstart/share-experiment.html" class="btn btn-neutral float-left" title="Sharing experiments" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="raw_data.html" class="btn btn-neutral float-right" title="Working directly with psydat files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

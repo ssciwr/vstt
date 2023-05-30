@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.clear
+===============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.clear

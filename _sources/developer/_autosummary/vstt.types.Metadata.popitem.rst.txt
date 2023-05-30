@@ -1,0 +1,6 @@
+vstt.types.Metadata.popitem
+===========================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Metadata.popitem

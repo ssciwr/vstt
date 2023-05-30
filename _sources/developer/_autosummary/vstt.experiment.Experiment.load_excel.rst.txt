@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.load\_excel
+======================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.load_excel

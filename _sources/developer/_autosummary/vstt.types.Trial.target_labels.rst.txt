@@ -1,0 +1,6 @@
+vstt.types.Trial.target\_labels
+===============================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.target_labels

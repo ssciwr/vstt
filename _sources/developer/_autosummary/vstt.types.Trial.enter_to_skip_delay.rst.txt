@@ -1,0 +1,6 @@
+vstt.types.Trial.enter\_to\_skip\_delay
+=======================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.enter_to_skip_delay

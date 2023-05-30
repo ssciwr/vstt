@@ -1,0 +1,6 @@
+vstt.trial.validate\_trial
+==========================
+
+.. currentmodule:: vstt.trial
+
+.. autofunction:: validate_trial

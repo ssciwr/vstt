@@ -1,0 +1,23 @@
+vstt.task.MotorTask
+===================
+
+.. currentmodule:: vstt.task
+
+.. autoclass:: MotorTask
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~MotorTask.__init__
+      ~MotorTask.run
+   
+   
+
+   
+   
+   

@@ -1,0 +1,6 @@
+vstt.types.Trial.show\_delay\_countdown
+=======================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.show_delay_countdown

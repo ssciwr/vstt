@@ -1,0 +1,6 @@
+vstt.vis.draw\_and\_flip
+========================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: draw_and_flip

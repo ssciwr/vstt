@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.to\_target\_distance
+==============================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.to_target_distance

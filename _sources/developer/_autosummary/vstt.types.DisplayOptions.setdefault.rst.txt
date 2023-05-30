@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.setdefault
+====================================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.setdefault

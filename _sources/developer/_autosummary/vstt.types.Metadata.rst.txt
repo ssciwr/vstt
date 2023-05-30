@@ -1,0 +1,51 @@
+vstt.types.Metadata
+===================
+
+.. currentmodule:: vstt.types
+
+.. autoclass:: Metadata
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~Metadata.__init__
+      ~Metadata.clear
+      ~Metadata.copy
+      ~Metadata.fromkeys
+      ~Metadata.get
+      ~Metadata.items
+      ~Metadata.keys
+      ~Metadata.pop
+      ~Metadata.popitem
+      ~Metadata.setdefault
+      ~Metadata.update
+      ~Metadata.values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      ~Metadata.name
+      ~Metadata.subject
+      ~Metadata.date
+      ~Metadata.author
+      ~Metadata.display_title
+      ~Metadata.display_text1
+      ~Metadata.display_text2
+      ~Metadata.display_text3
+      ~Metadata.display_text4
+      ~Metadata.display_duration
+      ~Metadata.show_delay_countdown
+      ~Metadata.enter_to_skip_delay
+   
+   

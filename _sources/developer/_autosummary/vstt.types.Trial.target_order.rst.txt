@@ -1,0 +1,6 @@
+vstt.types.Trial.target\_order
+==============================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.target_order

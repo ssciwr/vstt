@@ -1,0 +1,33 @@
+vstt.experiment.Experiment
+==========================
+
+.. currentmodule:: vstt.experiment
+
+.. autoclass:: Experiment
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~Experiment.__init__
+      ~Experiment.clear_results
+      ~Experiment.create_trialhandler
+      ~Experiment.import_and_validate_dicts
+      ~Experiment.import_and_validate_trial_handler
+      ~Experiment.load_excel
+      ~Experiment.load_file
+      ~Experiment.load_json
+      ~Experiment.load_psydat
+      ~Experiment.save_excel
+      ~Experiment.save_json
+      ~Experiment.save_psydat
+   
+   
+
+   
+   
+   

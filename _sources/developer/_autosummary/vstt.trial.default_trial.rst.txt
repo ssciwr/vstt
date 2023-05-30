@@ -1,0 +1,6 @@
+vstt.trial.default\_trial
+=========================
+
+.. currentmodule:: vstt.trial
+
+.. autofunction:: default_trial

@@ -1,0 +1,39 @@
+﻿vstt.task
+=========
+
+.. automodule:: vstt.task
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      add_trial_data_to_trial_handler
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+   
+      MotorTask
+      TrialData
+      TrialManager
+   
+   
+
+   
+   
+   
+
+
+

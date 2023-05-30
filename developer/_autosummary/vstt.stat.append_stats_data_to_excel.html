@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vstt.stat.append_stats_data_to_excel &mdash; Visuomotor Serial Targeting Task  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="vstt.stat.list_dest_stat_label_units" href="vstt.stat.list_dest_stat_label_units.html" />
+    <link rel="prev" title="vstt.stat" href="vstt.stat.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Visuomotor Serial Targeting Task
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/create-experiment.html">Creating a new experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/run-experiment.html">Running an experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/display-results.html">Displaying results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart/share-experiment.html">Sharing experiments</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Example jupyter notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/example.html">Analysing your results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/raw_data.html">Working directly with psydat files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Developer installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vstt.common.html">vstt.common</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.display.html">vstt.display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.experiment.html">vstt.experiment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.geom.html">vstt.geom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.meta.html">vstt.meta</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="vstt.stat.html">vstt.stat</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">vstt.stat.append_stats_data_to_excel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#vstt.stat.append_stats_data_to_excel"><code class="docutils literal notranslate"><span class="pre">append_stats_data_to_excel()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.stat.list_dest_stat_label_units.html">vstt.stat.list_dest_stat_label_units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vstt.stat.stats_dataframe.html">vstt.stat.stats_dataframe</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.task.html">vstt.task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.trial.html">vstt.trial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.types.html">vstt.types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vstt.vis.html">vstt.vis</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Visuomotor Serial Targeting Task</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="vstt.stat.html">vstt.stat</a></li>
+      <li class="breadcrumb-item active">vstt.stat.append_stats_data_to_excel</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/developer/_autosummary/vstt.stat.append_stats_data_to_excel.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="vstt-stat-append-stats-data-to-excel">
+<h1>vstt.stat.append_stats_data_to_excel<a class="headerlink" href="#vstt-stat-append-stats-data-to-excel" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="vstt.stat.append_stats_data_to_excel">
+<span class="sig-prename descclassname"><span class="pre">vstt.stat.</span></span><span class="sig-name descname"><span class="pre">append_stats_data_to_excel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#vstt.stat.append_stats_data_to_excel" title="Permalink to this definition"></a></dt>
+<dd><p>data_format can be
+- “trial”: one sheet of data exported per trial
+- “target: one sheet of data exported per target</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="vstt.stat.html" class="btn btn-neutral float-left" title="vstt.stat" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vstt.stat.list_dest_stat_label_units.html" class="btn btn-neutral float-right" title="vstt.stat.list_dest_stat_label_units" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

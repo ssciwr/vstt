@@ -1,0 +1,6 @@
+vstt.geom.points\_on\_circle
+============================
+
+.. currentmodule:: vstt.geom
+
+.. autofunction:: points_on_circle

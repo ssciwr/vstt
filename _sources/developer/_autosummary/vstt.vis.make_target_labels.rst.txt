@@ -1,0 +1,6 @@
+vstt.vis.make\_target\_labels
+=============================
+
+.. currentmodule:: vstt.vis
+
+.. autofunction:: make_target_labels

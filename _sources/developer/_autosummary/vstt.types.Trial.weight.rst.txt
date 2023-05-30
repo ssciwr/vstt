@@ -1,0 +1,6 @@
+vstt.types.Trial.weight
+=======================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.weight

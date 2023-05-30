@@ -1,0 +1,6 @@
+vstt.geom.PointRotator.\_\_init\_\_
+===================================
+
+.. currentmodule:: vstt.geom
+
+.. automethod:: PointRotator.__init__

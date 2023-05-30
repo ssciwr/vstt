@@ -1,0 +1,182 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Analysing your results"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import vstt\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Import\n",
+    "\n",
+    "To import an experiment from a psydat file:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "experiment = vstt.Experiment(\"example.psydat\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Conditions\n",
+    "\n",
+    "The trial conditions are in `trial_list`, each element in this list is a dict of trial conditions that defines a trial:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "experiment.trial_list"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This can be more easily viewed if converted to a pandas DataFrame:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pd.DataFrame(experiment.trial_list)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The `weight` of a trial is how many times it should be repeated."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Results\n",
+    "\n",
+    "The results of the trials are in `stats` which provides both the raw data and calculated statistics as a pandas DataFrame:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "stats = experiment.stats"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "stats.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "- each row in this DataFrame contains the data from a single movement to a target (and optionally back to the center)\n",
+    "- they are in the order that they were shown in the experiment\n",
+    "- `condition_index` is the index of the corresponding trial conditions in `trial_index`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "stats.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Plot statistics\n",
+    "Here we plot a few of the calculated statics for each target, identifying each set of conditions with a different color:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig, axs = plt.subplots(ncols=3, figsize=(18, 6))\n",
+    "for ax, statistic in zip(\n",
+    "    axs, [\"to_target_reaction_time\", \"to_target_movement_time\", \"to_target_distance\"]\n",
+    "):\n",
+    "    ax.set_title(f\"{statistic}\")\n",
+    "    for condition_index, df in stats.groupby(\"condition_index\"):\n",
+    "        ax.plot(df.index, df[statistic], label=f\"Condition {condition_index}\")\n",
+    "    ax.legend()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.15"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}

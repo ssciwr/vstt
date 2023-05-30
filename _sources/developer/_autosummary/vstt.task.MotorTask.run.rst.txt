@@ -1,0 +1,6 @@
+vstt.task.MotorTask.run
+=======================
+
+.. currentmodule:: vstt.task
+
+.. automethod:: MotorTask.run

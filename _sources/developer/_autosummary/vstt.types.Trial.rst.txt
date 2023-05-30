@@ -1,0 +1,69 @@
+vstt.types.Trial
+================
+
+.. currentmodule:: vstt.types
+
+.. autoclass:: Trial
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~Trial.__init__
+      ~Trial.clear
+      ~Trial.copy
+      ~Trial.fromkeys
+      ~Trial.get
+      ~Trial.items
+      ~Trial.keys
+      ~Trial.pop
+      ~Trial.popitem
+      ~Trial.setdefault
+      ~Trial.update
+      ~Trial.values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      ~Trial.weight
+      ~Trial.num_targets
+      ~Trial.target_order
+      ~Trial.target_indices
+      ~Trial.add_central_target
+      ~Trial.show_target_labels
+      ~Trial.target_labels
+      ~Trial.fixed_target_intervals
+      ~Trial.target_duration
+      ~Trial.inter_target_duration
+      ~Trial.target_distance
+      ~Trial.target_size
+      ~Trial.central_target_size
+      ~Trial.show_inactive_targets
+      ~Trial.ignore_incorrect_targets
+      ~Trial.play_sound
+      ~Trial.use_joystick
+      ~Trial.joystick_max_speed
+      ~Trial.show_cursor
+      ~Trial.cursor_size
+      ~Trial.show_cursor_path
+      ~Trial.automove_cursor_to_center
+      ~Trial.freeze_cursor_between_targets
+      ~Trial.cursor_rotation_degrees
+      ~Trial.post_trial_delay
+      ~Trial.post_trial_display_results
+      ~Trial.post_block_delay
+      ~Trial.post_block_display_results
+      ~Trial.show_delay_countdown
+      ~Trial.enter_to_skip_delay
+   
+   

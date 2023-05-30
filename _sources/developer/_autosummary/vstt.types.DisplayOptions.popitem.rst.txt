@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.popitem
+=================================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: DisplayOptions.popitem

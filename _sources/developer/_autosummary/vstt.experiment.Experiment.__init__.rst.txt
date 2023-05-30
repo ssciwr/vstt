@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.\_\_init\_\_
+=======================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.__init__

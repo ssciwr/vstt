@@ -1,0 +1,6 @@
+vstt.types.Trial.keys
+=====================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.keys

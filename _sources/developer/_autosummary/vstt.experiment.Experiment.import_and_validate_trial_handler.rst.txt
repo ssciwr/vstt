@@ -1,0 +1,6 @@
+vstt.experiment.Experiment.import\_and\_validate\_trial\_handler
+================================================================
+
+.. currentmodule:: vstt.experiment
+
+.. automethod:: Experiment.import_and_validate_trial_handler

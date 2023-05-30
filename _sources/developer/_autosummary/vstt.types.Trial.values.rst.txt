@@ -1,0 +1,6 @@
+vstt.types.Trial.values
+=======================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.values

@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.to\_target\_movement\_time
+====================================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.to_target_movement_time

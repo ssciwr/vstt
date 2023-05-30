@@ -1,0 +1,6 @@
+vstt.types.Trial.show\_cursor
+=============================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: Trial.show_cursor

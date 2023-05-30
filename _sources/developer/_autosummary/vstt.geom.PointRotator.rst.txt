@@ -1,0 +1,22 @@
+vstt.geom.PointRotator
+======================
+
+.. currentmodule:: vstt.geom
+
+.. autoclass:: PointRotator
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+      ~PointRotator.__init__
+   
+   
+
+   
+   
+   

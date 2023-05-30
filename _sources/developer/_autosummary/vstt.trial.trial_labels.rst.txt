@@ -1,0 +1,6 @@
+vstt.trial.trial\_labels
+========================
+
+.. currentmodule:: vstt.trial
+
+.. autofunction:: trial_labels

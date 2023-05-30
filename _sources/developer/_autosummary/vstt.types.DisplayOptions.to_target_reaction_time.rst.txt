@@ -1,0 +1,6 @@
+vstt.types.DisplayOptions.to\_target\_reaction\_time
+====================================================
+
+.. currentmodule:: vstt.types
+
+.. autoattribute:: DisplayOptions.to_target_reaction_time

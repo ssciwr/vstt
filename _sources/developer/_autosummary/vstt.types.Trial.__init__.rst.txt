@@ -1,0 +1,6 @@
+vstt.types.Trial.\_\_init\_\_
+=============================
+
+.. currentmodule:: vstt.types
+
+.. automethod:: Trial.__init__
