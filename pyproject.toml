@@ -33,7 +33,7 @@ vstt = "vstt.__main__:main"
 [project.urls]
 Github = "https://github.com/ssciwr/vstt"
 Issues = "https://github.com/ssciwr/vstt/issues"
-Documentation = "https://ssciwr.github.io/vstt/"
+Documentation = "https://vstt.readthedocs.io/"
 
 [project.optional-dependencies]
 tests = [
