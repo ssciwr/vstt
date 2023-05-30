@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "*.*.*"
+
 jobs:
   pypi:
     name: Upload wheel to github "latest" release

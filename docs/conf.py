@@ -15,9 +15,9 @@ sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
 
-project = "vstt"
-copyright = "xxx"
-author = "xxx"
+project = "Visuomotor Serial Targeting Task"
+copyright = "2022"
+author = "SSC"
 
 
 # -- General configuration ---------------------------------------------------
