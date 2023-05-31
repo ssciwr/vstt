@@ -1,6 +1,6 @@
 # Visuomotor Serial Targeting Task (VSTT)
 
-[![PyPI](https://img.shields.io/pypi/v/sme-contrib.svg)](https://pypi.org/project/sme-contrib)
+[![PyPI](https://img.shields.io/pypi/v/vstt.svg)](https://pypi.org/project/vstt)
 [![Docs](https://readthedocs.org/projects/vstt/badge/?version=latest)](https://vstt.readthedocs.io/en/latest/?badge=latest)
 [![CI](https://github.com/ssciwr/vstt/actions/workflows/ci.yml/badge.svg)](https://github.com/ssciwr/vstt/actions/workflows/ci.yml)
 [![Coverage](https://codecov.io/gh/ssciwr/vstt/branch/main/graph/badge.svg?token=sjsAdTyLH1)](https://codecov.io/gh/ssciwr/vstt)
