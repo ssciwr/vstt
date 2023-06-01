@@ -5,24 +5,23 @@ import pathlib
 from typing import Callable
 from typing import Optional
 
-import motor_task_prototype as mtp
-from motor_task_prototype import config as mtpconfig
-from motor_task_prototype.display_widget import DisplayOptionsWidget
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.meta_widget import MetadataWidget
-from motor_task_prototype.results_widget import ResultsWidget
-from motor_task_prototype.task import MotorTask
-from motor_task_prototype.trials_widget import TrialsWidget
+import vstt
 from psychopy.visual.window import Window
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
+from vstt.display_widget import DisplayOptionsWidget
+from vstt.experiment import Experiment
+from vstt.meta_widget import MetadataWidget
+from vstt.results_widget import ResultsWidget
+from vstt.task import MotorTask
+from vstt.trials_widget import TrialsWidget
 
 
-class MotorTaskGui(QtWidgets.QMainWindow):
+class Gui(QtWidgets.QMainWindow):
     def __init__(self, filename: Optional[str] = None, win: Optional[Window] = None):
         super().__init__()
-        self.experiment = MotorTaskExperiment()
+        self.experiment = Experiment()
         self._win = win
 
         grid_layout = QtWidgets.QVBoxLayout()
@@ -71,7 +70,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
 
     def btn_new_clicked(self) -> None:
         if self.save_changes_check_continue():
-            self.experiment = MotorTaskExperiment()
+            self.experiment = Experiment()
             self.reload_experiment()
 
     def _open_file(self, filename: str) -> None:
@@ -209,7 +208,7 @@ class MotorTaskGui(QtWidgets.QMainWindow):
         filename = self.experiment.filename
         if self.experiment.has_unsaved_changes:
             filename += "*"
-        self.setWindowTitle(f"{filename} :: Motor Task Prototype {mtp.__version__}")
+        self.setWindowTitle(f"{filename} :: VSTT {vstt.__version__}")
 
     def reload_experiment(self) -> None:
         self.metadata_widget.experiment = self.experiment
@@ -221,10 +220,9 @@ class MotorTaskGui(QtWidgets.QMainWindow):
     def about(self) -> None:
         QtWidgets.QMessageBox.about(
             self,
-            "About Motor Task Prototype",
-            f"Motor Task Prototype {mtp.__version__}\n\n"
-            f"Psychopy backend: {mtpconfig.win_type}\n\n"
-            + "https://ssciwr.github.io/motor-task-prototype",
+            "About VSTT",
+            f"Visuomotor Serial Targeting Task (VSTT)\n\nVersion {vstt.__version__}\n\n"
+            + "https://ssciwr.github.io/vstt",
         )
 
 
@@ -247,7 +245,7 @@ def _add_action(
         toolbar.addAction(action)
 
 
-def _create_menu_and_toolbar(gui: MotorTaskGui) -> QtWidgets.QToolBar:
+def _create_menu_and_toolbar(gui: vstt.gui.Gui) -> QtWidgets.QToolBar:
     menu = gui.menuBar()
     toolbar = QtWidgets.QToolBar()
     file_menu = menu.addMenu("&File")

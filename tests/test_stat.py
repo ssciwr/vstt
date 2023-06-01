@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import motor_task_prototype.stat as mtpstat
 import numpy as np
-from motor_task_prototype.experiment import MotorTaskExperiment
+import vstt
+from vstt.experiment import Experiment
 
 
-def test_data_df(experiment_with_results: MotorTaskExperiment) -> None:
+def test_data_df(experiment_with_results: Experiment) -> None:
     # results from 3 reps of 8-target trial, 1 rep of 4-target trial with automove back to center
-    df = mtpstat._data_df(experiment_with_results.trial_handler_with_results)
-    assert len(df.columns) == len(mtpstat._get_trial_data_columns())
+    df = vstt.stat._data_df(experiment_with_results.trial_handler_with_results)
+    assert len(df.columns) == len(vstt.stat._get_trial_data_columns())
     for index, row in df.iterrows():
         assert row["to_target_mouse_positions"].shape[1] == 2
         assert (
@@ -36,32 +36,32 @@ def test_data_df(experiment_with_results: MotorTaskExperiment) -> None:
         )
 
 
-def test_stats_df(experiment_with_results: MotorTaskExperiment) -> None:
-    df = mtpstat.stats_dataframe(experiment_with_results.trial_handler_with_results)
+def test_stats_df(experiment_with_results: Experiment) -> None:
+    df = vstt.stat.stats_dataframe(experiment_with_results.trial_handler_with_results)
     assert np.alltrue(np.isnan(df.loc[df.condition_index == 1]["to_center_time"]))
-    for destination, stat_label_units in mtpstat.list_dest_stat_label_units():
+    for destination, stat_label_units in vstt.stat.list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             assert stat in df.columns
 
 
 def test_distance() -> None:
-    assert np.allclose(mtpstat._distance(np.array([[0, 0]])), [0])
-    assert np.allclose(mtpstat._distance(np.array([[3, 4]])), [0])
-    assert np.allclose(mtpstat._distance(np.array([[0, 0], [1, 1]])), [np.sqrt(2)])
-    assert np.allclose(mtpstat._distance(np.array([[1, 1], [0, 0]])), [np.sqrt(2)])
+    assert np.allclose(vstt.stat._distance(np.array([[0, 0]])), [0])
+    assert np.allclose(vstt.stat._distance(np.array([[3, 4]])), [0])
+    assert np.allclose(vstt.stat._distance(np.array([[0, 0], [1, 1]])), [np.sqrt(2)])
+    assert np.allclose(vstt.stat._distance(np.array([[1, 1], [0, 0]])), [np.sqrt(2)])
     assert np.allclose(
-        mtpstat._distance(np.array([[0, 0], [1, 1], [0, 0]])), [2.0 * np.sqrt(2)]
+        vstt.stat._distance(np.array([[0, 0], [1, 1], [0, 0]])), [2.0 * np.sqrt(2)]
     )
     assert np.allclose(
-        mtpstat._distance(np.array([[0, 0], [1, 1], [0, 0], [-1, -1]])),
+        vstt.stat._distance(np.array([[0, 0], [1, 1], [0, 0], [-1, -1]])),
         [3.0 * np.sqrt(2)],
     )
     assert np.allclose(
-        mtpstat._distance(np.array([[0, 0], [1, 1], [0, 0], [-1, -1], [1, 1]])),
+        vstt.stat._distance(np.array([[0, 0], [1, 1], [0, 0], [-1, -1], [1, 1]])),
         [5.0 * np.sqrt(2)],
     )
     assert np.allclose(
-        mtpstat._distance(np.array([[0, 0], [np.sqrt(2), np.sqrt(2)], [0, 0]])), [4]
+        vstt.stat._distance(np.array([[0, 0], [np.sqrt(2), np.sqrt(2)], [0, 0]])), [4]
     )
 
 
@@ -78,7 +78,7 @@ def test_reaction_movement_time() -> None:
             positions = [[-1e-13, 1e-14]] * n_zeros + [[1, 1]] * (n - n_zeros)
             reaction_time = times[n_zeros]
             assert np.allclose(
-                mtpstat._reaction_time(np.array(times), np.array(positions)),
+                vstt.stat._reaction_time(np.array(times), np.array(positions)),
                 [reaction_time],
             )
 
@@ -86,26 +86,26 @@ def test_reaction_movement_time() -> None:
 def test_rmse() -> None:
     target = np.array([1, 1])
     # all points lie on the straight line between start and end point
-    assert np.allclose(mtpstat._rmse(np.array([(0, 0), (1, 1)]), target), [0])
-    assert np.allclose(mtpstat._rmse(np.array([(0, 0), (0.2, 0.2)]), target), [0])
+    assert np.allclose(vstt.stat._rmse(np.array([(0, 0), (1, 1)]), target), [0])
+    assert np.allclose(vstt.stat._rmse(np.array([(0, 0), (0.2, 0.2)]), target), [0])
     assert np.allclose(
-        mtpstat._rmse(
+        vstt.stat._rmse(
             np.array([(0, 0), (0.25, 0.25), (0.5, 0.5), (0.75, 0.75)]), target
         ),
         [0],
     )
     # points which are all 1/sqrt(2) perpendicular distance from line
     assert np.allclose(
-        mtpstat._rmse(np.array([(0, 0), (0, 1)]), target), [1.0 / np.sqrt(2.0)]
+        vstt.stat._rmse(np.array([(0, 0), (0, 1)]), target), [1.0 / np.sqrt(2.0)]
     )
     assert np.allclose(
-        mtpstat._rmse(np.array([(0, 0), (1, 0)]), target), [1.0 / np.sqrt(2.0)]
+        vstt.stat._rmse(np.array([(0, 0), (1, 0)]), target), [1.0 / np.sqrt(2.0)]
     )
     assert np.allclose(
-        mtpstat._rmse(np.array([(0, 0), (0, 1), (1, 0)]), target),
+        vstt.stat._rmse(np.array([(0, 0), (0, 1), (1, 0)]), target),
         [1.0 / np.sqrt(2.0)],
     )
     assert np.allclose(
-        mtpstat._rmse(np.array([(0, 0), (0, 1), (1, 0), (0, 1), (1, 0)]), target),
+        vstt.stat._rmse(np.array([(0, 0), (0, 1), (1, 0), (0, 1), (1, 0)]), target),
         [1.0 / np.sqrt(2.0)],
     )

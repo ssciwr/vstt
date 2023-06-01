@@ -4,40 +4,21 @@ Installation
 Windows with standalone Psychopy (recommended)
 ----------------------------------------------
 
-* Install `StandalonePsychoPy <https://github.com/psychopy/psychopy/releases/download/2022.2.4/StandalonePsychoPy-2022.2.4-win64.exe>`_
-* Download `UpdatePrototype.bat <https://github.com/ssciwr/motor-task-prototype/releases/download/latest/UpdatePrototype.bat>`_ and double-click on it
-* Download `RunPrototype.bat <https://github.com/ssciwr/motor-task-prototype/releases/download/latest/RunPrototype.bat>`_ and double-click on it
+For windows users the recommended way to install VSTT is to
+first install StandalonePsychoPy, then use the VSTT windows installer:
+
+1. Install `StandalonePsychoPy <https://github.com/psychopy/psychopy/releases/download/2023.1.2/StandalonePsychoPy-2023.1.2-win64.exe>`_
+2. Install `VSTT <https://github.com/ssciwr/vstt/releases/download/latest/vstt-windows-installer.exe>`_
+
+Pip install
+-----------
+
+VSTT can also be installed using pip:
+
+``pip install vstt``
 
 .. note::
-   * Your browser might warn you about downloading batch files
-      * This is normal for a .bat file
-      * Click keep -> show more -> keep anyway
-   * The first time you run it you might get a "Windows protected your PC" message
-      * This is also normal for a .bat file
-      * Click more info -> run anyway
-   * What does `UpdatePrototype.bat` do?
-      * This installs the latest version of the prototype into your Psychopy Python environment using pip
-      * It runs this command: ``"C:\Program Files\PsychoPy\python.exe" -m pip install https://github.com/ssciwr/motor-task-prototype/releases/download/latest/motor_task_prototype-latest-py3-none-any.whl``
-   * What does `RunPrototype.bat` do?
-      * This runs the prototype using your Psychopy Python environment
-      * It runs this command: ``"C:\Program Files\PsychoPy\python.exe" -m motor_task_prototype``
-   * If in doubt you can always open the .bat file in notepad to see what commands it will run
-   * If you have installed Psychopy in a non-default location you will need to update the paths
-     in these batch files to point to the psychopy-installed python.exe.
-
-Alternative pip install
------------------------
-
-If you already have a Python environment and git you can install using pip:
-
-``pip install git+https://github.com/ssciwr/motor-task-prototype``
-
-.. note::
-   On linux you will also need to give your Python executable permission
-   to set its own priority: ``sudo setcap cap_sys_nice=eip /path/to/python/binary``.
-
-.. note::
-   This method also installs the psychopy library with pip, which may need additional
-   system libraries and configuration steps to work properly,
-   which is probably why they provide standalone installers for
-   Psychopy on Windows and Mac which bundle all the requirements.
+   On linux the optional psychtoolbox dependency needs permission to set its priority. To allow this:
+      * ``sudo setcap cap_sys_nice+ep `python -c "import os; import sys; print(os.path.realpath(sys.executable))"``
+   Alternatively you can simply remove psychtoolbox
+      * ``pip uninstall psychtoolbox``

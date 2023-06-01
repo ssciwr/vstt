@@ -6,15 +6,15 @@ import pickle
 import numpy as np
 import pandas as pd
 import pytest
-from motor_task_prototype.display import default_display_options
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.meta import default_metadata
-from motor_task_prototype.trial import default_trial
 from psychopy.data import TrialHandlerExt
+from vstt.display import default_display_options
+from vstt.experiment import Experiment
+from vstt.meta import default_metadata
+from vstt.trial import default_trial
 
 
 def test_experiment_no_results(tmp_path: pathlib.Path) -> None:
-    exp = MotorTaskExperiment()
+    exp = Experiment()
     # default initial values
     assert exp.trial_list == [default_trial()]
     assert exp.metadata == default_metadata()
@@ -44,7 +44,7 @@ def test_experiment_no_results(tmp_path: pathlib.Path) -> None:
     exp.save_psydat(filename_to_save)
     assert exp.has_unsaved_changes is False
     # load the experiment
-    exp2 = MotorTaskExperiment(filename_to_load)
+    exp2 = Experiment(filename_to_load)
     assert exp2.metadata["author"] == "Joe Smith"
     assert exp2.display_options["to_target_paths"] is False
     assert exp2.has_unsaved_changes is False
@@ -58,7 +58,7 @@ def test_experiment_no_results(tmp_path: pathlib.Path) -> None:
 
 
 def test_experiment_with_results(
-    experiment_with_results: MotorTaskExperiment, tmp_path: pathlib.Path
+    experiment_with_results: Experiment, tmp_path: pathlib.Path
 ) -> None:
     # initial experiment has existing results
     assert experiment_with_results.trial_handler_with_results is not None
@@ -80,7 +80,7 @@ def test_experiment_with_results(
     experiment_with_results.save_psydat(filename)
     assert experiment_with_results.has_unsaved_changes is False
     # load the experiment
-    exp2 = MotorTaskExperiment(filename)
+    exp2 = Experiment(filename)
     assert exp2.metadata == experiment_with_results.metadata
     assert exp2.display_options == experiment_with_results.display_options
     assert exp2.trial_list == experiment_with_results.trial_list
@@ -110,14 +110,14 @@ def test_experiment_with_results(
 
 
 def test_experiment_to_excel_target_data_format(
-    experiment_with_results: MotorTaskExperiment, tmp_path: pathlib.Path
+    experiment_with_results: Experiment, tmp_path: pathlib.Path
 ) -> None:
     # export to an Excel file with a sheet for each target
     excel_file = tmp_path / "export.xlsx"
     experiment_with_results.save_excel(str(excel_file), data_format="target")
     stats: pd.DataFrame = experiment_with_results.stats
     # import this Excel file again
-    exp = MotorTaskExperiment(str(excel_file))
+    exp = Experiment(str(excel_file))
     assert exp.metadata == experiment_with_results.metadata
     assert exp.display_options == experiment_with_results.display_options
     assert exp.trial_list == experiment_with_results.trial_list
@@ -161,14 +161,14 @@ def test_experiment_to_excel_target_data_format(
 
 
 def test_experiment_to_excel_trial_data_format(
-    experiment_with_results: MotorTaskExperiment, tmp_path: pathlib.Path
+    experiment_with_results: Experiment, tmp_path: pathlib.Path
 ) -> None:
     # export to an Excel file with a sheet for each trial
     excel_file = tmp_path / "export.xlsx"
     experiment_with_results.save_excel(str(excel_file), data_format="trial")
     stats: pd.DataFrame = experiment_with_results.stats
     # import this Excel file again
-    exp = MotorTaskExperiment(str(excel_file))
+    exp = Experiment(str(excel_file))
     assert exp.metadata == experiment_with_results.metadata
     assert exp.display_options == experiment_with_results.display_options
     assert exp.trial_list == experiment_with_results.trial_list
@@ -261,7 +261,7 @@ def test_experiment_to_excel_trial_data_format(
 
 
 def test_experiment_to_excel_invalid_data_format(
-    experiment_with_results: MotorTaskExperiment, tmp_path: pathlib.Path
+    experiment_with_results: Experiment, tmp_path: pathlib.Path
 ) -> None:
     excel_file = tmp_path / "export.xlsx"
     with pytest.raises(RuntimeError):
@@ -269,13 +269,13 @@ def test_experiment_to_excel_invalid_data_format(
 
 
 def test_experiment_to_json(
-    experiment_with_results: MotorTaskExperiment, tmp_path: pathlib.Path
+    experiment_with_results: Experiment, tmp_path: pathlib.Path
 ) -> None:
     # export to a json file
     json_file = tmp_path / "export.json"
     experiment_with_results.save_json(str(json_file))
     # import this json file again
-    exp = MotorTaskExperiment(str(json_file))
+    exp = Experiment(str(json_file))
     assert exp.metadata == experiment_with_results.metadata
     assert exp.display_options == experiment_with_results.display_options
     assert exp.trial_list == experiment_with_results.trial_list
@@ -287,19 +287,19 @@ def test_experiment_to_json(
 def test_experiment_invalid_file(tmp_path: pathlib.Path) -> None:
     # file doesn't exist
     with pytest.raises(ValueError):
-        MotorTaskExperiment("I don't exist!")
+        Experiment("I don't exist!")
 
     # file exists and has psydat extension but is garbage
     file = tmp_path / "invalid.psydat"
     file.write_text("beep boop")
     with pytest.raises(pickle.PickleError):
-        MotorTaskExperiment(str(file))
+        Experiment(str(file))
 
     # file exists and has xlsx extension but is garbage
     file = tmp_path / "invalid.xlsx"
     file.write_text("beep boop")
     with pytest.raises(ValueError):
-        MotorTaskExperiment(str(file))
+        Experiment(str(file))
 
 
 def test_experiment_empty_trialhandler() -> None:
@@ -308,7 +308,7 @@ def test_experiment_empty_trialhandler() -> None:
     # this is what gets constructed from an empty trial list:
     assert empty_th.trialList == [None]
     assert empty_th.extraInfo is None
-    experiment = MotorTaskExperiment()
+    experiment = Experiment()
     experiment.import_and_validate_trial_handler(empty_th)
     # defaults are used for missing metadata and display_options
     assert experiment.metadata == default_metadata()

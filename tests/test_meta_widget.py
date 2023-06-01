@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import gui_test_utils as gtu
-import motor_task_prototype.meta as mtpmeta
 import qt_test_utils as qtu
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.meta_widget import MetadataWidget
+import vstt
 from psychopy.visual.window import Window
 from PyQt5 import QtWidgets
+from vstt.experiment import Experiment
+from vstt.meta_widget import MetadataWidget
 
 
 def test_metadata_widget(window: Window) -> None:
     widget = MetadataWidget(parent=None, win=window)
     signal_received = qtu.SignalReceived(widget.experiment_modified)
     # default-constructed widget has a default experiment with default metadata
-    assert widget.experiment.metadata == mtpmeta.default_metadata()
+    assert widget.experiment.metadata == vstt.meta.default_metadata()
     assert widget.experiment.has_unsaved_changes is False
     assert not signal_received
     screenshot = gtu.call_target_and_get_screenshot(
@@ -26,8 +26,8 @@ def test_metadata_widget(window: Window) -> None:
     assert 0.850 < default_grey_pixel_fraction < 0.999
     # a couple percent of black pixels due to black text
     assert 0.005 <= gtu.pixel_color_fraction(screenshot, (0, 0, 0)) <= 0.050
-    experiment = MotorTaskExperiment()
-    empty_metadata = mtpmeta.default_metadata()
+    experiment = Experiment()
+    empty_metadata = vstt.meta.default_metadata()
     for key, value in empty_metadata.items():
         if type(value) is str:
             empty_metadata[key] = ""  # type: ignore
@@ -67,12 +67,12 @@ def test_metadata_widget(window: Window) -> None:
         if type(value) is str:
             assert value == key
     # assign another experiment to widget & update fields
-    experiment2 = MotorTaskExperiment()
+    experiment2 = Experiment()
     experiment2.has_unsaved_changes = False
     widget.experiment = experiment2
     assert widget.experiment is experiment2
     assert widget.experiment.has_unsaved_changes is False
-    for key, value in mtpmeta.default_metadata().items():
+    for key, value in vstt.meta.default_metadata().items():
         if type(value) is str:
             line_edit = widget._str_widgets[key]
             signal_received.clear()
@@ -86,7 +86,7 @@ def test_metadata_widget(window: Window) -> None:
     # experiment2 has been updated
     for key, value in experiment2.metadata.items():
         if type(value) is str:
-            assert value == mtpmeta.default_metadata()[key] + "2"  # type: ignore
+            assert value == vstt.meta.default_metadata()[key] + "2"  # type: ignore
     # previous experiment was not modified
     for key, value in experiment.metadata.items():
         if type(value) is str:

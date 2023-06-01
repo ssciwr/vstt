@@ -1,5 +1,5 @@
-motor-task-prototype
-====================
+Visuomotor Serial Targeting Task (VSTT)
+=======================================
 
 .. toctree::
    :maxdepth: 2

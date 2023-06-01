@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import motor_task_prototype.trial as mtptrial
 import qt_test_utils as qtu
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.trials_widget import TrialsWidget
+import vstt
 from psychopy.visual.window import Window
+from vstt.experiment import Experiment
+from vstt.trials_widget import TrialsWidget
 
 
 def test_trials_widget_no_results(window: Window) -> None:
     widget = TrialsWidget(parent=None, win=window)
     signal_received = qtu.SignalReceived(widget.experiment_modified)
-    experiment = MotorTaskExperiment()
+    experiment = Experiment()
     experiment.trial_list = []
     experiment.has_unsaved_changes = False
     assert not signal_received
@@ -27,14 +27,14 @@ def test_trials_widget_no_results(window: Window) -> None:
     assert widget.experiment.has_unsaved_changes is False
     assert not signal_received
     # set an experiment with a single trial & no results
-    experiment.trial_list = [mtptrial.default_trial()]
+    experiment.trial_list = [vstt.trial.default_trial()]
     assert experiment.trial_handler_with_results is None
     assert experiment.has_unsaved_changes is False
     widget.experiment = experiment
     assert widget.experiment is experiment
     # select first row
     qtu.press_up_key(widget._widget_list_trials)
-    assert widget.experiment.trial_list == [mtptrial.default_trial()]
+    assert widget.experiment.trial_list == [vstt.trial.default_trial()]
     assert widget._widget_list_trials.count() == 1
     assert widget._widget_list_trials.currentRow() == 0
     assert widget._btn_add.isEnabled() is True
@@ -47,9 +47,9 @@ def test_trials_widget_no_results(window: Window) -> None:
     assert not signal_received
     # set an experiment with three trials & no results
     trials = [
-        mtptrial.default_trial(),
-        mtptrial.default_trial(),
-        mtptrial.default_trial(),
+        vstt.trial.default_trial(),
+        vstt.trial.default_trial(),
+        vstt.trial.default_trial(),
     ]
     trials[0]["weight"] = 0
     trials[1]["weight"] = 1
@@ -180,7 +180,7 @@ def test_trials_widget_no_results(window: Window) -> None:
 
 
 def test_trials_widget_with_results(
-    experiment_with_results: MotorTaskExperiment, window: Window
+    experiment_with_results: Experiment, window: Window
 ) -> None:
     widget = TrialsWidget(parent=None, win=window)
     signal_received = qtu.SignalReceived(widget.experiment_modified)

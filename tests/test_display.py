@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import motor_task_prototype.display as mtpdisplay
 import pytest
+import vstt
 
 
 def test_display_options_labels() -> None:
-    display_options = mtpdisplay.default_display_options()
-    labels = mtpdisplay.display_options_labels()
+    display_options = vstt.display.default_display_options()
+    labels = vstt.display.display_options_labels()
     assert len(display_options) == len(labels)
     assert display_options.keys() == labels.keys()
 
 
 def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
-    default_display_options = mtpdisplay.default_display_options()
+    default_display_options = vstt.display.default_display_options()
     display_options_dict = {
         "to_target_paths": True,
         "to_center_paths": "I should be a bool!",
@@ -40,7 +40,7 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
     ]
     for key in missing_keys:
         display_options_dict.pop(key)
-    display_options = mtpdisplay.import_display_options(display_options_dict)
+    display_options = vstt.display.import_display_options(display_options_dict)
     for key, value in display_options.items():
         if key in missing_keys:
             assert value == default_display_options[key]  # type: ignore

@@ -5,23 +5,23 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-import motor_task_prototype.common as mtpcommon
 import numpy as np
-from motor_task_prototype.types import MotorTaskTrial
 from psychopy.gui import DlgFromDict
+from vstt.common import import_typed_dict
+from vstt.types import Trial
 
 
-def describe_trial(trial: MotorTaskTrial) -> str:
+def describe_trial(trial: Trial) -> str:
     repeats = f"{trial['weight']} repeat{'s' if trial['weight'] > 1 else ''}"
     targets = f"target{'s' if trial['num_targets'] > 1 else ''}"
     return f"{repeats} of {trial['num_targets']} {trial['target_order']} {targets}"
 
 
-def describe_trials(trials: List[MotorTaskTrial]) -> str:
+def describe_trials(trials: List[Trial]) -> str:
     return "\n".join(["  - " + describe_trial(trial) for trial in trials])
 
 
-def default_trial() -> MotorTaskTrial:
+def default_trial() -> Trial:
     return {
         "weight": 1,
         "num_targets": 8,
@@ -92,8 +92,8 @@ def trial_labels() -> Dict:
 
 
 def get_trial_from_user(
-    initial_trial: Optional[MotorTaskTrial] = None,
-) -> Optional[MotorTaskTrial]:
+    initial_trial: Optional[Trial] = None,
+) -> Optional[Trial]:
     if initial_trial:
         trial = copy.deepcopy(initial_trial)
     else:
@@ -111,11 +111,11 @@ def get_trial_from_user(
     return validate_trial(trial)
 
 
-def import_trial(trial_dict: dict) -> MotorTaskTrial:
-    return mtpcommon.import_typed_dict(trial_dict, default_trial())
+def import_trial(trial_dict: dict) -> Trial:
+    return import_typed_dict(trial_dict, default_trial())
 
 
-def validate_trial(trial: MotorTaskTrial) -> MotorTaskTrial:
+def validate_trial(trial: Trial) -> Trial:
     # make any negative time durations zero
     for duration in [
         "target_duration",

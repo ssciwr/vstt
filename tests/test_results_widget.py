@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import gui_test_utils as gtu
 import qt_test_utils as qtu
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.results_widget import ResultsWidget
 from psychopy.visual.window import Window
+from vstt.experiment import Experiment
+from vstt.results_widget import ResultsWidget
 
 
 def test_results_widget_no_experiment(window: Window) -> None:
@@ -17,7 +17,7 @@ def test_results_widget_no_experiment(window: Window) -> None:
 
 
 def test_results_widget_experiment_no_results(
-    experiment_no_results: MotorTaskExperiment, window: Window
+    experiment_no_results: Experiment, window: Window
 ) -> None:
     widget = ResultsWidget(parent=None, win=window)
     # assign experiment without results
@@ -29,7 +29,7 @@ def test_results_widget_experiment_no_results(
 
 
 def test_results_widget_experiment_with_results(
-    experiment_with_results: MotorTaskExperiment, window: Window
+    experiment_with_results: Experiment, window: Window
 ) -> None:
     widget = ResultsWidget(parent=None, win=window)
     # assign experiment with results
@@ -80,7 +80,7 @@ def test_results_widget_experiment_with_results(
 
 
 def test_results_widget_experiment_invalid_state(
-    experiment_with_results: MotorTaskExperiment, window: Window
+    experiment_with_results: Experiment, window: Window
 ) -> None:
     widget = ResultsWidget(parent=None, win=window)
     # assign experiment with results

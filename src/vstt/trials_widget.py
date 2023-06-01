@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Optional
 
-from motor_task_prototype.experiment import MotorTaskExperiment
-from motor_task_prototype.trial import describe_trial
-from motor_task_prototype.trial import get_trial_from_user
-from motor_task_prototype.trial import MotorTaskTrial
 from psychopy.visual.window import Window
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from vstt.experiment import Experiment
+from vstt.trial import describe_trial
+from vstt.trial import get_trial_from_user
+from vstt.trial import Trial
 
 
 class TrialsWidget(QtWidgets.QWidget):
@@ -19,7 +19,7 @@ class TrialsWidget(QtWidgets.QWidget):
     ):
         super().__init__(parent)
         self._win = win
-        self._experiment = MotorTaskExperiment()
+        self._experiment = Experiment()
 
         outer_layout = QtWidgets.QVBoxLayout()
         group_box = QtWidgets.QGroupBox("Trial Conditions")
@@ -64,7 +64,7 @@ class TrialsWidget(QtWidgets.QWidget):
         self._btn_move_up.setEnabled(self._can_move_up(row))
         self._btn_move_down.setEnabled(self._can_move_down(row))
 
-    def _current_trial(self) -> Optional[MotorTaskTrial]:
+    def _current_trial(self) -> Optional[Trial]:
         row = self._widget_list_trials.currentRow()
         if not self._is_valid(row):
             return None
@@ -142,11 +142,11 @@ class TrialsWidget(QtWidgets.QWidget):
             item.setText(describe_trial(edited_trial))
 
     @property
-    def experiment(self) -> MotorTaskExperiment:
+    def experiment(self) -> Experiment:
         return self._experiment
 
     @experiment.setter
-    def experiment(self, experiment: MotorTaskExperiment) -> None:
+    def experiment(self, experiment: Experiment) -> None:
         self._experiment = experiment
         self._widget_list_trials.clear()
         self._widget_list_trials.addItems(

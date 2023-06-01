@@ -2,11 +2,11 @@ Sharing experiments
 ===================
 
 Experiments can be exported in different formats: psydat, Excel, and json.
-Psydat is the default format used by Motor Task Prototype,
+Psydat is the default format used by VSTT,
 which can also be opened from Python scripts or Jupyter notebooks.
 The Excel and json formats are provided to allow experiments
 and results to be shared, analysed and modified
-without requiring the Motor Task Prototype software to do so.
+without requiring the VSTT software to do so.
 
 .. list-table:: File format comparison
    :widths: 25 25 25 25
@@ -37,7 +37,7 @@ psydat
 ------
 
 This is the default file format, which includes the experiment results.
-These files can be opened in the Motor Task Prototype GUI or in Python
+These files can be opened in the VSTT GUI or in Python
 (see the example notebook for more information).
 
 Excel
@@ -51,7 +51,7 @@ The first 3 pages in the spreadsheet define the experiment:
 * trial_list
 
 These values can be edited in Excel and then the modified experiment can
-be opened in the Motor Task Prototype GUI (File -> Open, choose Excel as filetype).
+be opened in the VSTT GUI (File -> Open, choose Excel as filetype).
 Note that results are not imported from an Excel file.
 
 The excel sheet also contains a statistics page with calculated statistics for each trial.
@@ -85,7 +85,7 @@ json
 Experiments can also be exported as a json text file.
 This is a convenient format for sharing experimental setups,
 as it can be easily read and modified in a text editor.
-These files can also be opened in the Motor Task Prototype GUI
+These files can also be opened in the VSTT GUI
 (File -> Open, choose JSON as filetype).
 The json file contains all the information required to define the experiment:
 

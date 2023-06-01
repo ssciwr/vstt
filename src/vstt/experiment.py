@@ -9,20 +9,20 @@ from typing import List
 from typing import Optional
 
 import pandas as pd
-from motor_task_prototype.display import default_display_options
-from motor_task_prototype.display import import_display_options
-from motor_task_prototype.meta import default_metadata
-from motor_task_prototype.meta import import_metadata
-from motor_task_prototype.stat import append_stats_data_to_excel
-from motor_task_prototype.stat import stats_dataframe
-from motor_task_prototype.trial import default_trial
-from motor_task_prototype.trial import import_trial
-from motor_task_prototype.trial import validate_trial
 from psychopy.data import TrialHandlerExt
 from psychopy.misc import fromFile
+from vstt.display import default_display_options
+from vstt.display import import_display_options
+from vstt.meta import default_metadata
+from vstt.meta import import_metadata
+from vstt.stat import append_stats_data_to_excel
+from vstt.stat import stats_dataframe
+from vstt.trial import default_trial
+from vstt.trial import import_trial
+from vstt.trial import validate_trial
 
 
-class MotorTaskExperiment:
+class Experiment:
     def __init__(self, filename: Optional[str] = None):
         self.filename = "default-experiment.psydat"
         self.has_unsaved_changes = False
