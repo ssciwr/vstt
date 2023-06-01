@@ -19,6 +19,9 @@ VSTT can also be installed from `PyPI <https://pypi.org/project/vstt>`_ using pi
 
 .. note::
    On linux the optional psychtoolbox dependency needs permission to set its priority. To allow this:
-      * ``sudo setcap cap_sys_nice+ep `python -c "import os; import sys; print(os.path.realpath(sys.executable))"``
-   Alternatively you can simply remove psychtoolbox
+
+      * ``sudo setcap cap_sys_nice+ep `python -c "import os; import sys; print(os.path.realpath(sys.executable))"```
+
+   Alternatively you can simply remove psychtoolbox:
+
       * ``pip uninstall psychtoolbox``

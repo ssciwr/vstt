@@ -24,7 +24,15 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
 ]
-dependencies = ["psychopy", "psychopy-sounddevice", "numpy", "click", "PyQt5"]
+dependencies = [
+  "psychopy",
+  "psychopy-sounddevice",
+  "numpy",
+  "click",
+  "PyQt5",
+  "requests",
+  "packaging"
+]
 dynamic = ["version"]
 
 [project.scripts]

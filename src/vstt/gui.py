@@ -16,6 +16,8 @@ from vstt.meta_widget import MetadataWidget
 from vstt.results_widget import ResultsWidget
 from vstt.task import MotorTask
 from vstt.trials_widget import TrialsWidget
+from vstt.update import check_for_new_version
+from vstt.update import do_pip_upgrade
 
 
 class Gui(QtWidgets.QMainWindow):
@@ -225,6 +227,26 @@ class Gui(QtWidgets.QMainWindow):
             + "https://ssciwr.github.io/vstt",
         )
 
+    def check_for_updates(self) -> None:
+        title = "Update VSTT"
+        QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
+        new_version_available, new_version_message = check_for_new_version()
+        QtWidgets.QApplication.restoreOverrideCursor()
+        if not new_version_available:
+            QtWidgets.QMessageBox.information(
+                self,
+                title,
+                new_version_message,
+            )
+            return
+        yes_no = QtWidgets.QMessageBox.question(self, title, new_version_message)
+        if yes_no != QtWidgets.QMessageBox.Yes:
+            return
+        QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
+        upgrade_success, upgrade_message = do_pip_upgrade()
+        QtWidgets.QApplication.restoreOverrideCursor()
+        QtWidgets.QMessageBox.information(self, title, upgrade_message)
+
 
 def _add_action(
     name: str,
@@ -300,5 +322,6 @@ def _create_menu_and_toolbar(gui: vstt.gui.Gui) -> QtWidgets.QToolBar:
     )
     help_menu = menu.addMenu("&Help")
     _add_action("&About", gui.about, help_menu)
+    _add_action("&Check for updates", gui.check_for_updates, help_menu)
     toolbar.setContextMenuPolicy(Qt.PreventContextMenu)
     return toolbar
