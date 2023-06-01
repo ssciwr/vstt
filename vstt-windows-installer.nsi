@@ -32,7 +32,7 @@ FunctionEnd
 
 # validate that selected psychopy folder contains python.exe
 Function .onVerifyInstDir
-    IfFileExists $INSTDIR\python.exe PathGood
+    IfFileExists $INSTDIR\pythonw.exe PathGood
       Abort
     PathGood:
 FunctionEnd
@@ -40,8 +40,8 @@ FunctionEnd
 # installation
 Section "install"
     DetailPrint "PsychoPy installation location: $INSTDIR"
-    # pip install vstt using PsychoPy python.exe
-    ExecWait '"$INSTDIR\python.exe" -m pip install --upgrade vstt' $0
+    # pip install vstt using PsychoPy pythonw.exe
+    ExecWait '"$INSTDIR\pythonw.exe" -m pip install --upgrade vstt' $0
     ${If} $0 != 0
         messageBox mb_iconstop "Pip install of vstt failed. PsychoPy installation not found at $INSTDIR! Please install StandalonePsychoPy before running this installer, and ensure you have selected the correct location of your PsychoPy installation."
         setErrorLevel 1
