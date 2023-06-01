@@ -1,0 +1,43 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*.*.*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  nsis:
+    name: Create Windows installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: makensis.exe /V4 vstt-windows-installer.nsi
+      - name: Upload installer to tagged release
+        if: startsWith(github.event.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: vstt-windows-installer.exe
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+  pypi:
+    name: Create PyPI release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - run: pip install --upgrade build
+      - run: python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        if: startsWith(github.event.ref, 'refs/tags/')
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}

@@ -8,12 +8,12 @@ For windows users the recommended way to install VSTT is to
 first install StandalonePsychoPy, then use the VSTT windows installer:
 
 1. Install `StandalonePsychoPy <https://github.com/psychopy/psychopy/releases/download/2023.1.2/StandalonePsychoPy-2023.1.2-win64.exe>`_
-2. Install `VSTT <https://github.com/ssciwr/vstt/releases/download/latest/vstt-windows-installer.exe>`_
+2. Install `Visuomotor Serial Targeting Task <https://github.com/ssciwr/vstt/releases/latest/download/vstt-windows-installer.exe>`_
 
 Pip install
 -----------
 
-VSTT can also be installed using pip:
+VSTT can also be installed from `PyPI <https://pypi.org/project/vstt>`_ using pip:
 
 ``pip install vstt``
 
