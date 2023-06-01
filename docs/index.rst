@@ -17,6 +17,7 @@ Visuomotor Serial Targeting Task (VSTT)
 
    notebooks/example
    notebooks/raw_data
+   notebooks/area_calculation
 
 .. toctree::
    :maxdepth: 2
