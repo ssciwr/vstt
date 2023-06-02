@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Union
@@ -38,11 +40,31 @@ def _get_trial_data_columns() -> List[str]:
         "to_target_timestamps",
         "to_target_mouse_positions",
         "to_target_success",
+        "to_target_num_timestamps_before_visible",
         "center_pos",
         "to_center_timestamps",
         "to_center_mouse_positions",
         "to_center_success",
+        "to_center_num_timestamps_before_visible",
     ]
+
+
+def _get_dat(
+    data: Dict, key: str, index: Tuple, i_target: int, default_value: Any
+) -> Any:
+    ar = data.get(key)
+    if ar is None:
+        logging.warning(
+            f"Key '{key}' not found in data, using default value {default_value}"
+        )
+        return default_value
+    try:
+        return ar[index][i_target]
+    except IndexError:
+        logging.warning(
+            f"Index error for key '{key}', index '{index}', i_target '{i_target}', using default value {default_value}"
+        )
+    return default_value
 
 
 def _get_target_data(
@@ -54,24 +76,28 @@ def _get_target_data(
     target_pos = np.array(data["target_pos"][index][i_target])
     center_pos = np.array([0.0, 0.0])
     to_target_timestamps = np.array(data["to_target_timestamps"][index][i_target])
+    to_target_num_timestamps_before_visible = _get_dat(
+        data, "to_target_num_timestamps_before_visible", index, i_target, 0
+    )
     to_target_mouse_positions = np.stack(
         np.array(data["to_target_mouse_positions"][index][i_target])
     )  # type: ignore
     to_target_success = np.array(data["to_target_success"][index][i_target])
     to_center_success: Union[np.ndarray, bool]
-    if (
-        type(data["to_center_timestamps"][index]) is np.ndarray
-        and i_target < data["to_center_timestamps"][index].shape[0]
-    ):
-        to_center_timestamps = np.array(data["to_center_timestamps"][index][i_target])
-        to_center_mouse_positions = np.stack(
-            np.array(data["to_center_mouse_positions"][index][i_target])
-        )  # type: ignore
-        to_center_success = np.array(data["to_center_success"][index][i_target])
-    else:
-        to_center_timestamps = np.array([])
-        to_center_mouse_positions = np.array([])
-        to_center_success = True
+    to_center_timestamps = np.array(
+        _get_dat(data, "to_center_timestamps", index, i_target, [])
+    )
+    to_center_num_timestamps_before_visible = _get_dat(
+        data, "to_center_num_timestamps_before_visible", index, i_target, 0
+    )
+    to_center_mouse_positions = np.array(
+        _get_dat(data, "to_center_mouse_positions", index, i_target, [])
+    )
+    if to_center_mouse_positions.shape[0] > 0:
+        to_center_mouse_positions = np.stack(to_center_mouse_positions)  # type: ignore
+    to_center_success = np.array(
+        _get_dat(data, "to_center_success", index, i_target, True)
+    )
     return [
         index[0],
         index[1],
@@ -82,10 +108,12 @@ def _get_target_data(
         to_target_timestamps,
         to_target_mouse_positions,
         to_target_success,
+        to_target_num_timestamps_before_visible,
         center_pos,
         to_center_timestamps,
         to_center_mouse_positions,
         to_center_success,
+        to_center_num_timestamps_before_visible,
     ]
 
 
@@ -110,11 +138,16 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             lambda x: _reaction_time(
                 x[f"to_{destination}_timestamps"],
                 x[f"to_{destination}_mouse_positions"],
+                x[f"to_{destination}_num_timestamps_before_visible"],
             ),
             axis=1,
         )
-        df[f"to_{destination}_time"] = df[f"to_{destination}_timestamps"].map(
-            lambda x: x[-1] if x.shape[0] > 0 else np.nan
+        df[f"to_{destination}_time"] = df.apply(
+            lambda x: _total_time(
+                x[f"to_{destination}_timestamps"],
+                x[f"to_{destination}_num_timestamps_before_visible"],
+            ),
+            axis=1,
         )
         df[f"to_{destination}_movement_time"] = (
             df[f"to_{destination}_time"] - df[f"to_{destination}_reaction_time"]
@@ -156,8 +189,8 @@ def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) 
         # one sheet for each row (target) in df, with arrays of time/position data.
         # arrays transposed to columns, x-y pairs are split into two columns.
         # 6 columns:
-        #   - to_target_timestamps (negative until target displayed)
-        #   - to_center_timestamps (negative until target displayed)
+        #   - to_target_timestamps
+        #   - to_center_timestamps
         #   - to_target_mouse_positions_x
         #   - to_target_mouse_positions_y
         #   - to_center_mouse_positions_x
@@ -189,11 +222,10 @@ def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) 
         #   - timestamps (start from zero, increases throughout the trial)
         #   - mouse_x
         #   - mouse_y
-        #   - target_index (-1 if no target is currently displayed)
-        #   - target_x (-1 if no target is currently displayed)
-        #   - target_y (-1 if no target is currently displayed)
+        #   - target_index (-99 if no target is currently displayed)
+        #   - target_x (-99 if no target is currently displayed)
+        #   - target_y (-99 if no target is currently displayed)
         for i_trial in df.i_trial.unique():
-            t0 = 0.0
             times = np.array([])
             x_positions = np.array([])
             y_positions = np.array([])
@@ -204,7 +236,7 @@ def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) 
                 for dest in ["target", "center"]:
                     raw_times = getattr(row, f"to_{dest}_timestamps")
                     if raw_times.shape[-1] > 0:
-                        times = np.append(times, raw_times - raw_times[0] + t0)
+                        times = np.append(times, raw_times)
                         points = getattr(row, f"to_{dest}_mouse_positions")
                         x_positions = np.append(x_positions, points[:, 0])
                         y_positions = np.append(y_positions, points[:, 1])
@@ -212,22 +244,25 @@ def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) 
                         if dest == "center":
                             pos = (0.0, 0.0)
                             i_target = -1  # give center target the special index -1
+                            num_timestamps_before_target_visible = (
+                                row.to_center_num_timestamps_before_visible
+                            )
                         else:
                             pos = row.target_pos
                             i_target = row.i_target
+                            num_timestamps_before_target_visible = (
+                                row.to_target_num_timestamps_before_visible
+                            )
                         target_i = np.full_like(raw_times, i_target, dtype=np.int64)
                         target_x = np.full_like(raw_times, pos[0])
                         target_y = np.full_like(raw_times, pos[1])
-                        # set these to -99 if no target is visible (i.e. raw time is negative)
-                        target_i[raw_times < 0] = -99
-                        target_x[raw_times < 0] = -99
-                        target_y[raw_times < 0] = -99
+                        # if no target is visible use the special index -99
+                        target_i[0:num_timestamps_before_target_visible] = -99
+                        target_x[0:num_timestamps_before_target_visible] = -99
+                        target_y[0:num_timestamps_before_target_visible] = -99
                         i_targets = np.append(i_targets, target_i)
                         x_targets = np.append(x_targets, target_x)
                         y_targets = np.append(y_targets, target_y)
-                        t0 = (
-                            times[-1] + 1.0 / 60.0
-                        )  # add a single window flip between targets (?)
             df_data = pd.DataFrame(
                 {
                     "timestamps": times,
@@ -244,31 +279,84 @@ def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) 
 def _reaction_time(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
     epsilon: float = 1e-12,
 ) -> float:
-    if mouse_times.shape[0] != mouse_positions.shape[0] or mouse_times.shape[0] == 0:
+    """
+    The reaction time is defined as the timestamp where the cursor first moves,
+    minus the timestamp where the target becomes visible.
+    This means the reaction time can be negative if the cursor is moved before
+    the target is made visible.
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
+    :param epsilon: The minimum euclidean distance to qualify as moving the cursor
+    :return: The reaction time
+    """
+    if (
+        mouse_times.shape[0] != mouse_positions.shape[0]
+        or mouse_times.shape[0] == 0
+        or mouse_times.shape[0] < to_target_num_timestamps_before_visible
+    ):
         return np.nan
     i = 0
     while xydist(mouse_positions[0], mouse_positions[i]) < epsilon and i + 1 < len(
         mouse_times
     ):
         i += 1
-    return mouse_times[i]
+    return mouse_times[i] - mouse_times[to_target_num_timestamps_before_visible]
+
+
+def _total_time(
+    mouse_times: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float:
+    """
+    The time to target is defined as the final timestamp (corresponding either to the target being reached
+    or a timeout) minus the timestamp where the target becomes visible.
+
+    :param mouse_times: The array of timestamps
+    :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
+    :return: The total time to target
+    """
+    if (
+        mouse_times.shape[0] == 0
+        or mouse_times.shape[0] < to_target_num_timestamps_before_visible
+    ):
+        return np.nan
+    return mouse_times[-1] - mouse_times[to_target_num_timestamps_before_visible]
 
 
 def _distance(mouse_positions: np.ndarray) -> float:
+    """
+    The euclidean point-to-point distance travelled by the cursor.
+
+    :param mouse_positions: The array of mouse positions
+    :return: The distance travelled.
+    """
     dist = 0
     for i in range(mouse_positions.shape[0] - 1):
         dist += xydist(mouse_positions[i + 1], mouse_positions[i])
     return dist
 
 
-def _rmse(mouse_positions: np.ndarray, target: np.ndarray) -> float:
+def _rmse(mouse_positions: np.ndarray, target_position: np.ndarray) -> float:
+    """
+    The Root Mean Square Error (RMSE) of the perpendicular distance from each mouse point
+    to the straight line that intersects the initial mouse location and the target.
+
+    See: https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points.
+
+    :param mouse_positions: The array of mouse positions
+    :param target: The x,y coordinates of the target
+    :return: The RMSE of the distance from the ideal trajectoty
+    """
     if mouse_positions.shape[0] <= 1:
         return np.nan
     # use first mouse position as origin point, so exclude it from RMSE measure
     x1, y1 = mouse_positions[0]
-    x2, y2 = target
+    x2, y2 = target_position
     norm = np.power(x2 - x1, 2) + np.power(y2 - y1, 2)
     norm *= mouse_positions.shape[0] - 1
     sum_of_squares = 0
