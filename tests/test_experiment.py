@@ -231,13 +231,9 @@ def test_experiment_to_excel_trial_data_format(
             if dest is not None:
                 # target data from target display time
                 # get correct timestamps
-                ts = stats[f"to_{dest}_timestamps"][i_row]
-                # exclude any negative times from before target display
-                ts_correct = ts[ts >= 0]
+                ts_correct = stats[f"to_{dest}_timestamps"][i_row]
                 # get imported timestamps
                 ts = df_target.timestamps.to_numpy()
-                # subtract first timepoint to reset any offset to zero
-                ts = ts - ts[0]
                 assert np.allclose(ts, ts_correct)
                 # get correct mouse positions
                 xys = stats[f"to_{dest}_mouse_positions"][i_row]

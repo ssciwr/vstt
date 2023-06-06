@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import threading
 from time import sleep
+from typing import Dict
 from typing import List
 from typing import Tuple
 
 import gui_test_utils as gtu
 import numpy as np
 import pyautogui
+import pytest
 import vstt
 from psychopy.visual.window import Window
 from vstt.experiment import Experiment
@@ -74,14 +76,23 @@ def test_task_no_trials(window: Window) -> None:
     assert experiment_no_trials.trial_handler_with_results is None
 
 
-def test_task_automove_to_center(
-    experiment_no_results: Experiment, window: Window
+@pytest.mark.parametrize(
+    "trial_settings",
+    [
+        {"automove_cursor_to_center": True},
+        {"add_central_target": False, "automove_cursor_to_center": False, "weight": 1},
+    ],
+    ids=["automove_to_center", "no_central_target"],
+)
+def test_task(
+    experiment_no_results: Experiment, window: Window, trial_settings: Dict
 ) -> None:
     target_pixels = []
     experiment_no_results.has_unsaved_changes = False
     assert experiment_no_results.trial_handler_with_results is None
     for trial in experiment_no_results.trial_list:
-        trial["automove_cursor_to_center"] = True
+        for key, value in trial_settings.items():
+            trial[key] = value  # type: ignore
         target_pixels.append(
             [
                 gtu.pos_to_pixels(pos)
@@ -100,52 +111,15 @@ def test_task_automove_to_center(
     assert success is True
     assert experiment_no_results.has_unsaved_changes is True
     assert experiment_no_results.trial_handler_with_results is not None
+    data = experiment_no_results.trial_handler_with_results.data
     # check that we hit all the targets without timing out
-    for timestamps in experiment_no_results.trial_handler_with_results.data[
-        "to_target_timestamps"
-    ][0][0]:
+    for timestamps in data["to_target_timestamps"][0][0]:
         assert (
-            timestamps[-1]
+            timestamps[-1] - timestamps[0]
             < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
         )
-
-
-def test_task_no_central_target(
-    experiment_no_results: Experiment, window: Window
-) -> None:
-    target_pixels = []
-    experiment_no_results.has_unsaved_changes = False
-    assert experiment_no_results.trial_handler_with_results is None
-    for trial in experiment_no_results.trial_list:
-        trial["add_central_target"] = False
-        trial["automove_cursor_to_center"] = False
-        trial["weight"] = 1
-        target_pixels.append(
-            [
-                gtu.pos_to_pixels(pos)
-                for pos in points_on_circle(
-                    trial["num_targets"],
-                    trial["target_distance"],
-                    include_centre=False,
-                )
-            ]
-        )
-    do_task_thread = launch_do_task(experiment_no_results, target_pixels)
-    task = MotorTask(experiment_no_results, window)
-    success = task.run()
-    do_task_thread.join()
-    # task ran successfully, updated experiment with results
-    assert success is True
-    assert experiment_no_results.has_unsaved_changes is True
-    assert experiment_no_results.trial_handler_with_results is not None
-    # check that we hit all the targets without timing out
-    for timestamps in experiment_no_results.trial_handler_with_results.data[
-        "to_target_timestamps"
-    ][0][0]:
-        assert (
-            timestamps[-1]
-            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
-        )
+    for dest in ["target", "center"]:
+        assert np.all(data[f"to_{dest}_success"][0][0])
 
 
 def test_task_no_automove_to_center(
@@ -175,22 +149,21 @@ def test_task_no_automove_to_center(
     assert experiment_no_results.has_unsaved_changes is True
     assert experiment_no_results.trial_handler_with_results is not None
     # check that we hit all the targets
+    data = experiment_no_results.trial_handler_with_results.data
     for to_target_timestamps, to_center_timestamps in zip(
-        experiment_no_results.trial_handler_with_results.data["to_target_timestamps"][
-            0
-        ][0],
-        experiment_no_results.trial_handler_with_results.data["to_center_timestamps"][
-            0
-        ][0],
+        data["to_target_timestamps"][0][0],
+        data["to_center_timestamps"][0][0],
     ):
         assert (
-            to_target_timestamps[-1]
+            to_target_timestamps[-1] - to_target_timestamps[0]
             < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
         )
         assert (
-            to_center_timestamps[-1]
+            to_center_timestamps[-1] - to_target_timestamps[0]
             < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
         )
+    for dest in ["target", "center"]:
+        assert np.all(data[f"to_{dest}_success"][0][0])
 
 
 def test_task_fixed_intervals_no_user_input(window: Window) -> None:
@@ -217,20 +190,19 @@ def test_task_fixed_intervals_no_user_input(window: Window) -> None:
     assert experiment.trial_handler_with_results is not None
     # check that we failed to hit all targets
     expected_success = np.full((trial["num_targets"],), False)
+    data = experiment.trial_handler_with_results.data
     for success_name in ["to_target_success", "to_center_success"]:
-        assert np.all(
-            experiment.trial_handler_with_results.data[success_name][0][0]
-            == expected_success
-        )
-    # first to_target timestamps should start at approx -target_duration,
-    # at 0 the first target is displayed for target_duration secs, so it should end at approx target_duration
-    # subsequent ones should start at approx 0.0 since previous target is not reached, and end at approx target_duration
-    all_to_target_timestamps = experiment.trial_handler_with_results.data[
-        "to_target_timestamps"
-    ][0][0]
-    delta = 0.05 * target_duration
-    assert abs(all_to_target_timestamps[0][0] + target_duration) < delta
-    assert abs(all_to_target_timestamps[0][-1] - target_duration) < delta
-    for to_target_timestamps in all_to_target_timestamps[1:]:
-        assert abs(to_target_timestamps[0]) < delta
-        assert abs(to_target_timestamps[-1] - target_duration) < delta
+        assert np.all(data[success_name][0][0] == expected_success)
+    # first to_target timestamps should start at ~0,
+    # at ~target_duration the first target is displayed for target_duration secs,
+    # subsequent ones should be displayed every ~target_duration starting from ~2*target_duration
+    all_to_target_timestamps = data["to_target_timestamps"][0][0]
+    # require timestamps to be accurate within 0.1s
+    # On CI the fps / dropped frames can be erratic so this is a conservative value.
+    # If running on real hardware these should actually be within 2/fps
+    delta = 0.1
+    assert abs(all_to_target_timestamps[0][0]) < delta
+    assert abs(all_to_target_timestamps[0][-1] - 2 * target_duration) < delta
+    for count, to_target_timestamps in enumerate(all_to_target_timestamps[1:]):
+        assert abs(to_target_timestamps[0] - (count + 2) * target_duration) < delta
+        assert abs(to_target_timestamps[-1] - (count + 3) * target_duration) < delta

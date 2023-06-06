@@ -63,8 +63,8 @@ def make_mouse_positions(
     return np.array([(pos[0] * t + noise(), pos[1] * t + noise()) for t in time_points])
 
 
-def make_timestamps(n_min: int = 8, n_max: int = 20) -> np.ndarray:
-    return np.linspace(0.0, 1.0, np.random.randint(n_min, n_max))
+def make_timestamps(t0: float, n_min: int = 8, n_max: int = 20) -> np.ndarray:
+    return np.linspace(t0, t0 + 1.0, np.random.randint(n_min, n_max))
 
 
 @pytest.fixture
@@ -122,18 +122,21 @@ def experiment_with_results() -> Experiment:
         target_pos = points_on_circle(
             trial["num_targets"], trial["target_distance"], include_centre=False
         )
+        t0 = 0.0
         for pos in target_pos:
-            to_target_timestamps.append(make_timestamps())
+            to_target_timestamps.append(make_timestamps(t0))
             to_target_mouse_positions.append(
                 make_mouse_positions(pos, to_target_timestamps[-1])
             )
             to_target_success.append(True)
+            t0 = to_target_timestamps[-1][-1] + 1.0 / 60.0
             if not trial["automove_cursor_to_center"]:
-                to_center_timestamps.append(make_timestamps())
+                to_center_timestamps.append(make_timestamps(t0))
                 to_center_mouse_positions.append(
                     list(reversed(make_mouse_positions(pos, to_center_timestamps[-1])))
                 )
                 to_center_success.append(True)
+                t0 = to_center_timestamps[-1][-1] + 1.0 / 60.0
         trial_handler.addData("target_indices", np.array(range(len(target_pos))))
         trial_handler.addData("target_pos", np.array(target_pos))
         trial_handler.addData(

@@ -75,12 +75,15 @@ def test_reaction_movement_time() -> None:
     ]:
         n = len(times)
         for n_zeros in range(1, n):
-            positions = [[-1e-13, 1e-14]] * n_zeros + [[1, 1]] * (n - n_zeros)
-            reaction_time = times[n_zeros]
-            assert np.allclose(
-                vstt.stat._reaction_time(np.array(times), np.array(positions)),
-                [reaction_time],
-            )
+            for n_before_visible in range(1, n):
+                positions = [[-1e-13, 1e-14]] * n_zeros + [[1, 1]] * (n - n_zeros)
+                reaction_time = times[n_zeros] - times[n_before_visible]
+                assert np.allclose(
+                    vstt.stat._reaction_time(
+                        np.array(times), np.array(positions), n_before_visible
+                    ),
+                    [reaction_time],
+                )
 
 
 def test_rmse() -> None:

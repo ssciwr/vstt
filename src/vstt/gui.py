@@ -80,6 +80,7 @@ class Gui(QtWidgets.QMainWindow):
             self.experiment.load_file(filename)
         except Exception as e:
             logging.warning(f"Failed to load file {filename}: {e}")
+            logging.exception(e)
             QtWidgets.QMessageBox.critical(
                 self,
                 "Invalid file",
