@@ -29,7 +29,7 @@ repos:
           - "prettier-plugin-toml"
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.23.0
+    rev: 0.23.1
     hooks:
       - id: check-github-workflows
       - id: check-readthedocs
@@ -46,7 +46,7 @@ repos:
             --warn-redundant-casts,
           ]
 
-  - repo: https://github.com/asottile/reorder_python_imports
+  - repo: https://github.com/asottile/reorder-python-imports
     rev: v3.9.0
     hooks:
       - id: reorder-python-imports
