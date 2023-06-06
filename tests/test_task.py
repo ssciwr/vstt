@@ -197,12 +197,21 @@ def test_task_fixed_intervals_no_user_input(window: Window) -> None:
     # at ~target_duration the first target is displayed for target_duration secs,
     # subsequent ones should be displayed every ~target_duration starting from ~2*target_duration
     all_to_target_timestamps = data["to_target_timestamps"][0][0]
-    # require timestamps to be accurate within 0.1s
-    # On CI the fps / dropped frames can be erratic so this is a conservative value.
-    # If running on real hardware these should actually be within 2/fps
-    delta = 0.1
-    assert abs(all_to_target_timestamps[0][0]) < delta
-    assert abs(all_to_target_timestamps[0][-1] - 2 * target_duration) < delta
+    # require timestamps to be accurate within 0.5s
+    allowed_error_on_timestamp = 0.5
+    # this is a weak requirement to avoid tests failing on CI where many frames can get dropped
+    # if running tests locally allowed_error_on_timestamp should be ~2/fps
+    assert abs(all_to_target_timestamps[0][0]) < allowed_error_on_timestamp
+    assert (
+        abs(all_to_target_timestamps[0][-1] - 2 * target_duration)
+        < allowed_error_on_timestamp
+    )
     for count, to_target_timestamps in enumerate(all_to_target_timestamps[1:]):
-        assert abs(to_target_timestamps[0] - (count + 2) * target_duration) < delta
-        assert abs(to_target_timestamps[-1] - (count + 3) * target_duration) < delta
+        assert (
+            abs(to_target_timestamps[0] - (count + 2) * target_duration)
+            < allowed_error_on_timestamp
+        )
+        assert (
+            abs(to_target_timestamps[-1] - (count + 3) * target_duration)
+            < allowed_error_on_timestamp
+        )
