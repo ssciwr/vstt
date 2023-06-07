@@ -251,6 +251,7 @@ def _make_stats_drawables(
     # paths to center
     if (
         display_options["to_center_paths"]
+        and conditions["add_central_target"]
         and not conditions["automove_cursor_to_center"]
     ):
         for _, row in stats_df.iterrows():

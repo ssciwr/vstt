@@ -6,6 +6,7 @@ from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
 
 import numpy as np
@@ -87,16 +88,21 @@ class TrialManager:
         self.joystick_point_updater = JoystickPointUpdater(
             trial["cursor_rotation_degrees"], trial["joystick_max_speed"], win.size
         )
-        self.cursor_path = ShapeStim(
-            win, vertices=[(0, 0)], lineColor="white", closeShape=False
+        self._cursor_path = ShapeStim(
+            win, vertices=[(0.0, 0.0)], lineColor="white", closeShape=False
         )
-        self.prev_cursor_path = ShapeStim(
-            win, vertices=[(0, 0)], lineColor="white", closeShape=False
-        )
+        self._cursor_path_vertices: List[Tuple[float, float]] = []
         self.clock = Clock()
         if trial["show_cursor_path"]:
-            self.drawables.append(self.cursor_path)
-            self.drawables.append(self.prev_cursor_path)
+            self.drawables.append(self._cursor_path)
+
+    def cursor_path_add_vertex(
+        self, vertex: Tuple[float, float], clear_existing: bool = False
+    ) -> None:
+        if clear_existing:
+            self._cursor_path_vertices = []
+        self._cursor_path_vertices.append(vertex)
+        self._cursor_path.vertices = self._cursor_path_vertices
 
 
 def _contains_mixed_length_numpy_arrays(items: Iterable) -> bool:
@@ -228,16 +234,12 @@ class MotorTask:
             is_central_target = target_index == trial["num_targets"]
             mouse_times = []
             mouse_positions = []
-            if is_central_target:
-                tm.prev_cursor_path.vertices = tm.cursor_path.vertices
-                tm.cursor_path.vertices = [tm.cursor_path.vertices[-1]]
-            else:
+            if not is_central_target:
                 if trial["automove_cursor_to_center"]:
                     mouse_pos = np.array([0.0, 0.0])
                     self.mouse.setPos(mouse_pos)
                     tm.cursor.setPos(mouse_pos)
-                tm.cursor_path.vertices = [mouse_pos]
-                tm.prev_cursor_path.vertices = [(0, 0)]
+                tm.cursor_path_add_vertex(mouse_pos, clear_existing=True)
                 if not trial["fixed_target_intervals"]:
                     stop_waiting_time = t0 + trial["inter_target_duration"]
                 if stop_waiting_time > t0:
@@ -267,7 +269,7 @@ class MotorTask:
                         if trial["show_cursor"]:
                             tm.cursor.setPos(mouse_pos)
                         if trial["show_cursor_path"]:
-                            tm.cursor_path.vertices = mouse_positions
+                            tm.cursor_path_add_vertex(mouse_pos)
                         should_continue_waiting = (
                             tm.clock.getTime() + minimum_window_for_flip
                             < stop_waiting_time
@@ -309,7 +311,7 @@ class MotorTask:
                 mouse_times.append(tm.clock.getTime())
                 mouse_positions.append(mouse_pos)
                 if trial["show_cursor_path"]:
-                    tm.cursor_path.vertices = mouse_positions
+                    tm.cursor_path_add_vertex(mouse_pos)
                 dist_correct, dist_any = to_target_dists(
                     mouse_pos,
                     tm.targets.xys,
