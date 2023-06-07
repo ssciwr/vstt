@@ -12,7 +12,7 @@ from psychopy.gui.qtgui import ensureQtApp
 from psychopy.visual.window import Window
 from vstt.experiment import Experiment
 from vstt.geom import points_on_circle
-from vstt.stat import stats_dataframe
+from vstt.stats import stats_dataframe
 from vstt.trial import default_trial
 
 # add tests helpers package location to path so tests can import gui_test_utils

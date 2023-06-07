@@ -25,7 +25,7 @@ from vstt.experiment import Experiment
 from vstt.geom import JoystickPointUpdater
 from vstt.geom import PointRotator
 from vstt.geom import to_target_dists
-from vstt.stat import stats_dataframe
+from vstt.stats import stats_dataframe
 
 
 def _get_target_indices(outer_target_index: int, trial: Dict[str, Any]) -> List[int]:

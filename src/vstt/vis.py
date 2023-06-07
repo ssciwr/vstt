@@ -16,10 +16,10 @@ from psychopy.visual.shape import ShapeStim
 from psychopy.visual.textbox2 import TextBox2
 from psychopy.visual.window import Window
 from vstt.geom import points_on_circle
-from vstt.stat import list_dest_stat_label_units
-from vstt.stat import stats_dataframe
-from vstt.types import DisplayOptions
-from vstt.types import Metadata
+from vstt.stats import list_dest_stat_label_units
+from vstt.stats import stats_dataframe
+from vstt.vtypes import DisplayOptions
+from vstt.vtypes import Metadata
 
 colorNames.pop("none")
 colors = list(colorNames.values())

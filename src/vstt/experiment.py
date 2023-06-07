@@ -15,8 +15,8 @@ from vstt.display import default_display_options
 from vstt.display import import_display_options
 from vstt.meta import default_metadata
 from vstt.meta import import_metadata
-from vstt.stat import append_stats_data_to_excel
-from vstt.stat import stats_dataframe
+from vstt.stats import append_stats_data_to_excel
+from vstt.stats import stats_dataframe
 from vstt.trial import default_trial
 from vstt.trial import import_and_validate_trial
 

@@ -7,9 +7,9 @@ from typing import Mapping
 from typing import Type
 from typing import TypeVar
 
-from vstt.types import DisplayOptions
-from vstt.types import Metadata
-from vstt.types import Trial
+from vstt.vtypes import DisplayOptions
+from vstt.vtypes import Metadata
+from vstt.vtypes import Trial
 
 VsttTypedDict = TypeVar(
     "VsttTypedDict",
