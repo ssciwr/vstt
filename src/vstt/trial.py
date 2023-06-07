@@ -16,6 +16,9 @@ from vstt.vtypes import Trial
 def describe_trial(trial: Trial) -> str:
     repeats = f"{trial['weight']} repeat{'s' if trial['weight'] > 1 else ''}"
     targets = f"target{'s' if trial['num_targets'] > 1 else ''}"
+    if trial["condition_timeout"] > 0.0:
+        repeats = f"up to {repeats}"
+        targets = f"{targets} in {trial['condition_timeout']}s"
     return f"{repeats} of {trial['num_targets']} {trial['target_order']} {targets}"
 
 
@@ -26,6 +29,7 @@ def describe_trials(trials: List[Trial]) -> str:
 def default_trial() -> Trial:
     return {
         "weight": 1,
+        "condition_timeout": 0.0,
         "num_targets": 8,
         "target_order": "clockwise",
         "target_indices": "0 1 2 3 4 5 6 7",
@@ -62,6 +66,7 @@ def default_trial() -> Trial:
 def trial_labels() -> Dict:
     return {
         "weight": "Repetitions",
+        "condition_timeout": "Maximum time, 0=unlimited (secs)",
         "num_targets": "Number of targets",
         "target_order": "Target order",
         "target_indices": "Target indices",
@@ -119,6 +124,7 @@ def import_and_validate_trial(trial_or_dict: Mapping[str, Any]) -> Trial:
     trial = import_typed_dict(trial_or_dict, default_trial())
     # make any negative time durations zero
     for duration in [
+        "condition_timeout",
         "target_duration",
         "central_target_duration",
         "inter_target_duration",

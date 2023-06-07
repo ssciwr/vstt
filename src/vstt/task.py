@@ -160,8 +160,41 @@ class MotorTask:
         condition_trial_indices: List[List[int]] = [
             [] for _ in self.trial_handler.trialList
         ]
+        current_condition_index = -1
+        current_condition_first_trial_index = 0
+        current_condition_clock = Clock()
+        current_condition_max_time = 0.0
         for trial in self.trial_handler:
-            self._do_trial(trial, condition_trial_indices)
+            if self.trial_handler.thisIndex != current_condition_index:
+                # starting a new set of conditions
+                current_condition_clock.reset()
+                current_condition_max_time = trial["condition_timeout"]
+                current_condition_index = self.trial_handler.thisIndex
+                current_condition_first_trial_index = self.trial_handler.thisTrialN
+            condition_trial_indices[self.trial_handler.thisIndex].append(
+                self.trial_handler.thisTrialN
+            )
+            if (
+                current_condition_max_time == 0.0
+                or current_condition_clock.getTime() < current_condition_max_time
+            ):
+                # only do the trial if there is still time left for this condition
+                self._do_trial(trial)
+            is_final_trial_of_block = (
+                len(condition_trial_indices[self.trial_handler.thisIndex])
+                == trial["weight"]
+            )
+            if is_final_trial_of_block and trial["post_block_delay"] > 0:
+                vis.display_results(
+                    trial["post_block_delay"],
+                    trial["enter_to_skip_delay"],
+                    trial["show_delay_countdown"],
+                    self.trial_handler if trial["post_block_display_results"] else None,
+                    self.experiment.display_options,
+                    current_condition_first_trial_index,
+                    True,
+                    self.win,
+                )
         if self.win.nDroppedFrames > 0:
             logging.warning(f"Dropped {self.win.nDroppedFrames} frames")
 
@@ -174,26 +207,16 @@ class MotorTask:
             win=self.win,
         )
 
-    def _do_trial(
-        self, trial: Dict[str, Any], condition_trial_indices: List[List[int]]
-    ) -> None:
+    def _do_trial(self, trial: Dict[str, Any]) -> None:
         if trial["use_joystick"] and self.js is None:
             raise RuntimeError("Use joystick option is enabled, but no joystick found.")
         tom = TrialManager(self.win, trial, self.rng)
-        condition_trial_indices[self.trial_handler.thisIndex].append(
-            self.trial_handler.thisTrialN
-        )
-        is_final_trial_of_block = (
-            len(condition_trial_indices[self.trial_handler.thisIndex])
-            == trial["weight"]
-        )
         self.mouse.setPos(tom.cursor.pos)
         self.win.recordFrameIntervals = True
         tom.clock.reset()
         for index in tom.data.target_indices:
             self._do_target(trial, index, tom)
         self.win.recordFrameIntervals = False
-
         if trial["automove_cursor_to_center"]:
             tom.data.to_center_success = [True] * trial["num_targets"]
         add_trial_data_to_trial_handler(tom.data, self.trial_handler)
@@ -206,17 +229,6 @@ class MotorTask:
                 self.experiment.display_options,
                 self.trial_handler.thisTrialN,
                 False,
-                self.win,
-            )
-        if is_final_trial_of_block and trial["post_block_delay"] > 0:
-            vis.display_results(
-                trial["post_block_delay"],
-                trial["enter_to_skip_delay"],
-                trial["show_delay_countdown"],
-                self.trial_handler if trial["post_block_display_results"] else None,
-                self.experiment.display_options,
-                self.trial_handler.thisTrialN,
-                True,
                 self.win,
             )
 
