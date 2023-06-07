@@ -54,14 +54,14 @@ def _get_dat(
 ) -> Any:
     ar = data.get(key)
     if ar is None:
-        logging.warning(
+        logging.debug(
             f"Key '{key}' not found in data, using default value {default_value}"
         )
         return default_value
     try:
         return ar[index][i_target]
     except IndexError:
-        logging.warning(
+        logging.debug(
             f"Index error for key '{key}', index '{index}', i_target '{i_target}', using default value {default_value}"
         )
     return default_value

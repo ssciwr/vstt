@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import logging
 from typing import Any
-from typing import Dict
+from typing import Mapping
 from typing import Type
 from typing import TypeVar
 
@@ -30,7 +30,7 @@ def _has_valid_type(var: Any, correct_type: Type) -> bool:
 
 
 def import_typed_dict(
-    input_dict: Dict, default_typed_dict: VsttTypedDict
+    input_dict: Mapping[str, Any], default_typed_dict: VsttTypedDict
 ) -> VsttTypedDict:
     # start with a valid typed dict with default values
     output_dict = copy.deepcopy(default_typed_dict)

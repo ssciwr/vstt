@@ -18,8 +18,7 @@ from vstt.meta import import_metadata
 from vstt.stat import append_stats_data_to_excel
 from vstt.stat import stats_dataframe
 from vstt.trial import default_trial
-from vstt.trial import import_trial
-from vstt.trial import validate_trial
+from vstt.trial import import_and_validate_trial
 
 
 class Experiment:
@@ -35,8 +34,8 @@ class Experiment:
             self.load_file(filename)
 
     def create_trialhandler(self) -> TrialHandlerExt:
-        for trial in self.trial_list:
-            validate_trial(trial)
+        for index, trial in enumerate(self.trial_list):
+            self.trial_list[index] = import_and_validate_trial(trial)
         return TrialHandlerExt(
             self.trial_list,
             nReps=1,
@@ -147,11 +146,9 @@ class Experiment:
     ) -> None:
         self.metadata = import_metadata(metadata_dict)
         self.display_options = import_display_options(display_options_dict)
-        self.trial_list = []
-        for trial_dict in trial_dict_list:
-            trial = import_trial(trial_dict)
-            validate_trial(trial)
-            self.trial_list.append(trial)
+        self.trial_list = [
+            import_and_validate_trial(trial_dict) for trial_dict in trial_dict_list
+        ]
         self.trial_handler_with_results = None
         self.stats = None
         self.has_unsaved_changes = True
@@ -161,8 +158,8 @@ class Experiment:
         # psychopy trial handler converts empty trial list [] -> [None]
         if trial_handler.trialList == [None]:
             trial_handler.trialList = []
-        for trial in trial_handler.trialList:
-            validate_trial(trial)
+        for index, trial in enumerate(trial_handler.trialList):
+            trial_handler.trialList[index] = import_and_validate_trial(trial)
         self.trial_list = trial_handler.trialList
         if not trial_handler.extraInfo:
             trial_handler.extraInfo = {}
