@@ -31,7 +31,7 @@ def test_describe_trials() -> None:
 
 def test_default_trial() -> None:
     trial = vstt.trial.default_trial()
-    assert len(trial) == 30
+    assert len(trial) == len(vstt.trial.trial_labels())
     assert isinstance(trial["target_indices"], str)
     assert len(trial["target_indices"].split(" ")) == trial["num_targets"]
 
@@ -55,6 +55,7 @@ def test_import_trial() -> None:
         "target_labels": "0 1 2 3 4 5",
         "fixed_target_intervals": False,
         "target_duration": 3,
+        "central_target_duration": 3,
         "inter_target_duration": 0,
         "target_distance": 0.3,
         "target_size": 0.03,
@@ -78,7 +79,7 @@ def test_import_trial() -> None:
         "enter_to_skip_delay": True,
     }
     # all valid keys are imported
-    trial = vstt.trial.import_trial(trial_dict)
+    trial = vstt.trial.import_and_validate_trial(trial_dict)
     for key in trial:
         assert trial[key] == trial_dict[key]  # type: ignore
     # if any keys are missing, default values are used instead
@@ -93,7 +94,7 @@ def test_import_trial() -> None:
     # unknown keys are ignored
     trial_dict["unknown_key1"] = "ignore me"
     trial_dict["unknown_key2"] = False
-    trial = vstt.trial.import_trial(trial_dict)
+    trial = vstt.trial.import_and_validate_trial(trial_dict)
     for key in trial:
         if key in missing_keys:
             assert trial[key] == default_trial[key]  # type: ignore
@@ -105,21 +106,25 @@ def test_validate_trial_durations() -> None:
     trial = vstt.trial.default_trial()
     # positive durations are not modified
     trial["target_duration"] = 1
+    trial["central_target_duration"] = 1
     trial["inter_target_duration"] = 0.1
     trial["post_trial_delay"] = 0.2
     trial["post_block_delay"] = 0.7
-    vtrial = vstt.trial.validate_trial(trial)
+    vtrial = vstt.trial.import_and_validate_trial(trial)
     assert vtrial["target_duration"] == 1
+    assert vtrial["central_target_duration"] == 1
     assert vtrial["inter_target_duration"] == 0.1
     assert vtrial["post_trial_delay"] == 0.2
     assert vtrial["post_block_delay"] == 0.7
     # negative durations are cast to zero
     trial["target_duration"] = -1
+    trial["central_target_duration"] = -0.8
     trial["inter_target_duration"] = -0.1
     trial["post_trial_delay"] = -0.2
     trial["post_block_delay"] = -0.7
-    vtrial = vstt.trial.validate_trial(trial)
+    vtrial = vstt.trial.import_and_validate_trial(trial)
     assert vtrial["target_duration"] == 0
+    assert vtrial["central_target_duration"] == 0
     assert vtrial["inter_target_duration"] == 0
     assert vtrial["post_trial_delay"] == 0
     assert vtrial["post_block_delay"] == 0
@@ -130,28 +135,28 @@ def test_validate_trial_target_order() -> None:
     assert isinstance(trial["target_indices"], str)
     # clockwise
     trial["target_order"] = "clockwise"
-    vtrial = vstt.trial.validate_trial(trial)
+    vtrial = vstt.trial.import_and_validate_trial(trial)
     assert isinstance(vtrial["target_indices"], str)
     assert vtrial["target_indices"] == "0 1 2 3 4 5 6 7"
     # anti-clockwise
     trial["target_order"] = "anti-clockwise"
-    vtrial = vstt.trial.validate_trial(trial)
+    vtrial = vstt.trial.import_and_validate_trial(trial)
     assert isinstance(vtrial["target_indices"], str)
     assert vtrial["target_indices"] == "7 6 5 4 3 2 1 0"
     # random
     trial["target_order"] = "random"
-    vtrial = vstt.trial.validate_trial(trial)
+    vtrial = vstt.trial.import_and_validate_trial(trial)
     assert isinstance(vtrial["target_indices"], str)
     assert len(set(vtrial["target_indices"].split(" "))) == 8
     # fixed & valid
     trial["target_order"] = "fixed"
     trial["target_indices"] = "0 1 2 3 4 5 6 7"
-    vtrial = vstt.trial.validate_trial(trial)
+    vtrial = vstt.trial.import_and_validate_trial(trial)
     assert isinstance(vtrial["target_indices"], str)
     assert vtrial["target_indices"] == "0 1 2 3 4 5 6 7"
     # fixed & invalid - clipped to nearest valid indices
     trial["target_order"] = "fixed"
     trial["target_indices"] = "-2 8 1 5 12 -5"
-    vtrial = vstt.trial.validate_trial(trial)
+    vtrial = vstt.trial.import_and_validate_trial(trial)
     assert isinstance(vtrial["target_indices"], str)
     assert vtrial["target_indices"] == "0 7 1 5 7 0"

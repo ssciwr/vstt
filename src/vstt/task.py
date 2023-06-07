@@ -294,7 +294,10 @@ class MotorTask:
             if is_central_target:
                 target_size = trial["central_target_size"]
             if not trial["fixed_target_intervals"]:
-                stop_target_time = t0 + trial["target_duration"]
+                if is_central_target:
+                    stop_target_time = t0 + trial["central_target_duration"]
+                else:
+                    stop_target_time = t0 + trial["target_duration"]
             dist_correct = 1.0
             # ensure we get at least one flip
             should_continue_target = True

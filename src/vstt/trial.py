@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import copy
+from typing import Any
 from typing import Dict
 from typing import List
+from typing import Mapping
 from typing import Optional
 
 import numpy as np
@@ -32,6 +34,7 @@ def default_trial() -> Trial:
         "target_labels": "0 1 2 3 4 5 6 7",
         "fixed_target_intervals": False,
         "target_duration": 5.0,
+        "central_target_duration": 5.0,
         "inter_target_duration": 1.0,
         "target_distance": 0.4,
         "target_size": 0.04,
@@ -67,6 +70,7 @@ def trial_labels() -> Dict:
         "target_labels": "Target labels",
         "fixed_target_intervals": "Fixed target display intervals",
         "target_duration": "Target display duration (secs)",
+        "central_target_duration": "Central target display duration (secs)",
         "inter_target_duration": "Delay between targets (secs)",
         "target_distance": "Distance to targets (screen height fraction)",
         "target_size": "Target size (screen height fraction)",
@@ -108,17 +112,15 @@ def get_trial_from_user(
     )
     if not dialog.OK:
         return None
-    return validate_trial(trial)
+    return import_and_validate_trial(trial)
 
 
-def import_trial(trial_dict: dict) -> Trial:
-    return import_typed_dict(trial_dict, default_trial())
-
-
-def validate_trial(trial: Trial) -> Trial:
+def import_and_validate_trial(trial_or_dict: Mapping[str, Any]) -> Trial:
+    trial = import_typed_dict(trial_or_dict, default_trial())
     # make any negative time durations zero
     for duration in [
         "target_duration",
+        "central_target_duration",
         "inter_target_duration",
         "post_trial_delay",
         "post_block_delay",

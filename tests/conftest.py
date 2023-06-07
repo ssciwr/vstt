@@ -73,7 +73,8 @@ def experiment_no_results() -> Experiment:
     trial0 = default_trial()
     trial0["num_targets"] = 4
     trial0["play_sound"] = False
-    trial0["target_duration"] = 30.0
+    trial0["target_duration"] = 60.0
+    trial0["central_target_duration"] = 60.0
     trial0["inter_target_duration"] = 0.0
     trial0["post_block_display_results"] = False
     trial0["post_block_delay"] = 0.1
@@ -95,7 +96,7 @@ def experiment_with_results() -> Experiment:
     experiment = Experiment()
     # trial without auto-move to center, 3 reps, 8 targets
     trial0 = default_trial()
-    # disable sounds due to issues with sounds within tests on linux
+    # disable sounds due to issues with sounds within tests on linux CI
     trial0["play_sound"] = False
     trial0["weight"] = 3
     trial0["automove_cursor_to_center"] = False
@@ -114,7 +115,9 @@ def experiment_with_results() -> Experiment:
     trial_handler = experiment.create_trialhandler()
     for trial in trial_handler:
         to_target_timestamps = []
+        to_target_num_timestamps_before_visible = []
         to_center_timestamps = []
+        to_center_num_timestamps_before_visible = []
         to_target_mouse_positions = []
         to_center_mouse_positions = []
         to_target_success = []
@@ -125,6 +128,7 @@ def experiment_with_results() -> Experiment:
         t0 = 0.0
         for pos in target_pos:
             to_target_timestamps.append(make_timestamps(t0))
+            to_target_num_timestamps_before_visible.append(0)
             to_target_mouse_positions.append(
                 make_mouse_positions(pos, to_target_timestamps[-1])
             )
@@ -132,6 +136,7 @@ def experiment_with_results() -> Experiment:
             t0 = to_target_timestamps[-1][-1] + 1.0 / 60.0
             if not trial["automove_cursor_to_center"]:
                 to_center_timestamps.append(make_timestamps(t0))
+                to_center_num_timestamps_before_visible.append(0)
                 to_center_mouse_positions.append(
                     list(reversed(make_mouse_positions(pos, to_center_timestamps[-1])))
                 )
@@ -141,6 +146,10 @@ def experiment_with_results() -> Experiment:
         trial_handler.addData("target_pos", np.array(target_pos))
         trial_handler.addData(
             "to_target_timestamps", np.array(to_target_timestamps, dtype=object)
+        )
+        trial_handler.addData(
+            "to_target_num_timestamps_before_visible",
+            np.array(to_target_num_timestamps_before_visible),
         )
         trial_handler.addData(
             "to_target_mouse_positions",
@@ -153,6 +162,10 @@ def experiment_with_results() -> Experiment:
         trial_handler.addData(
             "to_center_mouse_positions",
             np.array(to_center_mouse_positions, dtype=object),
+        )
+        trial_handler.addData(
+            "to_center_num_timestamps_before_visible",
+            np.array(to_target_num_timestamps_before_visible),
         )
         if trial["automove_cursor_to_center"]:
             to_center_success = [True] * trial["num_targets"]

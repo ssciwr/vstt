@@ -20,6 +20,7 @@ class Trial(TypedDict):
     target_labels: str
     fixed_target_intervals: bool
     target_duration: float
+    central_target_duration: float
     inter_target_duration: float
     target_distance: float
     target_size: float
