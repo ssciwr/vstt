@@ -5,7 +5,7 @@ from typing import Dict
 import vstt
 
 
-def default_display_options() -> vstt.types.DisplayOptions:
+def default_display_options() -> vstt.vtypes.DisplayOptions:
     return {
         "to_target_paths": True,
         "to_center_paths": False,
@@ -45,7 +45,7 @@ def display_options_labels() -> Dict[str, str]:
     }
 
 
-def import_display_options(display_options_dict: dict) -> vstt.types.DisplayOptions:
+def import_display_options(display_options_dict: dict) -> vstt.vtypes.DisplayOptions:
     return vstt.common.import_typed_dict(
         display_options_dict, default_display_options()
     )

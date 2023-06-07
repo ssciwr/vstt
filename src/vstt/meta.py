@@ -5,7 +5,7 @@ from typing import Dict
 import vstt
 
 
-def default_metadata() -> vstt.types.Metadata:
+def default_metadata() -> vstt.vtypes.Metadata:
     return {
         "name": "Experiment",
         "subject": "Joe Smith",
@@ -41,5 +41,5 @@ def metadata_labels() -> Dict:
     }
 
 
-def import_metadata(metadata_dict: dict) -> vstt.types.Metadata:
+def import_metadata(metadata_dict: dict) -> vstt.vtypes.Metadata:
     return vstt.common.import_typed_dict(metadata_dict, default_metadata())

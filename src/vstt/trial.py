@@ -10,7 +10,7 @@ from typing import Optional
 import numpy as np
 from psychopy.gui import DlgFromDict
 from vstt.common import import_typed_dict
-from vstt.types import Trial
+from vstt.vtypes import Trial
 
 
 def describe_trial(trial: Trial) -> str:

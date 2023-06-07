@@ -14,9 +14,9 @@ API Reference
    #vstt.gui
    vstt.meta
    #vstt.meta_widget
-   vstt.stat
+   vstt.stats
    vstt.task
    vstt.trial
    #vstt.trials_widget
-   vstt.types
+   vstt.vtypes
    vstt.vis
