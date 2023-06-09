@@ -210,16 +210,21 @@ class MotorTask:
     def _do_trial(self, trial: Dict[str, Any]) -> None:
         if trial["use_joystick"] and self.js is None:
             raise RuntimeError("Use joystick option is enabled, but no joystick found.")
-        tom = TrialManager(self.win, trial, self.rng)
-        self.mouse.setPos(tom.cursor.pos)
+        tm = TrialManager(self.win, trial, self.rng)
+        self.mouse.setPos(tm.cursor.pos)
         self.win.recordFrameIntervals = True
-        tom.clock.reset()
-        for index in tom.data.target_indices:
-            self._do_target(trial, index, tom)
+        tm.clock.reset()
+        vis.update_target_colors(tm.targets, trial["show_inactive_targets"], None)
+        if trial["show_target_labels"]:
+            vis.update_target_label_colors(
+                tm.target_labels, trial["show_inactive_targets"], None
+            )
+        for index in tm.data.target_indices:
+            self._do_target(trial, index, tm)
         self.win.recordFrameIntervals = False
         if trial["automove_cursor_to_center"]:
-            tom.data.to_center_success = [True] * trial["num_targets"]
-        add_trial_data_to_trial_handler(tom.data, self.trial_handler)
+            tm.data.to_center_success = [True] * trial["num_targets"]
+        add_trial_data_to_trial_handler(tm.data, self.trial_handler)
         if trial["post_trial_delay"] > 0:
             vis.display_results(
                 trial["post_trial_delay"],
@@ -255,14 +260,14 @@ class MotorTask:
                 if not trial["fixed_target_intervals"]:
                     stop_waiting_time = t0 + trial["inter_target_duration"]
                 if stop_waiting_time > t0:
-                    # no target displayed
-                    vis.update_target_colors(
-                        tm.targets, trial["show_inactive_targets"], None
-                    )
-                    if trial["show_target_labels"]:
-                        vis.update_target_label_colors(
-                            tm.target_labels, trial["show_inactive_targets"], None
+                    if trial["hide_target_when_reached"]:
+                        vis.update_target_colors(
+                            tm.targets, trial["show_inactive_targets"], None
                         )
+                        if trial["show_target_labels"]:
+                            vis.update_target_label_colors(
+                                tm.target_labels, trial["show_inactive_targets"], None
+                            )
                     # ensure we get at least a single flip
                     should_continue_waiting = True
                     while should_continue_waiting:
