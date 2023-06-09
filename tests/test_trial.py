@@ -53,6 +53,7 @@ def test_import_trial() -> None:
         "target_indices": "0 1 2 3 4 5",
         "add_central_target": True,
         "show_target_labels": False,
+        "hide_target_when_reached": True,
         "target_labels": "0 1 2 3 4 5",
         "fixed_target_intervals": False,
         "target_duration": 3,
