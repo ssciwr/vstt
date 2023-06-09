@@ -47,25 +47,10 @@ Conditions can be added, re-ordered, edited and removed using the buttons below 
    The list of conditions used in the trial.
 
 To edit a trial, either click "Edit" or double click on the trial.
-This will then open a dialog box where the trial parameters can be adjusted.
+This will then open a dialog box where the trial conditions can be adjusted.
 When you are finished, click "OK".
 
 .. figure:: images/trial-screen.png
-   :alt: trial settings dialog
+   :alt: trial conditions dialog
 
-   Dialog to edit the settings for a trial.
-
-Notes on trial settings:
-
-* ``Target indices``
-   * if ``Target order`` is ``fixed`` then this lists the targets in the order to be displayed
-   * targets are numbered clockwise starting from 0 at the top of the circle
-   * note: if ``Target order`` is not ``fixed`` these indices are ignored
-* ``Fixed target display intervals``
-   * if enabled
-      * the next (outer) target is displayed every ``Target display duration`` seconds
-      * this happens regardless of what the user does
-      * the ``Delay between targets`` setting is ignored in this case
-   * if disabled
-      * all targets are displayed until either the user reaches them or ``Target display duration`` seconds elapse
-      * then there is a pause of ``Delay between targets`` seconds before each (outer) target is displayed
+   Dialog to edit the conditions for a trial.

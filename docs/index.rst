@@ -13,6 +13,7 @@ Visuomotor Serial Targeting Task (VSTT)
 .. toctree::
    :caption: Reference information
 
+   reference/trial-conditions
    reference/statistics
    reference/framerate
 

@@ -34,8 +34,8 @@ def default_trial() -> Trial:
         "target_order": "clockwise",
         "target_indices": "0 1 2 3 4 5 6 7",
         "add_central_target": True,
-        "show_target_labels": False,
         "hide_target_when_reached": True,
+        "show_target_labels": False,
         "target_labels": "0 1 2 3 4 5 6 7",
         "fixed_target_intervals": False,
         "target_duration": 5.0,
@@ -72,8 +72,8 @@ def trial_labels() -> Dict:
         "target_order": "Target order",
         "target_indices": "Target indices",
         "add_central_target": "Add a central target",
-        "show_target_labels": "Display target labels",
         "hide_target_when_reached": "Hide target when reached",
+        "show_target_labels": "Display target labels",
         "target_labels": "Target labels",
         "fixed_target_intervals": "Fixed target display intervals",
         "target_duration": "Target display duration (secs)",
@@ -96,7 +96,7 @@ def trial_labels() -> Dict:
         "post_trial_delay": "Delay between trials (secs)",
         "post_trial_display_results": "Display results after each trial",
         "post_block_delay": "Delay after last trial (secs)",
-        "post_block_display_results": "Display results after this block",
+        "post_block_display_results": "Display combined results after last trial",
         "show_delay_countdown": "Display a countdown during delays",
         "enter_to_skip_delay": "Skip delay by pressing enter key",
     }
@@ -115,7 +115,7 @@ def get_trial_from_user(
             order_of_targets.append(target_order)
     trial["target_order"] = order_of_targets
     dialog = DlgFromDict(
-        trial, title="Trial settings", labels=trial_labels(), sortKeys=False
+        trial, title="Trial conditions", labels=trial_labels(), sortKeys=False
     )
     if not dialog.OK:
         return None
