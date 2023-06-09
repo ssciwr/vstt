@@ -27,4 +27,5 @@ Visuomotor Serial Targeting Task (VSTT)
    :caption: Developer documentation
 
    developer/install
+   developer/forwards-compatibility
    developer/api
