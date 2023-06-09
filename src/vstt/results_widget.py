@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from typing import List
 from typing import Optional
 
+import numpy as np
 from psychopy.visual.window import Window
 from PyQt5 import QtWidgets
 from vstt.experiment import Experiment
@@ -21,6 +23,7 @@ class ResultsWidget(QtWidgets.QWidget):
         outer_layout.addWidget(group_box)
         inner_layout = QtWidgets.QGridLayout()
         group_box.setLayout(inner_layout)
+        self._list_trial_row_to_trial_index: List[int] = []
         self._list_trials = QtWidgets.QListWidget()
         self._list_trials.currentRowChanged.connect(self._row_changed)
         self._list_trials.itemDoubleClicked.connect(self._btn_display_trial_clicked)
@@ -62,7 +65,7 @@ class ResultsWidget(QtWidgets.QWidget):
             False,
             self._experiment.trial_handler_with_results,
             self._experiment.display_options,
-            row,
+            self._list_trial_row_to_trial_index[row],
             all_trials_for_this_condition,
             win=self._win,
         )
@@ -80,14 +83,20 @@ class ResultsWidget(QtWidgets.QWidget):
     @experiment.setter
     def experiment(self, experiment: Experiment) -> None:
         self._list_trials.clear()
+        self._list_trial_row_to_trial_index.clear()
         self._experiment = experiment
-        if experiment.trial_handler_with_results is None:
+        trial_handler = experiment.trial_handler_with_results
+        if trial_handler is None:
             return
         # assume 1 repetition of experiment
         rep_index = 0
-        for trial_index, condition_index in enumerate(
-            experiment.trial_handler_with_results.sequenceIndices
-        ):
-            self._list_trials.addItem(
-                f"Trial {trial_index} [Condition {condition_index[rep_index]}]"
-            )
+        for trial_index, condition_index in enumerate(trial_handler.sequenceIndices):
+            # trials that have no data have a default string instead of a numpy array
+            if (
+                type(trial_handler.data["target_indices"][(trial_index, rep_index)])
+                is np.ndarray
+            ):
+                self._list_trials.addItem(
+                    f"Trial {trial_index} [Condition {condition_index[rep_index]}]"
+                )
+                self._list_trial_row_to_trial_index.append(trial_index)

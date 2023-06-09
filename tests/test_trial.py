@@ -47,6 +47,7 @@ def test_import_trial() -> None:
     default_trial = vstt.trial.default_trial()
     trial_dict = {
         "weight": 2,
+        "condition_timeout": 0,
         "num_targets": 6,
         "target_order": "clockwise",
         "target_indices": "0 1 2 3 4 5",
@@ -78,6 +79,9 @@ def test_import_trial() -> None:
         "show_delay_countdown": False,
         "enter_to_skip_delay": True,
     }
+    # start with a dict containing valid values for all keys
+    for key in default_trial:
+        assert key in trial_dict
     # all valid keys are imported
     trial = vstt.trial.import_and_validate_trial(trial_dict)
     for key in trial:

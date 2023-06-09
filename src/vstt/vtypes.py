@@ -12,6 +12,7 @@ else:
 
 class Trial(TypedDict):
     weight: int
+    condition_timeout: float
     num_targets: int
     target_order: Union[str, List]
     target_indices: str

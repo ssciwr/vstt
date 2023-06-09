@@ -21,7 +21,7 @@ def _get_latest_pypi_version() -> version.Version:
 
 def check_for_new_version() -> Tuple[bool, str]:
     try:
-        current_version = version.parse(vstt.__version__)
+        current_version = version.Version(vstt.__version__)
         logging.info(f"Current version: {current_version}")
         latest_version = _get_latest_pypi_version()
         logging.info(f"Latest version: {latest_version}")

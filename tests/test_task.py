@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+from copy import deepcopy
 from time import sleep
 from typing import Dict
 from typing import List
@@ -215,3 +216,40 @@ def test_task_fixed_intervals_no_user_input(window: Window) -> None:
             abs(to_target_timestamps[-1] - (count + 3) * target_duration)
             < allowed_error_on_timestamp
         )
+
+
+def test_task_condition_timeout_no_user_input(window: Window) -> None:
+    # 4 seconds condition timeout where each trial has 1 target which is displayed for up to 2.1 seconds
+    # trial runs as long as it starts within the timeout -> should get 2 trials
+    experiment = Experiment()
+    experiment.metadata["display_duration"] = 0.0
+    trial1 = vstt.trial.default_trial()
+    trial1["weight"] = 100
+    trial1["condition_timeout"] = 4.0
+    trial1["num_targets"] = 1
+    trial1["target_duration"] = 2.1
+    trial1["inter_target_duration"] = 0.0
+    trial1["add_central_target"] = False
+    trial1["automove_cursor_to_center"] = False
+    trial1["freeze_cursor_between_targets"] = False
+    trial1["post_block_delay"] = 0.0
+    trial1["play_sound"] = False
+    # then a second copy but with 3 targets, each for 0.4 seconds, and a 1-second condition timeout -> single trial
+    trial2 = deepcopy(trial1)
+    trial2["condition_timeout"] = 1.0
+    trial2["num_targets"] = 3
+    trial2["target_duration"] = 0.4
+    experiment.trial_list = [trial1, trial2]
+    assert experiment.trial_handler_with_results is None
+    task = vstt.task.MotorTask(experiment, window)
+    # run task without moving mouse, which will stay in center for entire experiment
+    assert task.run() is True
+    # task ran successfully, updated experiment with results
+    assert experiment.has_unsaved_changes is True
+    assert experiment.trial_handler_with_results is not None
+    # we should get exactly 3 trials (as long as first flip on first trial has <4sec delay!)
+    assert len(experiment.stats.i_trial.unique()) == 3
+    # first two trials have 1 target, last trial has 3 targets -> 5 targets total
+    assert len(experiment.stats.to_target_success) == 5
+    # all targets should have been missed
+    assert np.all(~experiment.stats.to_target_success)
