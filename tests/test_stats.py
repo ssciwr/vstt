@@ -38,7 +38,7 @@ def test_data_df(experiment_with_results: Experiment) -> None:
 
 def test_stats_df(experiment_with_results: Experiment) -> None:
     df = vstt.stats.stats_dataframe(experiment_with_results.trial_handler_with_results)
-    assert np.alltrue(np.isnan(df.loc[df.condition_index == 1]["to_center_time"]))
+    assert np.all(np.isnan(df.loc[df.condition_index == 1]["to_center_time"]))
     for destination, stat_label_units in vstt.stats.list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             assert stat in df.columns
