@@ -21,6 +21,8 @@ def default_display_options() -> vstt.vtypes.DisplayOptions:
         "to_center_distance": False,
         "to_target_rmse": True,
         "to_center_rmse": False,
+        "to_target_success": False,
+        "to_center_success": False,
         "averages": True,
     }
 
@@ -41,6 +43,8 @@ def display_options_labels() -> Dict[str, str]:
         "to_center_distance": "Statistic: movement distance to center",
         "to_target_rmse": "Statistic: RMSE movement to target",
         "to_center_rmse": "Statistic: RMSE movement to center",
+        "to_target_success": "Statistic: successful movement to target",
+        "to_center_success": "Statistic: successful movement to center",
         "averages": "Also show statistics averaged over all targets",
     }
 

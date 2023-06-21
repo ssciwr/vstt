@@ -23,6 +23,7 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
             ("time", "Time", "s"),
             ("distance", "Distance", ""),
             ("rmse", "RMSE", ""),
+            ("success", "Success", ""),
         ]:
             stats.append((f"to_{destination}_{base_stat}", label, unit))
         list_dest_stats.append((destination, stats))
