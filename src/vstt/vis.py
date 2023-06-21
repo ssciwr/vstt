@@ -147,14 +147,24 @@ def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             if display_options.get(stat, False):  # type: ignore
-                if (stat == "to_target_success" or stat == "to_center_success") and "to_target_success_trial" not in stats:
+                if (
+                    stat == "to_target_success" or stat == "to_center_success"
+                ) and "to_target_success_trial" not in stats:
                     fraction = extend_fraction(stats[stat], stats["target_number"])
                     txt_stats += f"{label} (to {destination}): {fraction}\n"
-                elif (stat == "to_target_success" or stat == "to_center_success") and "to_target_success_trial" in stats:
-                    trial_fraction = extend_fraction(stats["to_target_success_trial"], stats["block_number"])
-                    txt_stats += f"{label} (to {destination}) in block: {trial_fraction}\n"
+                elif (
+                    stat == "to_target_success" or stat == "to_center_success"
+                ) and "to_target_success_trial" in stats:
+                    trial_fraction = extend_fraction(
+                        stats["to_target_success_trial"], stats["block_number"]
+                    )
+                    txt_stats += (
+                        f"{label} (to {destination}) in block: {trial_fraction}\n"
+                    )
                 else:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                    txt_stats += (
+                        f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                    )
     return txt_stats
 
 
@@ -200,14 +210,23 @@ def _make_stats_drawables(
     stats_df.to_center_success = stats_df.to_center_success.astype(int)
 
     # update the values of to_target_success and to_center_success to the success fraction, add target_number
-    filtered_df = stats_df[(stats_df.condition_index == i_condition) & (stats_df.i_trial == trial_indices[0])] \
-        if not len(trial_indices) > 1 else stats_df
-    to_target_success_fraction = sum(filtered_df.to_target_success) / len(filtered_df.to_target_success)
-    to_center_success_fraction = sum(filtered_df.to_center_success) / len(filtered_df.to_center_success)
+    filtered_df = (
+        stats_df[
+            (stats_df.condition_index == i_condition)
+            & (stats_df.i_trial == trial_indices[0])
+        ]
+        if not len(trial_indices) > 1
+        else stats_df
+    )
+    to_target_success_fraction = sum(filtered_df.to_target_success) / len(
+        filtered_df.to_target_success
+    )
+    to_center_success_fraction = sum(filtered_df.to_center_success) / len(
+        filtered_df.to_center_success
+    )
     stats_df["to_target_success"] = to_target_success_fraction
     stats_df["to_center_success"] = to_center_success_fraction
     stats_df["target_number"] = len(filtered_df.to_target_success)
-
 
     for _, row in (
         stats_df.groupby("target_index", as_index=False)
@@ -332,11 +351,13 @@ def display_results(
             to_target_success_trial = 0
             trial_indices = stats_df["i_trial"].unique()
             for trial_index in trial_indices:
-                data = stats_df.loc[stats_df.i_trial==trial_index]
+                data = stats_df.loc[stats_df.i_trial == trial_index]
                 false_number = (~data["to_target_success"]).values.sum()
                 if not false_number:
                     to_target_success_trial += 1
-            to_target_success_trial_fraction = to_target_success_trial / len(trial_indices)
+            to_target_success_trial_fraction = to_target_success_trial / len(
+                trial_indices
+            )
             stats_df["to_target_success_trial"] = to_target_success_trial_fraction
             stats_df["block_number"] = len(trial_indices)
         else:
