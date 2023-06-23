@@ -54,7 +54,7 @@ the screen height (i.e. a line of length 1.0 in these units would extend from th
    * Default: ``5.0``
 * Delay between targets (secs)
    * The delay before each outer target is displayed
-   * Default: ``1.0``
+   * Default: ``0.0``
 * Distance to targets (screen height fraction)
    * The distance from the centre of the screen to the outer targets
    * Default: ``0.4``
@@ -94,10 +94,10 @@ the screen height (i.e. a line of length 1.0 in these units would extend from th
    * Default: ``enabled``
 * Automatically move cursor to center
    * Enable to automatically move the cursor to the center after reaching an outer target
-   * Default: ``enabled``
+   * Default: ``disabled``
 * Freeze cursor until target is displayed
    * Enable to freeze the cursor until a target is displayed
-   * Default: ``enabled``
+   * Default: ``disabled``
 * Cursor rotation (degrees)
    * Rotate the cursor direction anticlockwise by this number of degrees
    * Default: ``0.0``
@@ -109,7 +109,7 @@ the screen height (i.e. a line of length 1.0 in these units would extend from th
    * Default: ``disabled``
 * Delay after last trial (secs)
    * How long to wait after the last trial with these trial conditions
-   * Default: ``0.0``
+   * Default: ``10.0``
 * Display combined results after last trial
    * Enable to display combined results for these trial conditions after the last trial
    * Default: ``enabled``
