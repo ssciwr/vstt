@@ -58,7 +58,8 @@ def test_import_trial() -> None:
         "fixed_target_intervals": False,
         "target_duration": 3,
         "central_target_duration": 3,
-        "inter_target_duration": 0,
+        "pre_target_delay": 0,
+        "pre_central_target_delay": 0,
         "target_distance": 0.3,
         "target_size": 0.03,
         "central_target_size": 0.01,
@@ -112,25 +113,29 @@ def test_validate_trial_durations() -> None:
     # positive durations are not modified
     trial["target_duration"] = 1
     trial["central_target_duration"] = 1
-    trial["inter_target_duration"] = 0.1
+    trial["pre_target_delay"] = 0.1
+    trial["pre_central_target_delay"] = 0.087
     trial["post_trial_delay"] = 0.2
     trial["post_block_delay"] = 0.7
     vtrial = vstt.trial.import_and_validate_trial(trial)
     assert vtrial["target_duration"] == 1
     assert vtrial["central_target_duration"] == 1
-    assert vtrial["inter_target_duration"] == 0.1
+    assert vtrial["pre_target_delay"] == 0.1
+    assert vtrial["pre_central_target_delay"] == 0.087
     assert vtrial["post_trial_delay"] == 0.2
     assert vtrial["post_block_delay"] == 0.7
     # negative durations are cast to zero
     trial["target_duration"] = -1
     trial["central_target_duration"] = -0.8
-    trial["inter_target_duration"] = -0.1
+    trial["pre_target_delay"] = -0.1
+    trial["pre_central_target_delay"] = -0.087
     trial["post_trial_delay"] = -0.2
     trial["post_block_delay"] = -0.7
     vtrial = vstt.trial.import_and_validate_trial(trial)
     assert vtrial["target_duration"] == 0
     assert vtrial["central_target_duration"] == 0
-    assert vtrial["inter_target_duration"] == 0
+    assert vtrial["pre_target_delay"] == 0
+    assert vtrial["pre_central_target_delay"] == 0
     assert vtrial["post_trial_delay"] == 0
     assert vtrial["post_block_delay"] == 0
 

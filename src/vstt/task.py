@@ -271,46 +271,50 @@ class MotorTask:
             is_central_target = target_index == trial["num_targets"]
             mouse_times = []
             mouse_positions = []
+            # current target is not yet displayed
             if not is_central_target:
                 if trial["automove_cursor_to_center"]:
                     mouse_pos = np.array([0.0, 0.0])
                     self.mouse.setPos(mouse_pos)
                     tm.cursor.setPos(mouse_pos)
                 tm.cursor_path_add_vertex(mouse_pos, clear_existing=True)
-                if not trial["fixed_target_intervals"]:
-                    stop_waiting_time = t0 + trial["inter_target_duration"]
-                if stop_waiting_time > t0:
-                    if trial["hide_target_when_reached"]:
-                        vis.update_target_colors(
-                            tm.targets, trial["show_inactive_targets"], None
+            if not trial["fixed_target_intervals"]:
+                if is_central_target:
+                    pre_target_delay = trial["pre_central_target_delay"]
+                else:
+                    pre_target_delay = trial["pre_target_delay"]
+                stop_waiting_time = t0 + pre_target_delay
+            if stop_waiting_time > t0:
+                if trial["hide_target_when_reached"]:
+                    vis.update_target_colors(
+                        tm.targets, trial["show_inactive_targets"], None
+                    )
+                    if trial["show_target_labels"] and tm.target_labels is not None:
+                        vis.update_target_label_colors(
+                            tm.target_labels, trial["show_inactive_targets"], None
                         )
-                        if trial["show_target_labels"] and tm.target_labels is not None:
-                            vis.update_target_label_colors(
-                                tm.target_labels, trial["show_inactive_targets"], None
+                # ensure we get at least a single flip
+                should_continue_waiting = True
+                while should_continue_waiting:
+                    if trial["freeze_cursor_between_targets"]:
+                        self.mouse.setPos(mouse_pos)
+                    vis.draw_and_flip(self.win, tm.drawables, self.kb)
+                    if not trial["freeze_cursor_between_targets"]:
+                        if trial["use_joystick"]:
+                            mouse_pos = tm.joystick_point_updater(
+                                mouse_pos, (self.js.getX(), self.js.getY())  # type: ignore
                             )
-                    # ensure we get at least a single flip
-                    should_continue_waiting = True
-                    while should_continue_waiting:
-                        if trial["freeze_cursor_between_targets"]:
-                            self.mouse.setPos(mouse_pos)
-                        vis.draw_and_flip(self.win, tm.drawables, self.kb)
-                        if not trial["freeze_cursor_between_targets"]:
-                            if trial["use_joystick"]:
-                                mouse_pos = tm.joystick_point_updater(
-                                    mouse_pos, (self.js.getX(), self.js.getY())  # type: ignore
-                                )
-                            else:
-                                mouse_pos = tm.point_rotator(self.mouse.getPos())
-                        mouse_times.append(tm.clock.getTime())
-                        mouse_positions.append(mouse_pos)
-                        if trial["show_cursor"]:
-                            tm.cursor.setPos(mouse_pos)
-                        if trial["show_cursor_path"]:
-                            tm.cursor_path_add_vertex(mouse_pos)
-                        should_continue_waiting = (
-                            tm.clock.getTime() + minimum_window_for_flip
-                            < stop_waiting_time
-                        )
+                        else:
+                            mouse_pos = tm.point_rotator(self.mouse.getPos())
+                    mouse_times.append(tm.clock.getTime())
+                    mouse_positions.append(mouse_pos)
+                    if trial["show_cursor"]:
+                        tm.cursor.setPos(mouse_pos)
+                    if trial["show_cursor_path"]:
+                        tm.cursor_path_add_vertex(mouse_pos)
+                    should_continue_waiting = (
+                        tm.clock.getTime() + minimum_window_for_flip < stop_waiting_time
+                    )
             # display current target
             t0 = tm.clock.getTime()
             vis.update_target_colors(

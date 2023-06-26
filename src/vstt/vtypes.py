@@ -23,7 +23,8 @@ class Trial(TypedDict):
     fixed_target_intervals: bool
     target_duration: float
     central_target_duration: float
-    inter_target_duration: float
+    pre_target_delay: float
+    pre_central_target_delay: float
     target_distance: float
     target_size: float
     central_target_size: float

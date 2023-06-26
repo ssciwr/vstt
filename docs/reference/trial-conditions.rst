@@ -52,8 +52,11 @@ the screen height (i.e. a line of length 1.0 in these units would extend from th
 * Central target display duration (secs)
    * How long each central target should be displayed for
    * Default: ``5.0``
-* Delay between targets (secs)
+* Delay before target display (secs)
    * The delay before each outer target is displayed
+   * Default: ``0.0``
+* Delay before central target display (secs)
+   * The delay before each central target is displayed
    * Default: ``0.0``
 * Distance to targets (screen height fraction)
    * The distance from the centre of the screen to the outer targets

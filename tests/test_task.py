@@ -228,7 +228,8 @@ def test_task_condition_timeout_no_user_input(window: Window) -> None:
     trial1["condition_timeout"] = 4.0
     trial1["num_targets"] = 1
     trial1["target_duration"] = 2.1
-    trial1["inter_target_duration"] = 0.0
+    trial1["pre_target_delay"] = 0.0
+    trial1["pre_central_target_delay"] = 0.0
     trial1["add_central_target"] = False
     trial1["automove_cursor_to_center"] = False
     trial1["freeze_cursor_between_targets"] = False
