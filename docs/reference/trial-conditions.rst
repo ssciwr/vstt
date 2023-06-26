@@ -12,7 +12,7 @@ the screen height (i.e. a line of length 1.0 in these units would extend from th
 * Maximum time, 0=unlimited (secs)
    * The maximum time allowed to complete all repeats of these trial conditions
    * If zero, there is no time limit
-   * If a trial is in progress when time runs out it is allowed to complete
+   * If a trial is in progress when time runs out it is stopped early and no data is recorded for this trial
    * Default: ``0``
 * Number of targets
    * The number of outer targets to display
