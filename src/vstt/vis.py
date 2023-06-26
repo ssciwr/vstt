@@ -297,9 +297,12 @@ def display_results(
     if trial_handler is not None:
         stats_df = stats_dataframe(trial_handler)
         if all_trials_for_this_condition:
-            condition_index = stats_df.loc[
-                stats_df.i_trial == i_trial
-            ].condition_index.to_numpy()[0]
+            condition_index = next(
+                iter(
+                    stats_df.loc[stats_df.i_trial == i_trial].condition_index.to_numpy()
+                ),
+                -1,
+            )
             stats_df = stats_df.loc[stats_df.condition_index == condition_index]
         else:
             stats_df = stats_df.loc[stats_df.i_trial == i_trial]

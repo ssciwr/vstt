@@ -2,6 +2,7 @@ Visuomotor Serial Targeting Task (VSTT)
 =======================================
 
 .. toctree::
+   :maxdepth: 2
    :caption: Getting started
 
    quickstart/install
@@ -11,6 +12,7 @@ Visuomotor Serial Targeting Task (VSTT)
    quickstart/share-experiment
 
 .. toctree::
+   :maxdepth: 2
    :caption: Reference information
 
    reference/trial-conditions
@@ -18,6 +20,7 @@ Visuomotor Serial Targeting Task (VSTT)
    reference/framerate
 
 .. toctree::
+   :maxdepth: 2
    :caption: Example jupyter notebooks
 
    notebooks/example
@@ -25,6 +28,7 @@ Visuomotor Serial Targeting Task (VSTT)
    notebooks/area_calculation
 
 .. toctree::
+   :maxdepth: 2
    :caption: Developer documentation
 
    developer/install

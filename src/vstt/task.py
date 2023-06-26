@@ -188,7 +188,10 @@ class MotorTask:
             ):
                 # only do the trial if there is still time left for this condition
                 current_cursor_pos = self._do_trial(
-                    trial, trial_manager, current_cursor_pos
+                    trial,
+                    trial_manager,
+                    current_cursor_pos,
+                    current_condition_max_time - current_condition_clock.getTime(),
                 )
             is_final_trial_of_block = (
                 len(condition_trial_indices[self.trial_handler.thisIndex])
@@ -222,6 +225,7 @@ class MotorTask:
         trial: Dict[str, Any],
         trial_manager: TrialManager,
         initial_cursor_pos: Tuple[float, float],
+        condition_timeout: float,
     ) -> Tuple[float, float]:
         if trial["use_joystick"] and self.js is None:
             raise RuntimeError("Use joystick option is enabled, but no joystick found.")
@@ -237,11 +241,20 @@ class MotorTask:
                 trial_manager.target_labels, trial["show_inactive_targets"], None
             )
         for index in trial_data.target_indices:
-            self._do_target(trial, index, trial_manager, trial_data)
+            if (
+                condition_timeout <= 0.0
+                or trial_manager.clock.getTime() < condition_timeout
+            ):
+                self._do_target(trial, index, trial_manager, trial_data)
         self.win.recordFrameIntervals = False
         if trial["automove_cursor_to_center"]:
             trial_data.to_center_success = [True] * trial["num_targets"]
-        add_trial_data_to_trial_handler(trial_data, self.trial_handler)
+        if (
+            condition_timeout <= 0.0
+            or trial_manager.clock.getTime() < condition_timeout
+        ):
+            # only store trial data if we didn't run out of time for this condition
+            add_trial_data_to_trial_handler(trial_data, self.trial_handler)
         if trial["post_trial_delay"] > 0:
             vis.display_results(
                 trial["post_trial_delay"],
