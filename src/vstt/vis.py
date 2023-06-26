@@ -5,6 +5,7 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
+from PIL.Image import Image
 from psychopy.clock import Clock
 from psychopy.colors import colorNames
 from psychopy.data import TrialHandlerExt
@@ -288,7 +289,8 @@ def display_results(
     i_trial: int,
     all_trials_for_this_condition: bool,
     win: Optional[Window] = None,
-) -> None:
+    return_screenshot: bool = False,
+) -> Optional[Image]:
     close_window_when_done = False
     if win is None:
         win = _make_window()
@@ -307,13 +309,14 @@ def display_results(
         else:
             stats_df = stats_df.loc[stats_df.i_trial == i_trial]
         drawables = _make_stats_drawables(trial_handler, display_options, stats_df, win)
-    display_drawables(
+    return display_drawables(
         display_time_seconds,
         enter_to_skip_delay,
         show_delay_countdown,
         drawables,
         win,
         close_window_when_done,
+        return_screenshot,
     )
 
 
@@ -376,38 +379,48 @@ def display_drawables(
     drawables: List[BaseVisualStim],
     win: Window,
     close_window_when_done: bool,
-) -> None:
+    return_screenshot: bool = False,
+) -> Optional[Image]:
+    screenshot = None
     if drawables is None:
         drawables = []
-    remaining_display_time = int(np.ceil(display_time_seconds))
-    if enter_to_skip_delay:
-        kb = Keyboard()
-        kb.clearEvents()
-        drawables.append(_make_textbox_press_enter(win))
+    if return_screenshot:
+        # do one flip, take screenshot, return image
+        enter_to_skip_delay = False
+        draw_and_flip(win, drawables, None)
+        screenshot = win.getMovieFrame()
     else:
-        kb = None
-    if show_delay_countdown:
-        countdown_textbox = _make_textbox_countdown(f"{remaining_display_time}", win)
-        drawables.append(countdown_textbox)
-    clock = Clock()
-    clock.reset()
-    while clock.getTime() < display_time_seconds:
+        remaining_display_time = int(np.ceil(display_time_seconds))
+        if enter_to_skip_delay:
+            kb = Keyboard()
+            kb.clearEvents()
+            drawables.append(_make_textbox_press_enter(win))
+        else:
+            kb = None
         if show_delay_countdown:
-            new_remaining_display_time = int(
-                np.ceil(display_time_seconds - clock.getTime())
+            countdown_textbox = _make_textbox_countdown(
+                f"{remaining_display_time}", win
             )
-            if new_remaining_display_time < remaining_display_time:
-                remaining_display_time = new_remaining_display_time
-                countdown_textbox.text = f"{remaining_display_time}"
-        try:
-            draw_and_flip(win, drawables, kb, "return")
-        except MotorTaskCancelledByUser:
-            if close_window_when_done:
-                win.close()
-            return
+            drawables.append(countdown_textbox)
+        clock = Clock()
+        clock.reset()
+        while clock.getTime() < display_time_seconds:
+            if show_delay_countdown:
+                new_remaining_display_time = int(
+                    np.ceil(display_time_seconds - clock.getTime())
+                )
+                if new_remaining_display_time < remaining_display_time:
+                    remaining_display_time = new_remaining_display_time
+                    countdown_textbox.text = f"{remaining_display_time}"
+            try:
+                draw_and_flip(win, drawables, kb, "return")
+            except MotorTaskCancelledByUser:
+                if close_window_when_done:
+                    win.close()
+                return None
     if close_window_when_done:
         win.close()
-    return
+    return screenshot
 
 
 def splash_screen(

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+import pathlib
 from typing import List
 from typing import Optional
 
@@ -27,13 +29,21 @@ class ResultsWidget(QtWidgets.QWidget):
         self._list_trials = QtWidgets.QListWidget()
         self._list_trials.currentRowChanged.connect(self._row_changed)
         self._list_trials.itemDoubleClicked.connect(self._btn_display_trial_clicked)
-        inner_layout.addWidget(self._list_trials, 0, 0, 1, 2)
-        self._btn_display_trial = QtWidgets.QPushButton("Display Trial")
+        inner_layout.addWidget(self._list_trials, 0, 0, 1, 4)
+        self._btn_display_trial = QtWidgets.QPushButton("View Trial")
         self._btn_display_trial.clicked.connect(self._btn_display_trial_clicked)
         inner_layout.addWidget(self._btn_display_trial, 1, 0)
-        self._btn_display_condition = QtWidgets.QPushButton("Display Condition")
+        self._btn_screenshot_trial = QtWidgets.QPushButton("Trial Image")
+        self._btn_screenshot_trial.clicked.connect(self._btn_screenshot_trial_clicked)
+        inner_layout.addWidget(self._btn_screenshot_trial, 1, 1)
+        self._btn_display_condition = QtWidgets.QPushButton("View Condition")
         self._btn_display_condition.clicked.connect(self._btn_display_condition_clicked)
-        inner_layout.addWidget(self._btn_display_condition, 1, 1)
+        inner_layout.addWidget(self._btn_display_condition, 1, 2)
+        self._btn_screenshot_condition = QtWidgets.QPushButton("Condition Image")
+        self._btn_screenshot_condition.clicked.connect(
+            self._btn_screenshot_condition_clicked
+        )
+        inner_layout.addWidget(self._btn_screenshot_condition, 1, 3)
         self.setLayout(outer_layout)
         self._row_changed()
 
@@ -53,13 +63,17 @@ class ResultsWidget(QtWidgets.QWidget):
     def _row_changed(self) -> None:
         valid = self._is_valid(self._list_trials.currentRow())
         self._btn_display_trial.setEnabled(valid)
+        self._btn_screenshot_trial.setEnabled(valid)
         self._btn_display_condition.setEnabled(valid)
+        self._btn_screenshot_condition.setEnabled(valid)
 
-    def _display_results(self, all_trials_for_this_condition: bool) -> None:
+    def _display_results(
+        self, all_trials_for_this_condition: bool, screenshot: bool
+    ) -> None:
         row = self._list_trials.currentRow()
         if not self._is_valid(row):
             return
-        display_results(
+        screenshot_image = display_results(
             60,
             True,
             False,
@@ -68,13 +82,45 @@ class ResultsWidget(QtWidgets.QWidget):
             self._list_trial_row_to_trial_index[row],
             all_trials_for_this_condition,
             win=self._win,
+            return_screenshot=screenshot,
         )
+        if screenshot:
+            if screenshot_image is None:
+                QtWidgets.QMessageBox.critical(
+                    self,
+                    "Screenshot error",
+                    "Could not take screenshot",
+                )
+                return
+            filename, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self,
+                "Save screenshot",
+                directory="screenshot.png",
+                filter="Png image file (*.png)",
+            )
+            if filename == "":
+                return
+            try:
+                screenshot_image.save(pathlib.Path(filename).with_suffix(".png"))
+            except Exception as e:
+                logging.warning(f"Failed to save file {filename}: {e}")
+                QtWidgets.QMessageBox.critical(
+                    self,
+                    "File save error",
+                    f"Could not save file '{filename}'",
+                )
 
     def _btn_display_trial_clicked(self) -> None:
-        self._display_results(False)
+        self._display_results(False, False)
+
+    def _btn_screenshot_trial_clicked(self) -> None:
+        self._display_results(False, True)
 
     def _btn_display_condition_clicked(self) -> None:
-        self._display_results(True)
+        self._display_results(True, False)
+
+    def _btn_screenshot_condition_clicked(self) -> None:
+        self._display_results(True, True)
 
     @property
     def experiment(self) -> Experiment:
