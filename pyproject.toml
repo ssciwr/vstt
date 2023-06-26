@@ -31,7 +31,8 @@ dependencies = [
   "click",
   "PyQt5",
   "requests",
-  "packaging"
+  "packaging",
+  "pillow"
 ]
 dynamic = ["version"]
 
