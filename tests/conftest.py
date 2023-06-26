@@ -75,7 +75,8 @@ def experiment_no_results() -> Experiment:
     trial0["play_sound"] = False
     trial0["target_duration"] = 60.0
     trial0["central_target_duration"] = 60.0
-    trial0["inter_target_duration"] = 0.0
+    trial0["pre_target_delay"] = 0.0
+    trial0["pre_central_target_delay"] = 0.0
     trial0["post_block_display_results"] = False
     trial0["post_block_delay"] = 0.1
     trial1 = copy.deepcopy(trial0)
