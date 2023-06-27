@@ -18,6 +18,7 @@ Visuomotor Serial Targeting Task (VSTT)
    reference/trial-conditions
    reference/statistics
    reference/framerate
+   reference/file-formats
 
 .. toctree::
    :maxdepth: 2

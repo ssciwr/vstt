@@ -1,8 +1,10 @@
 Displaying results
 ==================
 
-To display the results from a trial, select it from the list and click "Display Trial".
-You can also display all the trials with the same conditions with "Display Condition".
+To display the results from a trial, select it from the list and click "View Trial".
+Alternatively click "Image Trial" to save a screenshot of these results as a png image file.
+For combined results from all the trials with the same trial conditions as the selected trial,
+click "View Condition" or "Image Condition".
 
 .. figure:: images/results-list.png
    :alt: Results
