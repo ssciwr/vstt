@@ -116,3 +116,21 @@ Given pairs of :math:`(x, y)` cursor locations, and pairs of :math:`t` timestamp
 
     * Peak Acceleration
         * maximum Acceleration
+
+
+Spatial Error
+-------------
+
+.. figure:: images/spatial_error.svg
+   :alt: Spatial Error is the distance from movement end point and the center of the target minus target' radius
+
+The cursor location at a timestamp is given by a pair of :math:`(x, y)` coordinates,
+where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the screen height per second squared.
+
+Given pairs of :math:`(x, y)` cursor locations,the following statistics are calculated, all in units of screen height:
+
+    * Spatial Error to target
+        * the distance between the end point of the movement to the center of the target - radius of target
+
+    * Spatial Error to central target
+        * the distance between the end point of the movement to the center of the central target - radius of central target

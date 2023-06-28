@@ -70,6 +70,8 @@ class DisplayOptions(TypedDict):
     normalized_area: bool
     peak_velocity: bool
     peak_acceleration: bool
+    to_target_spatial_error: bool
+    to_center_spatial_error: bool
 
 
 class Metadata(TypedDict):
