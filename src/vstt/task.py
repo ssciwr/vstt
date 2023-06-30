@@ -96,6 +96,7 @@ class TrialManager:
         self.clock = Clock()
         if trial["show_cursor_path"]:
             self.drawables.append(self._cursor_path)
+        self.first_target_of_condition_shown = False
 
     def cursor_path_add_vertex(
         self, vertex: Tuple[float, float], clear_existing: bool = False
@@ -296,6 +297,12 @@ class MotorTask:
                     pre_target_delay = trial["pre_central_target_delay"]
                 else:
                     pre_target_delay = trial["pre_target_delay"]
+                    if (
+                        not tm.first_target_of_condition_shown
+                        and trial["pre_first_target_extra_delay"] > 0
+                    ):
+                        pre_target_delay += trial["pre_first_target_extra_delay"]
+                        tm.first_target_of_condition_shown = True
                 stop_waiting_time = t0 + pre_target_delay
             if stop_waiting_time > t0:
                 if trial["hide_target_when_reached"]:

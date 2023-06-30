@@ -219,17 +219,19 @@ def test_task_fixed_intervals_no_user_input(window: Window) -> None:
 
 
 def test_task_condition_timeout_no_user_input(window: Window) -> None:
-    # 4 seconds condition timeout where each trial has 1 target which is displayed for up to 1.35 seconds
-    # should get 2 trials in ~2.70secs, 3rd trial should time out
+    # 4 seconds condition timeout where each trial has 1 target which is displayed for up to 1.3 seconds
+    # first target of condition has additional 0.20 seconds delay
+    # should get 2 trials in ~2.80secs, 3rd trial should time out
     experiment = Experiment()
     experiment.metadata["display_duration"] = 0.0
     trial1 = vstt.trial.default_trial()
     trial1["weight"] = 100
     trial1["condition_timeout"] = 4.0
     trial1["num_targets"] = 1
-    trial1["target_duration"] = 1.35
+    trial1["target_duration"] = 1.30
     trial1["pre_target_delay"] = 0.0
     trial1["pre_central_target_delay"] = 0.0
+    trial1["pre_first_target_extra_delay"] = 0.20
     trial1["add_central_target"] = False
     trial1["automove_cursor_to_center"] = False
     trial1["freeze_cursor_between_targets"] = False
@@ -248,6 +250,7 @@ def test_task_condition_timeout_no_user_input(window: Window) -> None:
     # task ran successfully, updated experiment with results
     assert experiment.has_unsaved_changes is True
     assert experiment.trial_handler_with_results is not None
+    experiment.stats.to_pickle("./df.pkl")
     # we should get exactly 3 trials
     assert len(experiment.stats.i_trial.unique()) == 3
     # first two trials have 1 target, last trial has 3 targets -> 5 targets total
