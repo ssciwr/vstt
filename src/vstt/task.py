@@ -208,6 +208,8 @@ class MotorTask:
                     current_condition_first_trial_index,
                     True,
                     self.win,
+                    self.mouse,
+                    current_cursor_pos,
                 )
         if self.win.nDroppedFrames > 0:
             logging.warning(f"Dropped {self.win.nDroppedFrames} frames")
@@ -266,6 +268,8 @@ class MotorTask:
                 self.trial_handler.thisTrialN,
                 False,
                 self.win,
+                self.mouse,
+                trial_manager.cursor.pos,
             )
         return trial_manager.cursor.pos
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -9,6 +10,7 @@ from PIL.Image import Image
 from psychopy.clock import Clock
 from psychopy.colors import colorNames
 from psychopy.data import TrialHandlerExt
+from psychopy.event import Mouse
 from psychopy.hardware.keyboard import Keyboard
 from psychopy.visual.basevisual import BaseVisualStim
 from psychopy.visual.circle import Circle
@@ -289,6 +291,8 @@ def display_results(
     i_trial: int,
     all_trials_for_this_condition: bool,
     win: Optional[Window] = None,
+    mouse: Optional[Mouse] = None,
+    mouse_pos: Optional[Tuple[float, float]] = None,
     return_screenshot: bool = False,
 ) -> Optional[Image]:
     close_window_when_done = False
@@ -316,6 +320,8 @@ def display_results(
         drawables,
         win,
         close_window_when_done,
+        mouse,
+        mouse_pos,
         return_screenshot,
     )
 
@@ -379,6 +385,8 @@ def display_drawables(
     drawables: List[BaseVisualStim],
     win: Window,
     close_window_when_done: bool,
+    mouse: Optional[Mouse] = None,
+    mouse_pos: Optional[Tuple[float, float]] = None,
     return_screenshot: bool = False,
 ) -> Optional[Image]:
     screenshot = None
@@ -413,6 +421,8 @@ def display_drawables(
                     remaining_display_time = new_remaining_display_time
                     countdown_textbox.text = f"{remaining_display_time}"
             try:
+                if mouse is not None and mouse_pos is not None:
+                    mouse.setPos(mouse_pos)
                 draw_and_flip(win, drawables, kb, "return")
             except MotorTaskCancelledByUser:
                 if close_window_when_done:
