@@ -42,6 +42,7 @@ def default_trial() -> Trial:
         "central_target_duration": 5.0,
         "pre_target_delay": 0.0,
         "pre_central_target_delay": 0.0,
+        "pre_first_target_extra_delay": 0.0,
         "target_distance": 0.4,
         "target_size": 0.04,
         "central_target_size": 0.02,
@@ -81,6 +82,7 @@ def trial_labels() -> Dict:
         "central_target_duration": "Central target display duration (secs)",
         "pre_target_delay": "Delay before outer target display (secs)",
         "pre_central_target_delay": "Delay before central target display (secs)",
+        "pre_first_target_extra_delay": "Extra delay before first outer target of condition (secs)",
         "target_distance": "Distance to targets (screen height fraction)",
         "target_size": "Target size (screen height fraction)",
         "central_target_size": "Central target size (screen height fraction)",
@@ -133,6 +135,7 @@ def import_and_validate_trial(trial_or_dict: Mapping[str, Any]) -> Trial:
         "central_target_duration",
         "pre_target_delay",
         "pre_central_target_delay",
+        "pre_first_target_extra_delay",
         "post_trial_delay",
         "post_block_delay",
     ]:
