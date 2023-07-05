@@ -63,6 +63,8 @@ class DisplayOptions(TypedDict):
     to_center_distance: bool
     to_target_rmse: bool
     to_center_rmse: bool
+    to_target_success: bool
+    to_center_success: bool
     averages: bool
 
 

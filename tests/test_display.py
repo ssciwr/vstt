@@ -31,7 +31,11 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
         "averages": True,
         "unknown_key1": "ignore me",
         "unknown_key2": False,
+        "to_target_success": False,
+        "to_center_success": False,
     }
+    for key in default_display_options:
+        assert key in display_options_dict
     # if any keys are missing or have invalid values, default values are used instead
     missing_keys = [
         "to_center_reaction_time",
