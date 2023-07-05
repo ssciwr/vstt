@@ -147,17 +147,13 @@ def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             if display_options.get(stat, False):  # type: ignore
-                if (
-                    stat == "to_target_success" or stat == "to_center_success"
-                ) and "to_target_success_trial" not in stats:
-                    stats[stat] = True if stats[stat] == 1 else False
-                    txt_stats += f"{label} (to {destination}): {stats[stat]}\n"
-                elif (
-                    stat == "to_target_success" or stat == "to_center_success"
-                ) and "to_target_success_trial" in stats:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]:.3%}\n"
-                else:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                stat_str = f"{stats[stat]: .3f}{unit}"
+                if stat == "to_target_success" or stat == "to_center_success":
+                    if "to_target_success_trial" in stats:
+                        stat_str = f"{stats[stat]:.0%}"
+                    else:
+                        stat_str = f"{stats[stat] == 1}"
+                txt_stats += f"{label} (to {destination}): {stat_str}\n"
     return txt_stats
 
 
@@ -166,14 +162,13 @@ def _make_average_stats_txt(display_options: DisplayOptions, stats: pd.Series) -
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             if display_options.get(stat, False):  # type: ignore
-                if (stat == "to_target_success" or stat == "to_center_success") and "to_target_success_trial" not in stats:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]: .3%}{unit}\n"
-                elif (
-                    stat == "to_target_success" or stat == "to_center_success"
-                ) and "to_target_success_trial" in stats:
-                    txt_stats += f"{label} (to {destination}) in block: {stats[stat + '_trial']:.3%}\n"
-                else:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                stat_str = f"{stats[stat]: .3f}{unit}"
+                if stat == "to_target_success" or stat == "to_center_success":
+                    if "to_target_success_trial" in stats:
+                        stat_str = f"{stats[stat + '_trial']:.0%}"
+                    else:
+                        stat_str = f"{stats[stat]: .0%}"
+                txt_stats += f"{label} (to {destination}): {stat_str}\n"
     return txt_stats
 
 
@@ -350,9 +345,8 @@ def display_results(
                 stats_df.i_trial == i_trial
             ].condition_index.to_numpy()[0]
             stats_df = stats_df.loc[stats_df.condition_index == condition_index]
-            to_target_success_trial_fraction, to_center_success_trial_fraction = get_successful_trial_fraction(stats_df)
-            stats_df["to_target_success_trial"] = to_target_success_trial_fraction
-            stats_df["to_center_success_trial"] = to_center_success_trial_fraction
+            for dest in ["target", "center"]:
+                stats_df[f"to_{dest}_success_trial"] = get_successful_trial_fraction(stats_df, dest)
         else:
             stats_df = stats_df.loc[stats_df.i_trial == i_trial]
         drawables = _make_stats_drawables(trial_handler, display_options, stats_df, win)
@@ -366,23 +360,17 @@ def display_results(
     )
 
 
-def get_successful_trial_fraction(stats_df):
-    to_target_success_trial = 0
-    to_center_success_trial = 0
+def get_successful_trial_fraction(stats_df: pd.DataFrame, dest: str) -> float:
+    to_dest_success_trial = 0
     trial_indices = stats_df["i_trial"].unique()
     for trial_index in trial_indices:
         data = stats_df.loc[stats_df.i_trial == trial_index]
-        to_target_failed_number = (~data["to_target_success"]).values.sum()
-        to_center_failed_number = (~data["to_center_success"]).values.sum()
-        to_target_success_trial += 1 if not to_target_failed_number else 0
-        to_center_success_trial += 1 if not to_center_failed_number else 0
-    to_target_success_trial_fraction = to_target_success_trial / len(
+        to_dest_failed_number = (~data[f"to_{dest}_success"]).values.sum()
+        to_dest_success_trial += 1 if not to_dest_failed_number else 0
+    to_dest_success_trial_fraction = to_dest_success_trial / len(
         trial_indices
     )
-    to_center_success_trial_fraction = to_center_success_trial / len(
-        trial_indices
-    )
-    return to_target_success_trial_fraction, to_center_success_trial_fraction
+    return to_dest_success_trial_fraction
 
 
 def _make_textbox_press_enter(win: Window) -> TextBox2:
