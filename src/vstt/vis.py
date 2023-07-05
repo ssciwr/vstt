@@ -172,7 +172,6 @@ def _make_average_stats_txt(display_options: DisplayOptions, stats: pd.Series) -
     return txt_stats
 
 
-
 def _make_stats_drawables(
     trial_handler: TrialHandlerExt,
     display_options: DisplayOptions,
@@ -346,7 +345,9 @@ def display_results(
             ].condition_index.to_numpy()[0]
             stats_df = stats_df.loc[stats_df.condition_index == condition_index]
             for dest in ["target", "center"]:
-                stats_df[f"to_{dest}_success_trial"] = get_successful_trial_fraction(stats_df, dest)
+                stats_df[f"to_{dest}_success_trial"] = get_successful_trial_fraction(
+                    stats_df, dest
+                )
         else:
             stats_df = stats_df.loc[stats_df.i_trial == i_trial]
         drawables = _make_stats_drawables(trial_handler, display_options, stats_df, win)
@@ -367,9 +368,7 @@ def get_successful_trial_fraction(stats_df: pd.DataFrame, dest: str) -> float:
         data = stats_df.loc[stats_df.i_trial == trial_index]
         to_dest_failed_number = (~data[f"to_{dest}_success"]).values.sum()
         to_dest_success_trial += 1 if not to_dest_failed_number else 0
-    to_dest_success_trial_fraction = to_dest_success_trial / len(
-        trial_indices
-    )
+    to_dest_success_trial_fraction = to_dest_success_trial / len(trial_indices)
     return to_dest_success_trial_fraction
 
 
