@@ -212,7 +212,6 @@ def test_display_results_nothing(
     experiment_with_results: Experiment, window: Window
 ) -> None:
     experiment_with_results.display_options = {
-
         "to_target_paths": False,
         "to_center_paths": False,
         "targets": False,
