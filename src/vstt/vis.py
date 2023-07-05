@@ -157,7 +157,9 @@ def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
                 ) and "to_target_success_trial" in stats:
                     txt_stats += f"{label} (to {destination}): {stats[stat]:.3%}\n"
                 else:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                    txt_stats += (
+                        f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                    )
     return txt_stats
 
 
@@ -166,16 +168,21 @@ def _make_average_stats_txt(display_options: DisplayOptions, stats: pd.Series) -
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             if display_options.get(stat, False):  # type: ignore
-                if (stat == "to_target_success" or stat == "to_center_success") and "to_target_success_trial" not in stats:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]: .3%}{unit}\n"
+                if (
+                    stat == "to_target_success" or stat == "to_center_success"
+                ) and "to_target_success_trial" not in stats:
+                    txt_stats += (
+                        f"{label} (to {destination}): {stats[stat]: .3%}{unit}\n"
+                    )
                 elif (
                     stat == "to_target_success" or stat == "to_center_success"
                 ) and "to_target_success_trial" in stats:
                     txt_stats += f"{label} (to {destination}) in block: {stats[stat + '_trial']:.3%}\n"
                 else:
-                    txt_stats += f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                    txt_stats += (
+                        f"{label} (to {destination}): {stats[stat]: .3f}{unit}\n"
+                    )
     return txt_stats
-
 
 
 def _make_stats_drawables(
@@ -350,7 +357,10 @@ def display_results(
                 stats_df.i_trial == i_trial
             ].condition_index.to_numpy()[0]
             stats_df = stats_df.loc[stats_df.condition_index == condition_index]
-            to_target_success_trial_fraction, to_center_success_trial_fraction = get_successful_trial_fraction(stats_df)
+            (
+                to_target_success_trial_fraction,
+                to_center_success_trial_fraction,
+            ) = get_successful_trial_fraction(stats_df)
             stats_df["to_target_success_trial"] = to_target_success_trial_fraction
             stats_df["to_center_success_trial"] = to_center_success_trial_fraction
         else:
@@ -376,12 +386,8 @@ def get_successful_trial_fraction(stats_df):
         to_center_failed_number = (~data["to_center_success"]).values.sum()
         to_target_success_trial += 1 if not to_target_failed_number else 0
         to_center_success_trial += 1 if not to_center_failed_number else 0
-    to_target_success_trial_fraction = to_target_success_trial / len(
-        trial_indices
-    )
-    to_center_success_trial_fraction = to_center_success_trial / len(
-        trial_indices
-    )
+    to_target_success_trial_fraction = to_target_success_trial / len(trial_indices)
+    to_center_success_trial_fraction = to_center_success_trial / len(trial_indices)
     return to_target_success_trial_fraction, to_center_success_trial_fraction
 
 
