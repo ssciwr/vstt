@@ -56,6 +56,7 @@ tests = [
 docs = [
   "ipykernel",
   "matplotlib",
+  "myst_parser",
   "nbsphinx",
   "pandoc",
   "sphinx>=4.5.0",

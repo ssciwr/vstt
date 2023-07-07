@@ -8,7 +8,10 @@
 
 Visuomotor Serial Targeting Task (VSTT)
 
-Documentation: [vstt.readthedocs.io](https://vstt.readthedocs.io/)
+VSTT is an open source Python GUI tool for designing,
+running and analyzing motor skill acquisition experiments.
+
+See [vstt.readthedocs.io](https://vstt.readthedocs.io/) for more information.
 
 ![screenshot](https://raw.githubusercontent.com/ssciwr/vstt/main/docs/quickstart/images/gui.png)
 
