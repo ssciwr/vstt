@@ -1,52 +1,57 @@
 ---
-title: ""
+title: "Visuomotor Serial Targetting Task (VSTT)"
 tags:
   - Python
   - visuomotor tasks
+  - motor skill aquisition
   - psychopy
 authors:
   - name: Liam Keegan
     orcid: 0000-0002-0654-4979
-    affiliation: "1, 2"
+    affiliation: 1
     corresponding: true
     equal-contrib: true
   - name: Philipp Wanner
     orcid: 0000-0002-3295-7347
     equal-contrib: true
-    affiliation: 3
+    affiliation: 2
 affiliations:
   - name: Scientific Software Center, Heidelberg University
     index: 1
-  - name: Interdisciplinary Center for Scientific Computing, Heidelberg University
-    index: 2
   - name: Institut für Sport und Sportwissenschaft, Heidelberg University
-    index: 3
-date: 6 July 2023
+    index: 2
+date: 7 July 2023
 bibliography: paper.bib
 ---
 
 # Summary
 
-Visuomotor Serial Targetting Task (vstt) is an open source Python GUI tool
+Visuomotor Serial Targetting Task (VSTT) is an open source Python GUI tool
 for designing, running and analyzing motor skill acquisition experiments.
 
-![The main Graphical User Interface of vstt](docs/quickstart/images/gui.png)
+TODO: more summary here
 
 ...
 
 # Statement of need
 
+TODO: more summary here
+
 ...
 
 # Implementation
 
-...
+TODO: describe what the software does
 
-uses the Psychopy [@Peirce2019] library
+![The main graphical user interface of VSTT](docs/quickstart/images/gui.png)
 
-...
+TODO: more description
 
-![Screenshot of the results displayed at the end of an experiment](docs/quickstart/images/results.png)
+![The results displayed at the end of an experiment](docs/quickstart/images/results.png)
+
+VSTT is cross-platform, and uses PyQt for the graphical user interface, and the Psychopy [@Peirce2019] library to construct and execute the experiments.
+It is published on the Python Package Index and can be easily installed using pip.
+In addition we offer a windows installer for users who may be less familiar with installing Pytohn packages.
 
 # Acknowledgments
 
