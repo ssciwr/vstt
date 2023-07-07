@@ -51,7 +51,7 @@ TODO: more description
 
 VSTT is cross-platform, and uses PyQt for the graphical user interface, and the Psychopy [@Peirce2019] library to construct and execute the experiments.
 It is published on the Python Package Index and can be easily installed using pip.
-In addition we offer a windows installer for users who may be less familiar with installing Pytohn packages.
+In addition we offer a windows installer for users who may be less familiar with installing Python packages.
 
 # Acknowledgments
 
