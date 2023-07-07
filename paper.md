@@ -11,14 +11,16 @@ authors:
     affiliation: 1
     corresponding: true
     equal-contrib: true
+  - name: Shuangshuang Li
+    affiliation: 1
   - name: Philipp Wanner
-    orcid: 0000-0002-3295-7347
+    orcid: 0000-0002-2512-921X
     equal-contrib: true
     affiliation: 2
 affiliations:
   - name: Scientific Software Center, Heidelberg University
     index: 1
-  - name: Institut für Sport und Sportwissenschaft, Heidelberg University
+  - name: Institute for Sports and Sports Science, Heidelberg University
     index: 2
 date: 7 July 2023
 bibliography: paper.bib
