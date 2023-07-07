@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.0] - 2023-07-07
+
+### Added
+
+- optional extra delay before first target of a condition [#236](https://github.com/ssciwr/vstt/pull/236)
+- successful movement to target / center statistics [#221](https://github.com/ssciwr/vstt/pull/221)
+
+### Changed
+
+- cursor position is not updated during the delay between trials [#237](https://github.com/ssciwr/vstt/pull/237)
+
 ## [1.1.0] - 2023-06-27
 
 ### Added
