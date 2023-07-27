@@ -112,3 +112,12 @@ def test_rmse() -> None:
         vstt.stats._rmse(np.array([(0, 0), (0, 1), (1, 0), (0, 1), (1, 0)]), target),
         [1.0 / np.sqrt(2.0)],
     )
+
+def test_area() -> None:
+    assert np.allclose(vstt.stats._area(np.array([]), np.array([])), [0])
+    assert np.allclose(vstt.stats._area(np.array([]), np.array([[1, 1], [0, 1]])), [0])
+    assert np.allclose(vstt.stats._area(np.array([[0, 0], [0, 1]]), np.array([])), [0])
+    assert np.allclose(vstt.stats._area(np.array([[0, 0], [0, 1], [1, 1]]), np.array([[1, 1], [1, 0], [0, 0]])), [1])
+    assert np.allclose(vstt.stats._area(np.array([[0, 0], [0, 1], [1, 1]]), np.array([])), [0.5])
+    assert np.allclose(vstt.stats._area(np.array([[0, 1], [0, 0], [1, 1], [1, 0]]), np.array([[1, 0], [0, 1]])), [0.5])
+
