@@ -12,7 +12,8 @@ import pandas as pd
 from psychopy.data import TrialHandlerExt
 from psychopy.event import xydist
 from shapely.geometry import LineString
-from shapely.ops import polygonize, unary_union
+from shapely.ops import polygonize
+from shapely.ops import unary_union
 
 
 def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]:
@@ -163,9 +164,7 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             axis=1,
         )
     df["area"] = df.apply(
-        lambda x: _area(
-            x["to_target_mouse_positions"], x["to_center_mouse_positions"]
-        ),
+        lambda x: _area(x["to_target_mouse_positions"], x["to_center_mouse_positions"]),
         axis=1,
     )
     return df
@@ -374,6 +373,7 @@ def _rmse(mouse_positions: np.ndarray, target_position: np.ndarray) -> float:
         sum_of_squares += np.power((x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1), 2)
     return np.sqrt(sum_of_squares / norm)
 
+
 def _area(
     to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray
 ) -> float:
@@ -392,8 +392,16 @@ def _area(
     :return: area
 
     """
-    to_target_mouse_positions = to_target_mouse_positions.reshape(0, 2) if to_target_mouse_positions.size == 0 else to_target_mouse_positions
-    to_center_mouse_positions = to_center_mouse_positions.reshape(0, 2) if to_center_mouse_positions.size == 0 else to_center_mouse_positions
+    to_target_mouse_positions = (
+        to_target_mouse_positions.reshape(0, 2)
+        if to_target_mouse_positions.size == 0
+        else to_target_mouse_positions
+    )
+    to_center_mouse_positions = (
+        to_center_mouse_positions.reshape(0, 2)
+        if to_center_mouse_positions.size == 0
+        else to_center_mouse_positions
+    )
     coords = np.concatenate(
         [
             to_target_mouse_positions,

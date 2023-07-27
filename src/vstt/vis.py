@@ -331,14 +331,23 @@ def _make_stats_drawables(
     # fill the area closed by paths to target and center
     if display_options["area"]:
         for _, row in stats_df.iterrows():
-            row.to_target_mouse_positions = row.to_target_mouse_positions.reshape(0,
-                                                                          2) if row.to_target_mouse_positions.size == 0 else row.to_target_mouse_positions
-            row.to_center_mouse_positions = row.to_center_mouse_positions.reshape(0,
-                                                                          2) if row.to_center_mouse_positions.size == 0 else row.to_center_mouse_positions
+            row.to_target_mouse_positions = (
+                row.to_target_mouse_positions.reshape(0, 2)
+                if row.to_target_mouse_positions.size == 0
+                else row.to_target_mouse_positions
+            )
+            row.to_center_mouse_positions = (
+                row.to_center_mouse_positions.reshape(0, 2)
+                if row.to_center_mouse_positions.size == 0
+                else row.to_center_mouse_positions
+            )
             drawables.append(
                 ShapeStim(
                     win,
-                    vertices=np.concatenate((row.to_target_mouse_positions, row.to_center_mouse_positions), axis=0),
+                    vertices=np.concatenate(
+                        (row.to_target_mouse_positions, row.to_center_mouse_positions),
+                        axis=0,
+                    ),
                     lineColor="black",
                     fillColor=colors[row.target_index],
                     closeShape=True,
