@@ -21,7 +21,6 @@ from psychopy.visual.window import Window
 from vstt.geom import points_on_circle
 from vstt.stats import list_dest_stat_label_units
 from vstt.stats import stats_dataframe
-from vstt.stats import _area
 from vstt.vtypes import DisplayOptions
 from vstt.vtypes import Metadata
 

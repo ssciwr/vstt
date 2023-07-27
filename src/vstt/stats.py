@@ -168,7 +168,6 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
         ),
         axis=1,
     )
-    # df["area"] = _area(df["to_target_mouse_positions"], df["to_center_mouse_positions"])
     return df
 
 
