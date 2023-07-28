@@ -29,7 +29,7 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
         ]:
             stats.append((f"to_{destination}_{base_stat}", label, unit))
         list_dest_stats.append((destination, stats))
-    list_dest_stats.append((None, [("area", "Area", "")]))
+    list_dest_stats.append(("", [("area", "Area", "")]))
     return list_dest_stats
 
 
@@ -392,8 +392,17 @@ def _area(
     :return: area
 
     """
-    to_target_mouse_positions = to_target_mouse_positions.reshape(0, 2) if to_target_mouse_positions.size == 0 else to_target_mouse_positions
-    to_center_mouse_positions = to_center_mouse_positions.reshape(0, 2) if to_center_mouse_positions.size == 0 else to_center_mouse_positions
+    coords = get_closed_polygon(to_center_mouse_positions, to_target_mouse_positions)
+    polygons = polygonize(unary_union(LineString(coords)))
+    area = sum(polygon.area for polygon in polygons)
+    return area
+
+
+def get_closed_polygon(to_center_mouse_positions, to_target_mouse_positions):
+    to_target_mouse_positions = to_target_mouse_positions.reshape(0,
+                                                                  2) if to_target_mouse_positions.size == 0 else to_target_mouse_positions
+    to_center_mouse_positions = to_center_mouse_positions.reshape(0,
+                                                                  2) if to_center_mouse_positions.size == 0 else to_center_mouse_positions
     coords = np.concatenate(
         [
             to_target_mouse_positions,
@@ -402,6 +411,4 @@ def _area(
             to_target_mouse_positions[0:1],
         ]
     )
-    polygons = polygonize(unary_union(LineString(coords)))
-    area = sum(polygon.area for polygon in polygons)
-    return area
+    return coords

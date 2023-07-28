@@ -21,6 +21,7 @@ from psychopy.visual.window import Window
 from vstt.geom import points_on_circle
 from vstt.stats import list_dest_stat_label_units
 from vstt.stats import stats_dataframe
+from vstt.stats import get_closed_polygon
 from vstt.vtypes import DisplayOptions
 from vstt.vtypes import Metadata
 
@@ -331,14 +332,10 @@ def _make_stats_drawables(
     # fill the area closed by paths to target and center
     if display_options["area"]:
         for _, row in stats_df.iterrows():
-            row.to_target_mouse_positions = row.to_target_mouse_positions.reshape(0,
-                                                                          2) if row.to_target_mouse_positions.size == 0 else row.to_target_mouse_positions
-            row.to_center_mouse_positions = row.to_center_mouse_positions.reshape(0,
-                                                                          2) if row.to_center_mouse_positions.size == 0 else row.to_center_mouse_positions
             drawables.append(
                 ShapeStim(
                     win,
-                    vertices=np.concatenate((row.to_target_mouse_positions, row.to_center_mouse_positions), axis=0),
+                    vertices=get_closed_polygon(row.to_target_mouse_positions, row.to_center_mouse_positions),
                     lineColor="black",
                     fillColor=colors[row.target_index],
                     closeShape=True,
