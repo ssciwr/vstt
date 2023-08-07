@@ -15,12 +15,28 @@ concurrency:
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
-    name: "${{ matrix.os }} :: Python ${{ matrix.python-version }}"
+    name: "${{ matrix.os }} :: ${{ matrix.python-version }} :: ${{ matrix.psychopy-version }}"
     strategy:
       fail-fast: false
       matrix:
+        # test using latest available version of psychopy
         os: ["ubuntu-22.04", "windows-latest"]
         python-version: ["3.8", "3.9", "3.10"]
+        psychopy-version: ["latest"]
+        # additional regression tests using older versions of psychopy
+        include:
+          - os: "ubuntu-22.04"
+            python-version: "3.10"
+            psychopy-version: "2023.2.0"
+          - os: "ubuntu-22.04"
+            python-version: "3.10"
+            psychopy-version: "2023.1.3"
+          - os: "ubuntu-22.04"
+            python-version: "3.8"
+            psychopy-version: "2022.2.5"
+          - os: "ubuntu-22.04"
+            python-version: "3.8"
+            psychopy-version: "2022.1.4"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -28,11 +44,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Mesa 3D to get OpenGL support on Windows without a GPU
         uses: ssciwr/setup-mesa-dist-win@v1
+        with:
+          version: "23.1.5"
       - name: Linux setup
         if: runner.os == 'Linux'
         run: |
           # various psychopy & qt system dependencies
-          sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot libnotify-dev pandoc libxcb-glx0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-xfixes0 libxcb-xinerama0 libxcb-xinput0 libxcb-xkb1 libxcb1 libxkbcommon-x11-0 libxkbcommon0 libxrender1
+          sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot libnotify-dev pandoc libglu1-mesa-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev'
           # install pre-built ubuntu/gtk3 wxPython wheel
           pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }}/ wxPython
           # enable colours in logs
@@ -45,6 +63,10 @@ jobs:
           echo "DISPLAY=:99" >> $GITHUB_ENV
           # see Qt debug output when loading plugins
           echo "QT_DEBUG_PLUGINS=1" >> $GITHUB_ENV
+          # workaround for Xlib.error.XauthError ~/.Xauthority: [Errno 2] No such file or directory
+          sudo touch ~/.Xauthority
+      - if: matrix.psychopy-version != 'latest'
+        run: pip install psychopy==${{ matrix.psychopy-version }} --verbose
       - run: pip install -e .[tests,docs] --verbose
       - run: python -m pytest --cov=vstt --cov-report=xml -v -s -x
       - uses: actions/upload-artifact@v3

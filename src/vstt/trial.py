@@ -8,7 +8,7 @@ from typing import Mapping
 from typing import Optional
 
 import numpy as np
-from psychopy.gui import DlgFromDict
+from psychopy.gui.qtgui import DlgFromDict
 from vstt.common import import_typed_dict
 from vstt.vtypes import Trial
 

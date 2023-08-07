@@ -4,7 +4,7 @@ import gui_test_utils as gtu
 import qt_test_utils as qtu
 import vstt
 from psychopy.visual.window import Window
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 from vstt.experiment import Experiment
 from vstt.meta_widget import MetadataWidget
 

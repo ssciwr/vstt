@@ -7,9 +7,10 @@ from typing import Optional
 
 import vstt
 from psychopy.visual.window import Window
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from qtpy import QtGui
+from qtpy import QtWidgets
+from qtpy.compat import getsavefilename
+from qtpy.QtCore import Qt
 from vstt.display_widget import DisplayOptionsWidget
 from vstt.experiment import Experiment
 from vstt.meta_widget import MetadataWidget
@@ -101,11 +102,11 @@ class Gui(QtWidgets.QMainWindow):
             self._open_file(filename)
 
     def btn_save_clicked(self) -> bool:
-        filename, _ = QtWidgets.QFileDialog.getSaveFileName(
+        filename, _ = getsavefilename(
             self,
             "Save experiment",
-            directory=self.experiment.filename,
-            filter="Psydat files (*.psydat)",
+            self.experiment.filename,
+            "Psydat files (*.psydat)",
         )
         if filename == "":
             return False
@@ -122,12 +123,12 @@ class Gui(QtWidgets.QMainWindow):
         return True
 
     def btn_export_clicked(self) -> bool:
-        filename, selected_filter = QtWidgets.QFileDialog.getSaveFileName(
+        filename, selected_filter = getsavefilename(
             self,
             "Export experiment",
-            directory=str(pathlib.Path(self.experiment.filename).with_suffix(".xlsx")),
-            filter="Excel file (*.xlsx) ;; JSON file (*.json)",
-            initialFilter="Excel file (*.xlsx)",
+            str(pathlib.Path(self.experiment.filename).with_suffix(".xlsx")),
+            "Excel file (*.xlsx) ;; JSON file (*.json)",
+            "Excel file (*.xlsx)",
         )
         if filename == "":
             return False

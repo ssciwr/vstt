@@ -6,9 +6,9 @@ from typing import Tuple
 
 import qt_test_utils as qtu
 import vstt
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QInputDialog
 from pytest import MonkeyPatch
+from qtpy.QtWidgets import QFileDialog
+from qtpy.QtWidgets import QInputDialog
 from vstt.experiment import Experiment
 from vstt.gui import Gui
 

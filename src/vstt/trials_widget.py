@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Optional
 
 from psychopy.visual.window import Window
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
+from qtpy import QtCore
+from qtpy import QtWidgets
 from vstt.experiment import Experiment
 from vstt.trial import describe_trial
 from vstt.trial import get_trial_from_user
@@ -12,7 +12,7 @@ from vstt.trial import Trial
 
 
 class TrialsWidget(QtWidgets.QWidget):
-    experiment_modified = QtCore.pyqtSignal()
+    experiment_modified = QtCore.Signal()
 
     def __init__(
         self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None

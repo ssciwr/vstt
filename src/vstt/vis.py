@@ -24,8 +24,9 @@ from vstt.stats import stats_dataframe
 from vstt.vtypes import DisplayOptions
 from vstt.vtypes import Metadata
 
-colorNames.pop("none")
-colors = list(colorNames.values())
+colors = [
+    color for name, color in colorNames.items() if name not in ["none", "transparent"]
+]
 
 
 def make_cursor(window: Window, cursor_size: float) -> ShapeStim:

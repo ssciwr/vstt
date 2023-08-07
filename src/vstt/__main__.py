@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 from psychopy.gui.qtgui import ensureQtApp
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 from vstt.gui import Gui
 
 
