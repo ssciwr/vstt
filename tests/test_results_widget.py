@@ -9,8 +9,8 @@ import numpy as np
 import qt_test_utils as qtu
 from PIL import Image
 from psychopy.visual.window import Window
-from PyQt5.QtWidgets import QFileDialog
 from pytest import MonkeyPatch
+from qtpy.QtWidgets import QFileDialog
 from vstt.experiment import Experiment
 from vstt.results_widget import ResultsWidget
 

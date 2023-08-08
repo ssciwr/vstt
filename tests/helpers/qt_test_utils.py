@@ -4,11 +4,12 @@ from typing import Any
 from typing import List
 from typing import Optional
 
-from PyQt5 import QtCore
-from PyQt5 import QtGui
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtTest import QTest
+import qtpy
+from qtpy import QtCore
+from qtpy import QtGui
+from qtpy import QtWidgets
+from qtpy.QtCore import Qt
+from qtpy.QtTest import QTest
 
 
 # send key clicks to a widget
@@ -111,7 +112,10 @@ class ModalWidgetTimer:
         for key in self._keys:
             key_seq = QtGui.QKeySequence(key)
             str_key = key_seq.toString()
-            qt_key = Qt.Key(key_seq[0])
+            if qtpy.QT6:
+                qt_key = key_seq[0].key()
+            else:
+                qt_key = Qt.Key(key_seq[0])
             print(
                 f"ModalWidgetTimer ::   - sending '{str_key} [{qt_key}]' to {widget}",
                 flush=True,
