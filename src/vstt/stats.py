@@ -162,6 +162,8 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             ),
             axis=1,
         )
+    # delete
+    area = _area(np.array([[0, 0], [0, 1], [1, 1]]), np.array([]))
     df["area"] = df.apply(
         lambda x: _area(
             x["to_target_mouse_positions"], x["to_center_mouse_positions"]
@@ -392,7 +394,7 @@ def _area(
     :return: area
 
     """
-    coords = get_closed_polygon(to_center_mouse_positions, to_target_mouse_positions)
+    coords = get_closed_polygon(to_target_mouse_positions, to_center_mouse_positions)
     polygons = polygonize(unary_union(LineString(coords)))
     area = sum(polygon.area for polygon in polygons)
     return area
