@@ -70,6 +70,3 @@ The cursor location at a timestamp is given by a pair of :math:`(x, y)` coordina
 where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the height of the screen.
 
 Given pairs of :math:`(x, y)` cursor locations to the target and to the center respectively, get the cursor coordinates of the polygon which is closed by the to target and to center :math:`(x, y)` cursor locations, use the build-in function to calculate the area of the polygon.
-
-
-
