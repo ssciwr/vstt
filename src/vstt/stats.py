@@ -163,8 +163,6 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             ),
             axis=1,
         )
-    # delete
-    area = _area(np.array([[0, 0], [0, 1], [1, 1]]), np.array([]))
     df["area"] = df.apply(
         lambda x: _area(x["to_target_mouse_positions"], x["to_center_mouse_positions"]),
         axis=1,
