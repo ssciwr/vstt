@@ -398,7 +398,15 @@ def _area(
     return area
 
 
-def get_closed_polygon(to_center_mouse_positions, to_target_mouse_positions):
+def get_closed_polygon(to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray) -> np.ndarray:
+    """
+    connect the to target path and to center path to a closed polygon
+
+    :param to_target_mouse_positions: x,y mouse positions moving towards the target
+    :param to_center_mouse_positions: x,y mouse positions moving towards the center
+    :return: x,y mouse positions of the closed polygon
+
+    """
     to_target_mouse_positions = to_target_mouse_positions.reshape(0,
                                                                   2) if to_target_mouse_positions.size == 0 else to_target_mouse_positions
     to_center_mouse_positions = to_center_mouse_positions.reshape(0,
