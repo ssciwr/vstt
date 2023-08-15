@@ -74,6 +74,3 @@ In cases where the cursor movement results in intersecting paths, multiple polyg
 Moreover, when the movement not only intersects but also leads to overlapping regions, the overlapped area is counted twice.
 e.g.
 .. figure:: images/overlapping.svg
-
-
-
