@@ -76,6 +76,3 @@ Moreover, when the movement not only intersects but also leads to overlapping re
 e.g.
 
 .. figure:: images/overlapping.svg
-
-
-
