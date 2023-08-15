@@ -7,7 +7,8 @@ from typing import Optional
 
 import numpy as np
 from psychopy.visual.window import Window
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
+from qtpy.compat import getsavefilename
 from vstt.experiment import Experiment
 from vstt.vis import display_results
 
@@ -92,11 +93,11 @@ class ResultsWidget(QtWidgets.QWidget):
                     "Could not take screenshot",
                 )
                 return
-            filename, _ = QtWidgets.QFileDialog.getSaveFileName(
+            filename, _ = getsavefilename(
                 self,
                 "Save screenshot",
-                directory="screenshot.png",
-                filter="Png image file (*.png)",
+                "screenshot.png",
+                "Png image file (*.png)",
             )
             if filename == "":
                 return

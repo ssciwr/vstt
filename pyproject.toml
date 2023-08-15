@@ -29,7 +29,7 @@ dependencies = [
   "psychopy-sounddevice",
   "numpy",
   "click",
-  "PyQt5",
+  "qtpy",
   "requests",
   "packaging",
   "pillow"

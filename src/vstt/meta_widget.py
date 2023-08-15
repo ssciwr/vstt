@@ -6,9 +6,9 @@ from typing import Optional
 from typing import Union
 
 from psychopy.visual.window import Window
-from PyQt5 import QtCore
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
+from qtpy import QtCore
+from qtpy import QtWidgets
+from qtpy.QtCore import Qt
 from vstt.experiment import Experiment
 from vstt.meta import default_metadata
 from vstt.meta import metadata_labels
@@ -16,7 +16,7 @@ from vstt.vis import splash_screen
 
 
 class MetadataWidget(QtWidgets.QWidget):
-    experiment_modified = QtCore.pyqtSignal()
+    experiment_modified = QtCore.Signal()
 
     def __init__(
         self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
