@@ -63,3 +63,6 @@ repos:
     rev: "v1.6.25"
     hooks:
       - id: actionlint
+
+ci:
+  autoupdate_schedule: quarterly
