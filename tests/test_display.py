@@ -33,6 +33,7 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
         "unknown_key2": False,
         "to_target_success": False,
         "to_center_success": False,
+        "area": False,
     }
     for key in default_display_options:
         assert key in display_options_dict

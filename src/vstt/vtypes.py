@@ -66,6 +66,7 @@ class DisplayOptions(TypedDict):
     to_target_success: bool
     to_center_success: bool
     averages: bool
+    area: bool
 
 
 class Metadata(TypedDict):

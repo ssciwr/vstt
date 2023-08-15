@@ -19,6 +19,7 @@ from psychopy.visual.shape import ShapeStim
 from psychopy.visual.textbox2 import TextBox2
 from psychopy.visual.window import Window
 from vstt.geom import points_on_circle
+from vstt.stats import get_closed_polygon
 from vstt.stats import list_dest_stat_label_units
 from vstt.stats import stats_dataframe
 from vstt.vtypes import DisplayOptions
@@ -157,7 +158,10 @@ def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
                         stat_str = f"{stats[stat]:.0%}"
                     else:
                         stat_str = f"{stats[stat] == 1}"
-                txt_stats += f"{label} (to {destination}): {stat_str}\n"
+                if stat == "area":
+                    txt_stats += f"{label}: {stat_str}\n"
+                else:
+                    txt_stats += f"{label} (to {destination}): {stat_str}\n"
     return txt_stats
 
 
@@ -172,7 +176,10 @@ def _make_average_stats_txt(display_options: DisplayOptions, stats: pd.Series) -
                         stat_str = f"{stats[stat + '_trial']:.0%}"
                     else:
                         stat_str = f"{stats[stat]: .0%}"
-                txt_stats += f"{label} (to {destination}): {stat_str}\n"
+                if stat == "area":
+                    txt_stats += f"{label}: {stat_str}\n"
+                else:
+                    txt_stats += f"{label} (to {destination}): {stat_str}\n"
     return txt_stats
 
 
@@ -320,6 +327,21 @@ def _make_stats_drawables(
                     vertices=row.to_target_mouse_positions,
                     lineColor=colors[row.target_index],
                     closeShape=False,
+                    lineWidth=3,
+                )
+            )
+    # fill the area closed by paths to target and center
+    if display_options["area"]:
+        for _, row in stats_df.iterrows():
+            drawables.append(
+                ShapeStim(
+                    win,
+                    vertices=get_closed_polygon(
+                        row.to_target_mouse_positions, row.to_center_mouse_positions
+                    ),
+                    lineColor="black",
+                    fillColor=colors[row.target_index],
+                    closeShape=True,
                     lineWidth=3,
                 )
             )

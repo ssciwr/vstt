@@ -11,6 +11,9 @@ import numpy as np
 import pandas as pd
 from psychopy.data import TrialHandlerExt
 from psychopy.event import xydist
+from shapely.geometry import LineString
+from shapely.ops import polygonize
+from shapely.ops import unary_union
 
 
 def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]:
@@ -27,6 +30,7 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
         ]:
             stats.append((f"to_{destination}_{base_stat}", label, unit))
         list_dest_stats.append((destination, stats))
+    list_dest_stats.append(("", [("area", "Area", "")]))
     return list_dest_stats
 
 
@@ -159,6 +163,10 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             ),
             axis=1,
         )
+    df["area"] = df.apply(
+        lambda x: _area(x["to_target_mouse_positions"], x["to_center_mouse_positions"]),
+        axis=1,
+    )
     return df
 
 
@@ -364,3 +372,59 @@ def _rmse(mouse_positions: np.ndarray, target_position: np.ndarray) -> float:
     for x0, y0 in mouse_positions[1:]:
         sum_of_squares += np.power((x2 - x1) * (y1 - y0) - (x1 - x0) * (y2 - y1), 2)
     return np.sqrt(sum_of_squares / norm)
+
+
+def _area(
+    to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray
+) -> float:
+    """
+    Calculates the total area enclosed by the mouse positions and the corresponding list of closed polygons
+
+    Uses the built-in operation `area` in the library `shapely` to calculate the area of geometry object.
+    However this is only available for valid (not self intersected) geometries.
+    To tackle the self-intersection problem,
+    the strategy is to split one self intersected object into the union of LineString (a geometry type composed of one or more line segments),
+    then construct a bunch of valid polygons from these lines,
+    then calculate the area of each valid polygon and sum them up.
+
+    :param to_target_mouse_positions: x,y mouse positions moving towards the target
+    :param to_center_mouse_positions: x,y mouse positions moving towards the center
+    :return: area
+
+    """
+    coords = get_closed_polygon(to_target_mouse_positions, to_center_mouse_positions)
+    polygons = polygonize(unary_union(LineString(coords)))
+    area = sum(polygon.area for polygon in polygons)
+    return area
+
+
+def get_closed_polygon(
+    to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray
+) -> np.ndarray:
+    """
+    connect the to target path and to center path to a closed polygon
+
+    :param to_target_mouse_positions: x,y mouse positions moving towards the target
+    :param to_center_mouse_positions: x,y mouse positions moving towards the center
+    :return: x,y mouse positions of the closed polygon
+
+    """
+    to_target_mouse_positions = (
+        to_target_mouse_positions.reshape(0, 2)
+        if to_target_mouse_positions.size == 0
+        else to_target_mouse_positions
+    )
+    to_center_mouse_positions = (
+        to_center_mouse_positions.reshape(0, 2)
+        if to_center_mouse_positions.size == 0
+        else to_center_mouse_positions
+    )
+    coords = np.concatenate(
+        [
+            to_target_mouse_positions,
+            to_center_mouse_positions[0:1],
+            to_center_mouse_positions,
+            to_target_mouse_positions[0:1],
+        ]
+    )
+    return coords
