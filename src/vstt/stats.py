@@ -416,7 +416,6 @@ def _normalized_area(
 def get_movement_length(to_center_mouse_positions, to_target_mouse_positions):
     to_target_path_length = _distance(to_target_mouse_positions)
     to_center_path_length = _distance(to_center_mouse_positions)
-    movement_length = 0
     if to_target_path_length == 0:
         try:
             to_target_path_length = xydist(to_center_mouse_positions[0], to_center_mouse_positions[-1])
