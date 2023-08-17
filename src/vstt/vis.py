@@ -164,12 +164,18 @@ def format_float(value, significant_digit=3, unit=None):
 
 def format_stat_value(stat, stats, unit=None, averages=False):
     if stat in ["to_target_success", "to_center_success"]:
-        success_stat_key = stat + '_trial'
-        success_stat = stats[success_stat_key] if success_stat_key in stats else stats[stat]
+        success_stat_key = stat + "_trial"
+        success_stat = (
+            stats[success_stat_key] if success_stat_key in stats else stats[stat]
+        )
         if averages:
             return format_percentage(success_stat)
         else:
-            return format_percentage(stats[stat]) if success_stat_key in stats else format_boolean(stats[stat] == 1)
+            return (
+                format_percentage(stats[stat])
+                if success_stat_key in stats
+                else format_boolean(stats[stat] == 1)
+            )
     else:
         return format_float(stats[stat], unit=unit)
 

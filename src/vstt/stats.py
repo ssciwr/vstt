@@ -169,7 +169,9 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
         axis=1,
     )
     df["normalized_area"] = df.apply(
-        lambda x: _normalized_area(x["to_target_mouse_positions"], x["to_center_mouse_positions"]),
+        lambda x: _normalized_area(
+            x["to_target_mouse_positions"], x["to_center_mouse_positions"]
+        ),
         axis=1,
     )
     return df
@@ -407,9 +409,11 @@ def _normalized_area(
     to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray
 ) -> float:
     area = _area(to_target_mouse_positions, to_center_mouse_positions)
-    movement_length = get_movement_length(to_center_mouse_positions, to_target_mouse_positions)
+    movement_length = get_movement_length(
+        to_center_mouse_positions, to_target_mouse_positions
+    )
 
-    normalized_area = area/(movement_length**2) if movement_length != 0 else 0
+    normalized_area = area / (movement_length**2) if movement_length != 0 else 0
     return normalized_area
 
 
@@ -418,12 +422,16 @@ def get_movement_length(to_center_mouse_positions, to_target_mouse_positions):
     to_center_path_length = _distance(to_center_mouse_positions)
     if to_target_path_length == 0:
         try:
-            to_target_path_length = xydist(to_center_mouse_positions[0], to_center_mouse_positions[-1])
+            to_target_path_length = xydist(
+                to_center_mouse_positions[0], to_center_mouse_positions[-1]
+            )
         except IndexError:
             pass
     if to_center_path_length == 0:
         try:
-            to_center_path_length = xydist(to_target_mouse_positions[0], to_target_mouse_positions[-1])
+            to_center_path_length = xydist(
+                to_target_mouse_positions[0], to_target_mouse_positions[-1]
+            )
         except IndexError:
             pass
     movement_length = to_target_path_length + to_center_path_length
