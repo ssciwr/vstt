@@ -230,6 +230,7 @@ def test_display_results_nothing(
         "to_target_success": False,
         "to_center_success": False,
         "area": False,
+        "normalized_area": False,
     }
     for all_trials_for_this_condition in [False, True]:
         # trial 0: 0,1,2 are trials without auto-move to center
@@ -294,6 +295,7 @@ def test_display_results_everything(
         "to_target_success": True,
         "to_center_success": True,
         "area": True,
+        "normalized_area": True,
     }
     for all_trials_for_this_condition in [False, True]:
         # trial 0: 0,1,2 are trials without auto-move to center

@@ -147,39 +147,43 @@ def draw_and_flip(
         raise MotorTaskCancelledByUser
 
 
-def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
+def format_percentage(value):
+    return f"{value:.0%}"
+
+
+def format_boolean(value):
+    return True if value else False
+
+
+def format_float(value, significant_digit=3, unit=None):
+    formatted_value = f"{value:.{significant_digit}g}"
+    if unit:
+        formatted_value += unit
+    return formatted_value
+
+
+def format_stat_value(stat, stats, unit=None, averages=False):
+    if stat in ["to_target_success", "to_center_success"]:
+        success_stat_key = stat + '_trial'
+        success_stat = stats[success_stat_key] if success_stat_key in stats else stats[stat]
+        if averages:
+            return format_percentage(success_stat)
+        else:
+            return format_percentage(stats[stat]) if success_stat_key in stats else format_boolean(stats[stat] == 1)
+    else:
+        return format_float(stats[stat], unit=unit)
+
+
+def _make_stats_txt(display_options, stats, averages=False):
     txt_stats = ""
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
-            if display_options.get(stat, False):  # type: ignore
-                stat_str = f"{stats[stat]: .3f}{unit}"
-                if stat == "to_target_success" or stat == "to_center_success":
-                    if "to_target_success_trial" in stats:
-                        stat_str = f"{stats[stat]:.0%}"
-                    else:
-                        stat_str = f"{stats[stat] == 1}"
-                if stat == "area":
-                    txt_stats += f"{label}: {stat_str}\n"
+            if display_options.get(stat, False):
+                stat_value = format_stat_value(stat, stats, unit, averages)
+                if destination:
+                    txt_stats += f"{label} (to {destination}): {stat_value}\n"
                 else:
-                    txt_stats += f"{label} (to {destination}): {stat_str}\n"
-    return txt_stats
-
-
-def _make_average_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
-    txt_stats = ""
-    for destination, stat_label_units in list_dest_stat_label_units():
-        for stat, label, unit in stat_label_units:
-            if display_options.get(stat, False):  # type: ignore
-                stat_str = f"{stats[stat]: .3f}{unit}"
-                if stat == "to_target_success" or stat == "to_center_success":
-                    if "to_target_success_trial" in stats:
-                        stat_str = f"{stats[stat + '_trial']:.0%}"
-                    else:
-                        stat_str = f"{stats[stat]: .0%}"
-                if stat == "area":
-                    txt_stats += f"{label}: {stat_str}\n"
-                else:
-                    txt_stats += f"{label} (to {destination}): {stat_str}\n"
+                    txt_stats += f"{label}: {stat_value}\n"
     return txt_stats
 
 
@@ -264,8 +268,8 @@ def _make_stats_drawables(
     stats_df["to_center_success"] = to_center_success_fraction
     # average stats
     if display_options["averages"]:
-        txt_stats = "Averages:\n" + _make_average_stats_txt(
-            display_options, stats_df.mean(numeric_only=True)
+        txt_stats = "Averages:\n" + _make_stats_txt(
+            display_options, stats_df.mean(numeric_only=True), True
         )
         drawables.append(
             TextBox2(
