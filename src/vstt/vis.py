@@ -153,7 +153,7 @@ def format_percentage(value: float) -> str:
     format the value into percentage
 
     :param value: input number
-    :return: percentage
+    :return: percentage in string type
     """
     return f"{value:.0%}"
 
@@ -164,7 +164,7 @@ def format_float(value: float, significant_digit: int = 3) -> str:
 
     :param value: input number
     :param significant_digit: significant digit
-    :return: float with certain significant digit
+    :return: float in string type with certain significant digit
     """
     formatted_value = f"{value:.{significant_digit}g}"
     return formatted_value
