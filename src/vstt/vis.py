@@ -6,6 +6,7 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
+from pandas.core.series import Series
 from PIL.Image import Image
 from psychopy.clock import Clock
 from psychopy.colors import colorNames
@@ -147,34 +148,68 @@ def draw_and_flip(
         raise MotorTaskCancelledByUser
 
 
-def format_percentage(value):
+def format_percentage(value: float) -> str:
+    """
+    format the value into percentage
+
+    :param value: input number
+    :return: percentage
+    """
     return f"{value:.0%}"
 
 
-def format_boolean(value):
-    return True if value else False
+def format_float(value: float, significant_digit: int = 3) -> str:
+    """
+    format the value into float with certain significant digits
 
-
-def format_float(value, significant_digit=3, unit=None):
+    :param value: input number
+    :param significant_digit: significant digit
+    :return: float with certain significant digit
+    """
     formatted_value = f"{value:.{significant_digit}g}"
-    if unit:
-        formatted_value += unit
     return formatted_value
 
 
-def format_stat_value(stat, stats, unit=None, averages=False):
+def format_stat_value(
+    stat: str, stats: Series, unit: str = "", averages: bool = False
+) -> str | bool:
+    """
+    format the value in the statistic data
+
+    :param stat: current statistic data
+    :param stats: the whole statistic data
+    :param unit: unit of current statistic value
+    :param averages: is the statistic data the average data or not
+    :return: the formatted statistic data
+    """
     if stat in ["to_target_success", "to_center_success"]:
-        success_stat_key = stat + '_trial'
-        success_stat = stats[success_stat_key] if success_stat_key in stats else stats[stat]
+        success_stat_key = stat + "_trial"
+        success_stat = (
+            stats[success_stat_key] if success_stat_key in stats else stats[stat]
+        )
         if averages:
             return format_percentage(success_stat)
         else:
-            return format_percentage(stats[stat]) if success_stat_key in stats else format_boolean(stats[stat] == 1)
+            return (
+                format_percentage(stats[stat])
+                if success_stat_key in stats
+                else stats[stat] == 1
+            )
     else:
-        return format_float(stats[stat], unit=unit)
+        return format_float(stats[stat]) + unit
 
 
-def _make_stats_txt(display_options, stats, averages=False):
+def _make_stats_txt(
+    display_options: DisplayOptions, stats: Series, averages: bool = False
+) -> str:
+    """
+    create the statistic data
+
+    :param display_options: the display options user chosen
+    :param stats: the whole statistic data
+    :param averages: is the statistic data the average data or not
+    :return: the text form of statistic data
+    """
     txt_stats = ""
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
