@@ -8,7 +8,7 @@ import vstt
 def default_display_options() -> vstt.vtypes.DisplayOptions:
     return {
         "to_target_paths": True,
-        "to_center_paths": False,
+        "to_center_paths": True,
         "targets": True,
         "central_target": True,
         "to_target_reaction_time": True,
