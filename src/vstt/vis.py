@@ -6,7 +6,6 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-from pandas.core.series import Series
 from PIL.Image import Image
 from psychopy.clock import Clock
 from psychopy.colors import colorNames
@@ -148,77 +147,39 @@ def draw_and_flip(
         raise MotorTaskCancelledByUser
 
 
-def format_percentage(value: float) -> str:
-    """
-    format the value into percentage
-
-    :param value: input number
-    :return: percentage in string type
-    """
-    return f"{value:.0%}"
-
-
-def format_float(value: float, significant_digit: int = 3) -> str:
-    """
-    format the value into float with certain significant digits
-
-    :param value: input number
-    :param significant_digit: significant digit
-    :return: float in string type with certain significant digit
-    """
-    formatted_value = f"{value:.{significant_digit}g}"
-    return formatted_value
-
-
-def format_stat_value(
-    stat: str, stats: Series, unit: str = "", averages: bool = False
-) -> str | bool:
-    """
-    format the value in the statistic data
-
-    :param stat: current statistic data
-    :param stats: the whole statistic data
-    :param unit: unit of current statistic value
-    :param averages: is the statistic data the average data or not
-    :return: the formatted statistic data
-    """
-    if stat in ["to_target_success", "to_center_success"]:
-        success_stat_key = stat + "_trial"
-        success_stat = (
-            stats[success_stat_key] if success_stat_key in stats else stats[stat]
-        )
-        if averages:
-            return format_percentage(success_stat)
-        else:
-            return (
-                format_percentage(stats[stat])
-                if success_stat_key in stats
-                else stats[stat] == 1
-            )
-    else:
-        return format_float(stats[stat]) + unit
-
-
-def _make_stats_txt(
-    display_options: DisplayOptions, stats: Series, averages: bool = False
-) -> str:
-    """
-    create the statistic data
-
-    :param display_options: the display options user chosen
-    :param stats: the whole statistic data
-    :param averages: is the statistic data the average data or not
-    :return: the text form of statistic data
-    """
+def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
     txt_stats = ""
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
-            if display_options.get(stat, False):
-                stat_value = format_stat_value(stat, stats, unit, averages)
-                if destination:
-                    txt_stats += f"{label} (to {destination}): {stat_value}\n"
+            if display_options.get(stat, False):  # type: ignore
+                stat_str = f"{stats[stat]: .3f}{unit}"
+                if stat == "to_target_success" or stat == "to_center_success":
+                    if "to_target_success_trial" in stats:
+                        stat_str = f"{stats[stat]:.0%}"
+                    else:
+                        stat_str = f"{stats[stat] == 1}"
+                if stat == "area" or stat == "normalized_area":
+                    txt_stats += f"{label}: {stat_str}\n"
                 else:
-                    txt_stats += f"{label}: {stat_value}\n"
+                    txt_stats += f"{label} (to {destination}): {stat_str}\n"
+    return txt_stats
+
+
+def _make_average_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
+    txt_stats = ""
+    for destination, stat_label_units in list_dest_stat_label_units():
+        for stat, label, unit in stat_label_units:
+            if display_options.get(stat, False):  # type: ignore
+                stat_str = f"{stats[stat]: .3f}{unit}"
+                if stat == "to_target_success" or stat == "to_center_success":
+                    if "to_target_success_trial" in stats:
+                        stat_str = f"{stats[stat + '_trial']:.0%}"
+                    else:
+                        stat_str = f"{stats[stat]: .0%}"
+                if stat == "area" or stat == "normalized_area":
+                    txt_stats += f"{label}: {stat_str}\n"
+                else:
+                    txt_stats += f"{label} (to {destination}): {stat_str}\n"
     return txt_stats
 
 
@@ -303,8 +264,8 @@ def _make_stats_drawables(
     stats_df["to_center_success"] = to_center_success_fraction
     # average stats
     if display_options["averages"]:
-        txt_stats = "Averages:\n" + _make_stats_txt(
-            display_options, stats_df.mean(numeric_only=True), True
+        txt_stats = "Averages:\n" + _make_average_stats_txt(
+            display_options, stats_df.mean(numeric_only=True)
         )
         drawables.append(
             TextBox2(
