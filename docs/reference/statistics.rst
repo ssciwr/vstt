@@ -69,10 +69,14 @@ Area
 The cursor location at a timestamp is given by a pair of :math:`(x, y)` coordinates,
 where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the height of the screen.
 
-Given pairs of :math:`(x, y)` cursor locations to the target and to the center respectively, get the cursor coordinates of the polygon which is closed by the to target and to center :math:`(x, y)` cursor locations, use the build-in function to calculate the area of the polygon.
+Given pairs of :math:`(x, y)` cursor locations, the following statistics are calculated, all in units of screen height:
 
-In cases where the cursor movement results in intersecting paths, multiple polygons are formed, and their areas are summed.
-Moreover, when the movement not only intersects but also leads to overlapping regions, the overlapped area is counted twice.
-e.g.
+    * Area
+        * get the cursor coordinates of the polygon which is closed by the to target and to center :math:`(x, y)` cursor locations, use the build-in function to calculate the area of the polygon.
+        * In cases where the cursor movement results in intersecting paths, multiple polygons are formed, and their areas are summed.
+        * Moreover, when the movement not only intersects but also leads to overlapping regions, the overlapped area is counted twice.
+        * e.g.
+        * .. figure:: images/overlapping.svg
 
-.. figure:: images/overlapping.svg
+    * Normalized Area
+        * (the area formed by paths) / (length of the paths)²
