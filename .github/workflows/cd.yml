@@ -15,7 +15,7 @@ jobs:
     name: Create Windows installer
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: makensis.exe /V4 vstt-windows-installer.nsi
       - name: Upload installer to tagged release
         if: startsWith(github.event.ref, 'refs/tags/')
@@ -33,7 +33,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: 3.11
