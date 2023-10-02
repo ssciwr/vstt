@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import vstt
 from vstt.experiment import Experiment
@@ -128,8 +130,41 @@ def test_area() -> None:
         vstt.stats._area(np.array([[0, 0], [0, 1], [1, 1]]), np.array([])), [0.5]
     )
     assert np.allclose(
+        vstt.stats._area(np.array([]), np.array([[0, 0], [0, 1], [1, 1]])), [0.5]
+    )
+    assert np.allclose(
         vstt.stats._area(
             np.array([[0, 1], [0, 0], [1, 1], [1, 0]]), np.array([[1, 0], [0, 1]])
         ),
         [0.5],
+    )
+
+
+def test_normalized_area() -> None:
+    assert np.allclose(vstt.stats._normalized_area(np.array([]), np.array([])), [0])
+    assert np.allclose(
+        vstt.stats._normalized_area(np.array([]), np.array([[1, 1], [0, 1]])), [0]
+    )
+    assert np.allclose(
+        vstt.stats._normalized_area(np.array([[0, 0], [0, 1]]), np.array([])), [0]
+    )
+    assert np.allclose(
+        vstt.stats._normalized_area(
+            np.array([[0, 0], [0, 1], [1, 1]]), np.array([[1, 1], [1, 0], [0, 0]])
+        ),
+        [1 / 16],
+    )
+    assert np.allclose(
+        vstt.stats._normalized_area(np.array([[0, 0], [0, 1], [1, 1]]), np.array([])),
+        [1 / (12 + 8 * math.sqrt(2))],
+    )
+    assert np.allclose(
+        vstt.stats._normalized_area(np.array([]), np.array([[0, 0], [0, 1], [1, 1]])),
+        [1 / (12 + 8 * math.sqrt(2))],
+    )
+    assert np.allclose(
+        vstt.stats._normalized_area(
+            np.array([[0, 1], [0, 0], [1, 1], [1, 0]]), np.array([[1, 0], [0, 1]])
+        ),
+        [1 / (24 + 16 * math.sqrt(2))],
     )

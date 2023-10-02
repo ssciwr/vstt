@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] - 2023-09-29
+
+### Added
+
+- hand path area statistic and visualization [#241](https://github.com/ssciwr/vstt/pull/241)
+- normalised hand path area statistic [#247](https://github.com/ssciwr/vstt/pull/247)
+- support for psychopy 2023.2.0 [#244](https://github.com/ssciwr/vstt/pull/244)
+
 ## [1.2.0] - 2023-07-07
 
 ### Added

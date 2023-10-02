@@ -24,6 +24,7 @@ def default_display_options() -> vstt.vtypes.DisplayOptions:
         "to_target_success": False,
         "to_center_success": False,
         "area": False,
+        "normalized_area": False,
         "averages": True,
     }
 
@@ -46,7 +47,8 @@ def display_options_labels() -> Dict[str, str]:
         "to_center_rmse": "Statistic: RMSE movement to center",
         "to_target_success": "Statistic: successful movement to target",
         "to_center_success": "Statistic: successful movement to center",
-        "area": "Statistic: the area enclosed by the to target path and to center path",
+        "area": "Statistic: the area formed by the paths connecting the target and the center",
+        "normalized_area": "Statistic: (the area formed by paths) / (length of the paths)²",
         "averages": "Also show statistics averaged over all targets",
     }
 

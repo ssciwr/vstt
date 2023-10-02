@@ -31,6 +31,7 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
             stats.append((f"to_{destination}_{base_stat}", label, unit))
         list_dest_stats.append((destination, stats))
     list_dest_stats.append(("", [("area", "Area", "")]))
+    list_dest_stats.append(("", [("normalized_area", "Normalized Area", "")]))
     return list_dest_stats
 
 
@@ -165,6 +166,12 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
         )
     df["area"] = df.apply(
         lambda x: _area(x["to_target_mouse_positions"], x["to_center_mouse_positions"]),
+        axis=1,
+    )
+    df["normalized_area"] = df.apply(
+        lambda x: _normalized_area(
+            x["to_target_mouse_positions"], x["to_center_mouse_positions"]
+        ),
         axis=1,
     )
     return df
@@ -398,6 +405,43 @@ def _area(
     return area
 
 
+def _normalized_area(
+    to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray
+) -> float:
+    """
+    normalized area = (the area formed by paths) / (length of the paths)²
+
+    :param to_target_mouse_positions: x,y mouse positions moving towards the target
+    :param to_center_mouse_positions: x,y mouse positions moving towards the center
+    :return: normalized area
+    """
+    area = _area(to_target_mouse_positions, to_center_mouse_positions)
+    movement_length = get_movement_length(
+        to_target_mouse_positions, to_center_mouse_positions
+    )
+
+    normalized_area = area / (movement_length**2) if movement_length != 0 else 0
+    return normalized_area
+
+
+def get_movement_length(
+    to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray
+) -> float:
+    """
+    calculate the length of the paths connecting the target and the center
+    if only 1 path exists, another path is the distance between the head and tail of the existing path.
+
+    :param to_target_mouse_positions: x,y mouse positions moving towards the target
+    :param to_center_mouse_positions: x,y mouse positions moving towards the center
+    :return: length of the movement
+    """
+    closed_polygon_coords = get_closed_polygon(
+        to_target_mouse_positions, to_center_mouse_positions
+    )
+    movement_length = _distance(closed_polygon_coords)
+    return movement_length
+
+
 def get_closed_polygon(
     to_target_mouse_positions: np.ndarray, to_center_mouse_positions: np.ndarray
 ) -> np.ndarray:
@@ -409,16 +453,23 @@ def get_closed_polygon(
     :return: x,y mouse positions of the closed polygon
 
     """
-    to_target_mouse_positions = (
-        to_target_mouse_positions.reshape(0, 2)
-        if to_target_mouse_positions.size == 0
-        else to_target_mouse_positions
-    )
-    to_center_mouse_positions = (
-        to_center_mouse_positions.reshape(0, 2)
-        if to_center_mouse_positions.size == 0
-        else to_center_mouse_positions
-    )
+    to_target_mouse_positions = preprocess_mouse_positions(to_target_mouse_positions)
+    to_center_mouse_positions = preprocess_mouse_positions(to_center_mouse_positions)
+    if to_target_mouse_positions.size == 0:
+        return np.concatenate(
+            [
+                to_center_mouse_positions,
+                to_center_mouse_positions[0:1],
+            ]
+        )
+    if to_center_mouse_positions.size == 0:
+        return np.concatenate(
+            [
+                to_target_mouse_positions,
+                to_target_mouse_positions[0:1],
+            ]
+        )
+
     coords = np.concatenate(
         [
             to_target_mouse_positions,
@@ -428,3 +479,17 @@ def get_closed_polygon(
         ]
     )
     return coords
+
+
+def preprocess_mouse_positions(mouse_positions: np.ndarray) -> np.ndarray:
+    """
+    reshape the mouse position to (0, 2) if the mouse position is empty, to prevent error happens in the following
+    concatenate() function
+
+    :param mouse_positions: x,y mouse positions during movement
+    :return: x,y mouse positions after preprocess
+    """
+    mouse_positions = (
+        mouse_positions.reshape(0, 2) if mouse_positions.size == 0 else mouse_positions
+    )
+    return mouse_positions
