@@ -407,18 +407,8 @@ def get_successful_target_fraction(stats_df: pd.DataFrame, dest: str) -> float:
     :return: successful target fraction
 
     """
-    i_condition = stats_df.iloc[0].condition_index
-    trial_indices = stats_df["i_trial"].unique()
-    trial_df = (
-        stats_df[
-            (stats_df.condition_index == i_condition)
-            & (stats_df.i_trial == trial_indices[0])
-        ]
-        if not len(trial_indices) > 1
-        else stats_df
-    )
-    successful_target_fraction = trial_df[f"to_{dest}_success"].values.sum() / len(
-        trial_df[f"to_{dest}_success"]
+    successful_target_fraction = stats_df[f"to_{dest}_success"].values.sum() / len(
+        stats_df[f"to_{dest}_success"]
     )
     return successful_target_fraction
 
