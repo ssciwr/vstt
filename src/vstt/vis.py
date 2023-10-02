@@ -147,35 +147,22 @@ def draw_and_flip(
         raise MotorTaskCancelledByUser
 
 
-def _make_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
+def _make_stats_txt(
+    display_options: DisplayOptions,
+    stats: pd.Series,
+    all_trials_for_this_condition: bool,
+    average: bool,
+) -> str:
     txt_stats = ""
     for destination, stat_label_units in list_dest_stat_label_units():
         for stat, label, unit in stat_label_units:
             if display_options.get(stat, False):  # type: ignore
                 stat_str = f"{stats[stat]: .3f}{unit}"
-                if stat == "to_target_success" or stat == "to_center_success":
-                    if "to_target_success_trial" in stats:
-                        stat_str = f"{stats[stat]:.0%}"
+                if stat == f"to_{destination}_success":
+                    if average or all_trials_for_this_condition:
+                        stat_str = f"{stats[stat]: .0%}"
                     else:
                         stat_str = f"{stats[stat] == 1}"
-                if stat == "area" or stat == "normalized_area":
-                    txt_stats += f"{label}: {stat_str}\n"
-                else:
-                    txt_stats += f"{label} (to {destination}): {stat_str}\n"
-    return txt_stats
-
-
-def _make_average_stats_txt(display_options: DisplayOptions, stats: pd.Series) -> str:
-    txt_stats = ""
-    for destination, stat_label_units in list_dest_stat_label_units():
-        for stat, label, unit in stat_label_units:
-            if display_options.get(stat, False):  # type: ignore
-                stat_str = f"{stats[stat]: .3f}{unit}"
-                if stat == "to_target_success" or stat == "to_center_success":
-                    if "to_target_success_trial" in stats:
-                        stat_str = f"{stats[stat + '_trial']:.0%}"
-                    else:
-                        stat_str = f"{stats[stat]: .0%}"
                 if stat == "area" or stat == "normalized_area":
                     txt_stats += f"{label}: {stat_str}\n"
                 else:
@@ -188,6 +175,7 @@ def _make_stats_drawables(
     display_options: DisplayOptions,
     stats_df: pd.DataFrame,
     win: Window,
+    all_trials_for_this_condition: bool,
 ) -> List[BaseVisualStim]:
     drawables: List[BaseVisualStim] = []
     if stats_df.shape[0] == 0:
@@ -209,7 +197,7 @@ def _make_stats_drawables(
     )
     # stats
     letter_height = 0.014
-    # split target_pos pair into two scalars so they survive the groupby.mean()
+    # split target_pos pair into two scalars, so they survive the groupby.mean()
     stats_df[["target_pos_x", "target_pos_y"]] = pd.DataFrame(
         stats_df.target_pos.tolist(), index=stats_df.index
     )
@@ -223,7 +211,9 @@ def _make_stats_drawables(
         .iterrows()
     ):
         color = colors[int(np.rint(row.target_index))]
-        txt_stats = _make_stats_txt(display_options, row)
+        txt_stats = _make_stats_txt(
+            display_options, row, all_trials_for_this_condition, average=False
+        )
         if row.target_pos_x > 0:
             text_pos = row.target_pos_x + 0.18, row.target_pos_y
         else:
@@ -245,27 +235,20 @@ def _make_stats_drawables(
                 )
             )
 
-    # update the values of to_target_success and to_center_success to the success fraction
-    filtered_df = (
-        stats_df[
-            (stats_df.condition_index == i_condition)
-            & (stats_df.i_trial == trial_indices[0])
-        ]
-        if not len(trial_indices) > 1
-        else stats_df
-    )
-    to_target_success_fraction = sum(filtered_df.to_target_success) / len(
-        filtered_df.to_target_success
-    )
-    to_center_success_fraction = sum(filtered_df.to_center_success) / len(
-        filtered_df.to_center_success
-    )
-    stats_df["to_target_success"] = to_target_success_fraction
-    stats_df["to_center_success"] = to_center_success_fraction
-    # average stats
+    # update the values of to_target_success and to_center_success to the successful trial fraction or successful target fraction
+    for dest in ["target", "center"]:
+        stats_df[f"to_{dest}_success"] = (
+            get_successful_trial_fraction(stats_df, dest)
+            if all_trials_for_this_condition
+            else get_successful_target_fraction(stats_df, dest)
+        )
+
     if display_options["averages"]:
-        txt_stats = "Averages:\n" + _make_average_stats_txt(
-            display_options, stats_df.mean(numeric_only=True)
+        txt_stats = "Averages:\n" + _make_stats_txt(
+            display_options,
+            stats_df.mean(numeric_only=True),
+            all_trials_for_this_condition,
+            average=True,
         )
         drawables.append(
             TextBox2(
@@ -376,13 +359,11 @@ def display_results(
                 -1,
             )
             stats_df = stats_df.loc[stats_df.condition_index == condition_index]
-            for dest in ["target", "center"]:
-                stats_df[f"to_{dest}_success_trial"] = get_successful_trial_fraction(
-                    stats_df, dest
-                )
         else:
             stats_df = stats_df.loc[stats_df.i_trial == i_trial]
-        drawables = _make_stats_drawables(trial_handler, display_options, stats_df, win)
+        drawables = _make_stats_drawables(
+            trial_handler, display_options, stats_df, win, all_trials_for_this_condition
+        )
     return display_drawables(
         display_time_seconds,
         enter_to_skip_delay,
@@ -397,14 +378,39 @@ def display_results(
 
 
 def get_successful_trial_fraction(stats_df: pd.DataFrame, dest: str) -> float:
-    to_dest_success_trial = 0
+    """
+    get successful trial fraction
+
+    :param stats_df: stats dataframe
+    :param dest: "target" or "center"
+    :return: successful trial fraction
+
+    """
     trial_indices = stats_df["i_trial"].unique()
+
+    to_dest_success_trial = 0
     for trial_index in trial_indices:
         data = stats_df.loc[stats_df.i_trial == trial_index]
-        to_dest_failed_number = (~data[f"to_{dest}_success"]).values.sum()
-        to_dest_success_trial += 1 if not to_dest_failed_number else 0
-    to_dest_success_trial_fraction = to_dest_success_trial / len(trial_indices)
-    return to_dest_success_trial_fraction
+        to_dest_success_target_number = (data[f"to_{dest}_success"]).values.sum()
+        to_dest_success_trial += 1 if to_dest_success_target_number == len(data) else 0
+    successful_trial_fraction = to_dest_success_trial / len(trial_indices)
+
+    return successful_trial_fraction
+
+
+def get_successful_target_fraction(stats_df: pd.DataFrame, dest: str) -> float:
+    """
+    get successful target fraction
+
+    :param stats_df: stats dataframe
+    :param dest: "target" or "center"
+    :return: successful target fraction
+
+    """
+    successful_target_fraction = stats_df[f"to_{dest}_success"].values.sum() / len(
+        stats_df[f"to_{dest}_success"]
+    )
+    return successful_target_fraction
 
 
 def _make_textbox_press_enter(win: Window) -> TextBox2:
