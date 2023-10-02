@@ -167,7 +167,6 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
         lambda x: _area(x["to_target_mouse_positions"], x["to_center_mouse_positions"]),
         axis=1,
     )
-    # print(f"stats_dataframe() output:{df}")
     return df
 
 
