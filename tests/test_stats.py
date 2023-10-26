@@ -168,3 +168,41 @@ def test_normalized_area() -> None:
         ),
         [1 / (24 + 16 * math.sqrt(2))],
     )
+
+
+def test_peak_velocity() -> None:
+    assert np.allclose(vstt.stats._peak_velocity(np.array([]), np.array([])), [0])
+    assert np.allclose(
+        vstt.stats._peak_velocity(np.array([0, 0.5, 0.6, 1]), np.array([])), [0]
+    )
+    assert np.allclose(
+        vstt.stats._peak_velocity(
+            np.array([]), np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
+        ),
+        [0],
+    )
+    assert np.allclose(
+        vstt.stats._peak_velocity(
+            np.array([0, 0.5, 0.6, 1]), np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
+        ),
+        [10],
+    )
+
+
+def test_peak_acceleration() -> None:
+    assert np.allclose(vstt.stats._peak_acceleration(np.array([]), np.array([])), [0])
+    assert np.allclose(
+        vstt.stats._peak_acceleration(np.array([0, 0.5, 0.6, 1]), np.array([])), [0]
+    )
+    assert np.allclose(
+        vstt.stats._peak_acceleration(
+            np.array([]), np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
+        ),
+        [0],
+    )
+    assert np.allclose(
+        vstt.stats._peak_acceleration(
+            np.array([0, 0.5, 0.6, 1]), np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
+        ),
+        [103.07764],
+    )

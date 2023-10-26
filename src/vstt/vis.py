@@ -163,7 +163,12 @@ def _make_stats_txt(
                         stat_str = f"{stats[stat]: .0%}"
                     else:
                         stat_str = f"{stats[stat] == 1}"
-                if stat == "area" or stat == "normalized_area":
+                if (
+                    stat == "area"
+                    or stat == "normalized_area"
+                    or stat == "peak_velocity"
+                    or stat == "peak_acceleration"
+                ):
                     txt_stats += f"{label}: {stat_str}\n"
                 else:
                     txt_stats += f"{label} (to {destination}): {stat_str}\n"
