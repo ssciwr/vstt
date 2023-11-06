@@ -539,13 +539,13 @@ def _peak_acceleration(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> 
 
 
 def get_derivative(y: np.ndarray, x: np.ndarray) -> np.ndarray:
+    if x.size <= 1 or y.size <= 1:
+        return np.array([0])
     dy_dx = np.diff(y) / np.diff(x)
     return dy_dx
 
 
 def get_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> np.ndarray:
-    if mouse_times.size == 0 or mouse_positions.size == 0:
-        return np.array([0])
     first_order_derivative = get_derivative(mouse_positions.transpose(), mouse_times)
     velocity = LA.norm(first_order_derivative, axis=0)
     return velocity
@@ -554,8 +554,6 @@ def get_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> np.nda
 def get_acceleration(
     mouse_times: np.ndarray, mouse_positions: np.ndarray
 ) -> np.ndarray:
-    if mouse_times.size == 0 or mouse_positions.size == 0:
-        return np.array([0])
     first_order_derivative = get_derivative(mouse_positions.transpose(), mouse_times)
     second_order_derivative = get_derivative(first_order_derivative, mouse_times[:-1])
     acceleration = LA.norm(second_order_derivative, axis=0)

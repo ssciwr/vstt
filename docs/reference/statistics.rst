@@ -80,3 +80,39 @@ Given pairs of :math:`(x, y)` cursor locations, the following statistics are cal
 
     * Normalized Area
         * (the area formed by paths) / (length of the paths)²
+
+Velocity
+--------
+
+.. figure:: images/velocity.svg
+   :alt: Velocity is defined as the rate of change of position with respect to time
+
+The cursor location at a timestamp is given by a pair of :math:`(x, y)` coordinates,
+where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the height of the screen.
+
+Given pairs of :math:`(x, y)` cursor locations, and pairs of :math:`t` timestamp, the following statistics are calculated, all in units of screen height:
+
+    * Velocity
+        * :math:`\frac{\sqrt{(x_{i+1}-x_i)^2+(y_{i+1}-y_i)^2}}{t_{i+1}-t_i}`
+        * the rate of change of position with respect to time
+
+    * Peak Velocity
+        * maximum velocity
+
+Acceleration
+-----------
+
+.. figure:: images/acceleration.png
+   :alt: Acceleration is the rate of change of the velocity of an object with respect to time
+
+The cursor location at a timestamp is given by a pair of :math:`(x, y)` coordinates,
+where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the height of the screen.
+
+Given pairs of :math:`(x, y)` cursor locations, and pairs of :math:`t` timestamp, the following statistics are calculated, all in units of screen height:
+
+    * Acceleration
+        * :math:`\frac{\sqrt{(\frac{x_{i+2}-x_{i+1}}{t_{i+2}-t_{i+1}}-\frac{x_{i+1}-x_{i}}{t_{i+1}-t_{i}})^2+(\frac{y_{i+2}-y_{i+1}}{t_{i+2}-t_{i+1}}-\frac{y_{i+1}-y`_{i}}{t_{i+1}-t_{i}})^2}}{t_{i+1}-t_i}`
+        * the rate of change of the velocity of an object with respect to time
+
+    * Peak Acceleration
+        * maximum Acceleration

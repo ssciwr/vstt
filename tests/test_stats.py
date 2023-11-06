@@ -187,6 +187,18 @@ def test_peak_velocity() -> None:
         ),
         [10],
     )
+    assert np.allclose(
+        vstt.stats._peak_velocity(np.array([0.5]), np.array([[0, 0]])),
+        [0],
+    )
+    assert np.allclose(
+        vstt.stats._peak_velocity(np.array([0.5]), np.array([])),
+        [0],
+    )
+    assert np.allclose(
+        vstt.stats._peak_velocity(np.array([]), np.array([[0, 0]])),
+        [0],
+    )
 
 
 def test_peak_acceleration() -> None:
@@ -205,4 +217,16 @@ def test_peak_acceleration() -> None:
             np.array([0, 0.5, 0.6, 1]), np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
         ),
         [103.07764],
+    )
+    assert np.allclose(
+        vstt.stats._peak_acceleration(np.array([0.5]), np.array([[0, 0]])),
+        [0],
+    )
+    assert np.allclose(
+        vstt.stats._peak_acceleration(np.array([0.5]), np.array([])),
+        [0],
+    )
+    assert np.allclose(
+        vstt.stats._peak_acceleration(np.array([]), np.array([[0, 0]])),
+        [0],
     )
