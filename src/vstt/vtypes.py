@@ -68,6 +68,8 @@ class DisplayOptions(TypedDict):
     averages: bool
     area: bool
     normalized_area: bool
+    peak_velocity: bool
+    peak_acceleration: bool
 
 
 class Metadata(TypedDict):

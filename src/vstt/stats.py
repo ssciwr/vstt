@@ -9,6 +9,7 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
+from numpy import linalg as LA
 from psychopy.data import TrialHandlerExt
 from psychopy.event import xydist
 from shapely.geometry import LineString
@@ -32,6 +33,8 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
         list_dest_stats.append((destination, stats))
     list_dest_stats.append(("", [("area", "Area", "")]))
     list_dest_stats.append(("", [("normalized_area", "Normalized Area", "")]))
+    list_dest_stats.append(("", [("peak_velocity", "Peak Velocity", "")]))
+    list_dest_stats.append(("", [("peak_acceleration", "Peak Acceleration", "")]))
     return list_dest_stats
 
 
@@ -171,6 +174,34 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
     df["normalized_area"] = df.apply(
         lambda x: _normalized_area(
             x["to_target_mouse_positions"], x["to_center_mouse_positions"]
+        ),
+        axis=1,
+    )
+    df["peak_velocity"] = df.apply(
+        lambda x: _peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            np.concatenate(
+                (
+                    x["to_target_mouse_positions"],
+                    x["to_center_mouse_positions"].reshape(
+                        x["to_center_mouse_positions"].shape[0], 2
+                    ),
+                )
+            ),
+        ),
+        axis=1,
+    )
+    df["peak_acceleration"] = df.apply(
+        lambda x: _peak_acceleration(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            np.concatenate(
+                (
+                    x["to_target_mouse_positions"],
+                    x["to_center_mouse_positions"].reshape(
+                        x["to_center_mouse_positions"].shape[0], 2
+                    ),
+                )
+            ),
         ),
         axis=1,
     )
@@ -493,3 +524,37 @@ def preprocess_mouse_positions(mouse_positions: np.ndarray) -> np.ndarray:
         mouse_positions.reshape(0, 2) if mouse_positions.size == 0 else mouse_positions
     )
     return mouse_positions
+
+
+def _peak_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> float:
+    velocity = get_velocity(mouse_times, mouse_positions)
+    peak_velocity = np.amax(velocity)
+    return peak_velocity
+
+
+def _peak_acceleration(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> float:
+    acceleration = get_acceleration(mouse_times, mouse_positions)
+    peak_acceleration = np.amax(acceleration)
+    return peak_acceleration
+
+
+def get_derivative(y: np.ndarray, x: np.ndarray) -> np.ndarray:
+    if x.size <= 1 or y.size <= 1:
+        return np.array([0])
+    dy_dx = np.diff(y) / np.diff(x)
+    return dy_dx
+
+
+def get_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> np.ndarray:
+    first_order_derivative = get_derivative(mouse_positions.transpose(), mouse_times)
+    velocity = LA.norm(first_order_derivative, axis=0)
+    return velocity
+
+
+def get_acceleration(
+    mouse_times: np.ndarray, mouse_positions: np.ndarray
+) -> np.ndarray:
+    first_order_derivative = get_derivative(mouse_positions.transpose(), mouse_times)
+    second_order_derivative = get_derivative(first_order_derivative, mouse_times[:-1])
+    acceleration = LA.norm(second_order_derivative, axis=0)
+    return acceleration
