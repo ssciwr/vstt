@@ -125,7 +125,7 @@ Spatial Error
    :alt: Spatial Error is the distance from movement end point and the center of the target minus target' radius
 
 The cursor location at a timestamp is given by a pair of :math:`(x, y)` coordinates,
-where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the screen height per second squared.
+where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the screen height.
 
 Given pairs of :math:`(x, y)` cursor locations,the following statistics are calculated, all in units of screen height:
 

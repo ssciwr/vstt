@@ -579,11 +579,7 @@ def get_acceleration(
 def _spatial_error(
     mouse_position: np.ndarray, target: np.ndarray, target_radius: float
 ) -> float:
-    if mouse_position.size >= 1:
-        end_point = mouse_position[-1]
-    else:
+    if mouse_position.size < 1:
         return 0
-    if xydist(end_point, target) >= target_radius:
-        return xydist(end_point, target) - target_radius
-    else:
-        return 0
+    spatial_error = xydist(mouse_position[-1], target) - target_radius
+    return max(spatial_error, 0)
