@@ -172,6 +172,7 @@ def test_task_fixed_intervals_no_user_input(window: Window) -> None:
     experiment.metadata["display_duration"] = 0.0
     target_duration = 1.0
     trial = vstt.trial.default_trial()
+    trial["weight"] = 3
     trial["num_targets"] = 3
     trial["target_order"] = "random"
     trial["show_target_labels"] = True
@@ -192,30 +193,41 @@ def test_task_fixed_intervals_no_user_input(window: Window) -> None:
     # check that we failed to hit all targets
     expected_success = np.full((trial["num_targets"],), False)
     data = experiment.trial_handler_with_results.data
-    for success_name in ["to_target_success", "to_center_success"]:
-        assert np.all(data[success_name][0][0] == expected_success)
-    # first to_target timestamps should start at ~0,
-    # at ~target_duration the first target is displayed for target_duration secs,
-    # subsequent ones should be displayed every ~target_duration starting from ~2*target_duration
-    all_to_target_timestamps = data["to_target_timestamps"][0][0]
-    # require timestamps to be accurate within 0.5s
-    allowed_error_on_timestamp = 0.5
-    # this is a weak requirement to avoid tests failing on CI where many frames can get dropped
-    # if running tests locally allowed_error_on_timestamp should be ~2/fps
-    assert abs(all_to_target_timestamps[0][0]) < allowed_error_on_timestamp
-    assert (
-        abs(all_to_target_timestamps[0][-1] - 2 * target_duration)
-        < allowed_error_on_timestamp
-    )
-    for count, to_target_timestamps in enumerate(all_to_target_timestamps[1:]):
+    assert data["to_target_timestamps"].shape == (3, 1)
+    for irep in [0, 1, 2]:
+        for success_name in ["to_target_success", "to_center_success"]:
+            assert np.all(data[success_name][irep][0] == expected_success)
+        # For first target of first repetition: to_target timestamps should go from 0 to 2*target_duration
+        # All subsequent to_target timestamps should follow sequentially and last target_duration
+        # Each rep resets the clock to zero
+        all_to_target_timestamps = data["to_target_timestamps"][irep][0]
+        # require timestamps to be accurate within 0.5s
+        allowed_error_on_timestamp = 0.5  # 1.0/30.0
+        # this is a weak requirement to avoid tests failing on CI where many frames can get dropped
+        # if running tests locally allowed_error_on_timestamp should be ~2/fps
+        expected_initial_t_first_target = 0
+        expected_final_t_first_target = (
+            2 * target_duration if irep == 0 else target_duration
+        )
         assert (
-            abs(to_target_timestamps[0] - (count + 2) * target_duration)
+            abs(all_to_target_timestamps[0][0]) - expected_initial_t_first_target
             < allowed_error_on_timestamp
         )
         assert (
-            abs(to_target_timestamps[-1] - (count + 3) * target_duration)
+            abs(all_to_target_timestamps[0][-1] - expected_final_t_first_target)
             < allowed_error_on_timestamp
         )
+        for count, to_target_timestamps in enumerate(all_to_target_timestamps[1:]):
+            expected_initial_t = expected_final_t_first_target + count * target_duration
+            expected_final_t = expected_initial_t + target_duration
+            assert (
+                abs(to_target_timestamps[0] - expected_initial_t)
+                < allowed_error_on_timestamp
+            )
+            assert (
+                abs(to_target_timestamps[-1] - expected_final_t)
+                < allowed_error_on_timestamp
+            )
 
 
 def test_task_condition_timeout_no_user_input(window: Window) -> None:
