@@ -97,6 +97,8 @@ class TrialManager:
         if trial["show_cursor_path"]:
             self.drawables.append(self._cursor_path)
         self.first_target_of_condition_shown = False
+        self.most_recent_target_display_time = 0.0
+        self.final_target_display_time_previous_trial = 0.0
 
     def cursor_path_add_vertex(
         self, vertex: Tuple[float, float], clear_existing: bool = False
@@ -233,6 +235,9 @@ class MotorTask:
         if trial["use_joystick"] and self.js is None:
             raise RuntimeError("Use joystick option is enabled, but no joystick found.")
         trial_manager.cursor.setPos(initial_cursor_pos)
+        trial_manager.final_target_display_time_previous_trial = (
+            trial_manager.most_recent_target_display_time
+        )
         trial_data = TrialData(trial, self.rng)
         self.win.recordFrameIntervals = True
         trial_manager.clock.reset()
@@ -282,7 +287,9 @@ class MotorTask:
         stop_target_time = 0.0
         if trial["fixed_target_intervals"]:
             num_completed_targets = len(trial_data.to_target_timestamps)
-            stop_waiting_time = (num_completed_targets + 1) * trial["target_duration"]
+            stop_waiting_time = (num_completed_targets + 1) * trial[
+                "target_duration"
+            ] - tm.final_target_display_time_previous_trial
             stop_target_time = stop_waiting_time + trial["target_duration"]
         for target_index in _get_target_indices(index, trial):
             t0 = tm.clock.getTime()
@@ -398,6 +405,7 @@ class MotorTask:
                     dist > target_size
                     and tm.clock.getTime() + minimum_window_for_flip < stop_target_time
                 )
+            tm.most_recent_target_display_time = tm.clock.getTime() - stop_waiting_time
             success = (
                 dist_correct <= target_size
                 and tm.clock.getTime() + minimum_window_for_flip < stop_target_time
