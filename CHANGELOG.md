@@ -2,6 +2,10 @@
 
 ## [1.3.2] - 2023-12-08
 
+### Added
+
+- peak velocity and acceleration statistics [#253](https://github.com/ssciwr/vstt/pull/253)
+
 ### Fixed
 
 - additional delay between repetitions of a condition when using fixed target display intervals [#256](https://github.com/ssciwr/vstt/issues/256)
