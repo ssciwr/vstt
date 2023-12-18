@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.4.0] - 2023-12-08
+
+### Added
+
+- peak velocity and acceleration statistics [#253](https://github.com/ssciwr/vstt/pull/253)
+
+### Fixed
+
+- additional delay between repetitions of a condition when using fixed target display intervals [#256](https://github.com/ssciwr/vstt/issues/256)
+
+## [1.3.1] - 2023-11-06
+
+### Fixed
+
+- missing dependency for vstt 1.3.0 [#254](https://github.com/ssciwr/vstt/pull/254)
+
 ## [1.3.0] - 2023-09-29
 
 ### Added
