@@ -230,3 +230,19 @@ def test_peak_acceleration() -> None:
         vstt.stats._peak_acceleration(np.array([]), np.array([[0, 0]])),
         [0],
     )
+
+
+def test_spatial_error() -> None:
+    assert np.allclose(
+        vstt.stats._spatial_error(np.array([]), np.array([1, 1]), 0.01), [0]
+    )
+    assert np.allclose(
+        vstt.stats._spatial_error(np.array([[1, 1]]), np.array([1, 1]), 0.01), [0]
+    )
+    assert np.allclose(
+        vstt.stats._spatial_error(np.array([[0.99, 1]]), np.array([1, 1]), 0.02), [0]
+    )
+    assert np.allclose(
+        vstt.stats._spatial_error(np.array([[-1, -1], [0, 0]]), np.array([1, 1]), 0.01),
+        [1.404213562],
+    )

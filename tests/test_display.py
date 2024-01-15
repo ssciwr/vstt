@@ -37,6 +37,8 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
         "normalized_area": False,
         "peak_velocity": False,
         "peak_acceleration": False,
+        "to_target_spatial_error": False,
+        "to_center_spatial_error": False,
     }
     for key in default_display_options:
         assert key in display_options_dict

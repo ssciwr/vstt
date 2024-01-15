@@ -28,6 +28,7 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
             ("distance", "Distance", ""),
             ("rmse", "RMSE", ""),
             ("success", "Success", ""),
+            ("spatial_error", "Spatial", ""),
         ]:
             stats.append((f"to_{destination}_{base_stat}", label, unit))
         list_dest_stats.append((destination, stats))
@@ -46,11 +47,13 @@ def _get_trial_data_columns() -> List[str]:
         "condition_index",
         "target_index",
         "target_pos",
+        "target_radius",
         "to_target_timestamps",
         "to_target_mouse_positions",
         "to_target_success",
         "to_target_num_timestamps_before_visible",
         "center_pos",
+        "center_radius",
         "to_center_timestamps",
         "to_center_mouse_positions",
         "to_center_success",
@@ -81,6 +84,9 @@ def _get_target_data(
 ) -> List:
     data = trial_handler.data
     condition_index = trial_handler.sequenceIndices[index]
+    conditions = trial_handler.trialList[condition_index]
+    target_radius = conditions["target_size"]
+    central_target_radius = conditions["central_target_size"]
     target_index = data["target_indices"][index][i_target]
     target_pos = np.array(data["target_pos"][index][i_target])
     center_pos = np.array([0.0, 0.0])
@@ -114,11 +120,13 @@ def _get_target_data(
         condition_index,
         target_index,
         target_pos,
+        target_radius,
         to_target_timestamps,
         to_target_mouse_positions,
         to_target_success,
         to_target_num_timestamps_before_visible,
         center_pos,
+        central_target_radius,
         to_center_timestamps,
         to_center_mouse_positions,
         to_center_success,
@@ -164,6 +172,14 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
         df[f"to_{destination}_rmse"] = df.apply(
             lambda x: _rmse(
                 x[f"to_{destination}_mouse_positions"], x[f"{destination}_pos"]
+            ),
+            axis=1,
+        )
+        df[f"to_{destination}_spatial_error"] = df.apply(
+            lambda x: _spatial_error(
+                x[f"to_{destination}_mouse_positions"],
+                x[f"{destination}_pos"],
+                x[f"{destination}_radius"],
             ),
             axis=1,
         )
@@ -558,3 +574,12 @@ def get_acceleration(
     second_order_derivative = get_derivative(first_order_derivative, mouse_times[:-1])
     acceleration = LA.norm(second_order_derivative, axis=0)
     return acceleration
+
+
+def _spatial_error(
+    mouse_position: np.ndarray, target: np.ndarray, target_radius: float
+) -> float:
+    if mouse_position.size < 1:
+        return 0
+    spatial_error = xydist(mouse_position[-1], target) - target_radius
+    return max(spatial_error, 0)

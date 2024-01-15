@@ -27,6 +27,8 @@ def default_display_options() -> vstt.vtypes.DisplayOptions:
         "normalized_area": False,
         "peak_velocity": False,
         "peak_acceleration": False,
+        "to_target_spatial_error": False,
+        "to_center_spatial_error": False,
         "averages": True,
     }
 
@@ -53,6 +55,8 @@ def display_options_labels() -> Dict[str, str]:
         "normalized_area": "Statistic: (the area formed by paths) / (length of the paths)²",
         "peak_velocity": "Statistic: maximum velocity during cursor movement",
         "peak_acceleration": "Statistic: maximum acceleration during cursor movement",
+        "to_target_spatial_error": "Statistic: distance from the movement end point to the target",
+        "to_center_spatial_error": "Statistic: distance from the movement end point to the center",
         "averages": "Also show statistics averaged over all targets",
     }
 
