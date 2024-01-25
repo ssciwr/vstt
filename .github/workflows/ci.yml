@@ -39,13 +39,13 @@ jobs:
             psychopy-version: "2022.1.4"
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Mesa 3D to get OpenGL support on Windows without a GPU
-        uses: ssciwr/setup-mesa-dist-win@v1
+        uses: ssciwr/setup-mesa-dist-win@v2
         with:
-          version: "23.1.5"
+          version: "23.3.3"
       - name: Linux setup
         if: runner.os == 'Linux'
         run: |
