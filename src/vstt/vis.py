@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-from typing import Optional
-from typing import Tuple
-
 import numpy as np
 import pandas as pd
 from PIL.Image import Image
@@ -18,6 +14,7 @@ from psychopy.visual.elementarray import ElementArrayStim
 from psychopy.visual.shape import ShapeStim
 from psychopy.visual.textbox2 import TextBox2
 from psychopy.visual.window import Window
+
 from vstt.geom import points_on_circle
 from vstt.stats import get_closed_polygon
 from vstt.stats import list_dest_stat_label_units
@@ -77,8 +74,8 @@ def make_target_labels(
     radius: float,
     point_radius: float,
     labels_string: str,
-) -> List[TextBox2]:
-    text_boxes: List[TextBox2] = []
+) -> list[TextBox2]:
+    text_boxes: list[TextBox2] = []
     positions = points_on_circle(n_circles, radius, include_centre=False)
     labels = labels_string.strip().split(" ")
     for label, position in zip(
@@ -101,7 +98,7 @@ def make_target_labels(
 
 
 def update_target_colors(
-    targets: ElementArrayStim, show_inactive_targets: bool, index: Optional[int] = None
+    targets: ElementArrayStim, show_inactive_targets: bool, index: int | None = None
 ) -> None:
     inactive_rgb = 0.0
     if show_inactive_targets:
@@ -116,9 +113,9 @@ def update_target_colors(
 
 
 def update_target_label_colors(
-    target_labels: List[TextBox2],
+    target_labels: list[TextBox2],
     show_inactive_targets: bool,
-    index: Optional[int] = None,
+    index: int | None = None,
 ) -> None:
     inactive_rgb = 0.0
     if show_inactive_targets:
@@ -136,8 +133,8 @@ class MotorTaskCancelledByUser(Exception):
 
 def draw_and_flip(
     win: Window,
-    drawables: List[BaseVisualStim],
-    kb: Optional[Keyboard],
+    drawables: list[BaseVisualStim],
+    kb: Keyboard | None,
     kb_stop_key: str = "escape",
 ) -> None:
     for drawable in drawables:
@@ -181,8 +178,8 @@ def _make_stats_drawables(
     stats_df: pd.DataFrame,
     win: Window,
     all_trials_for_this_condition: bool,
-) -> List[BaseVisualStim]:
-    drawables: List[BaseVisualStim] = []
+) -> list[BaseVisualStim]:
+    drawables: list[BaseVisualStim] = []
     if stats_df.shape[0] == 0:
         # no results to display
         return drawables
@@ -340,15 +337,15 @@ def display_results(
     display_time_seconds: float,
     enter_to_skip_delay: bool,
     show_delay_countdown: bool,
-    trial_handler: Optional[TrialHandlerExt],
+    trial_handler: TrialHandlerExt | None,
     display_options: DisplayOptions,
     i_trial: int,
     all_trials_for_this_condition: bool,
-    win: Optional[Window] = None,
-    mouse: Optional[Mouse] = None,
-    mouse_pos: Optional[Tuple[float, float]] = None,
+    win: Window | None = None,
+    mouse: Mouse | None = None,
+    mouse_pos: tuple[float, float] | None = None,
     return_screenshot: bool = False,
-) -> Optional[Image]:
+) -> Image | None:
     close_window_when_done = False
     if win is None:
         win = _make_window()
@@ -474,13 +471,13 @@ def display_drawables(
     display_time_seconds: float,
     enter_to_skip_delay: bool,
     show_delay_countdown: bool,
-    drawables: List[BaseVisualStim],
+    drawables: list[BaseVisualStim],
     win: Window,
     close_window_when_done: bool,
-    mouse: Optional[Mouse] = None,
-    mouse_pos: Optional[Tuple[float, float]] = None,
+    mouse: Mouse | None = None,
+    mouse_pos: tuple[float, float] | None = None,
     return_screenshot: bool = False,
-) -> Optional[Image]:
+) -> Image | None:
     screenshot = None
     if drawables is None:
         drawables = []
@@ -530,7 +527,7 @@ def splash_screen(
     enter_to_skip_delay: bool,
     show_delay_countdown: bool,
     metadata: Metadata,
-    win: Optional[Window] = None,
+    win: Window | None = None,
 ) -> None:
     close_window_when_done = False
     if win is None:

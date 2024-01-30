@@ -4,7 +4,6 @@ import copy
 import logging
 from typing import Any
 from typing import Mapping
-from typing import Type
 from typing import TypeVar
 
 from vstt.vtypes import DisplayOptions
@@ -19,7 +18,7 @@ VsttTypedDict = TypeVar(
 )
 
 
-def _has_valid_type(var: Any, correct_type: Type) -> bool:
+def _has_valid_type(var: Any, correct_type: type) -> bool:
     if isinstance(var, correct_type):
         # var has the correct type
         return True

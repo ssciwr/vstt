@@ -39,4 +39,4 @@ def test_display_options_widget(window: Window) -> None:
         assert signal_received
     # check that all values have the correct type
     for value in widget.experiment.display_options.values():
-        assert type(value) is bool
+        assert isinstance(value, bool)

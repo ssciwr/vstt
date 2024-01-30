@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pathlib
 from typing import Any
-from typing import Tuple
 
 import qt_test_utils as qtu
 import vstt
@@ -160,16 +159,24 @@ def test_gui_import_export(
         assert not export_filepath.is_file()
 
         # monkey patch QFileDialog.getSaveFileName to just return desired filename
-        def mock_getSaveFileName(*args: Any, **kwargs: Any) -> Tuple[str, str]:
-            return str(export_filepath), filter
+        def mock_get_save_file_name(
+            *args: Any,
+            mock_return_value: tuple[str, str] = (str(export_filepath), filter),
+            **kwargs: Any,
+        ) -> tuple[str, str]:
+            return mock_return_value
 
-        monkeypatch.setattr(QFileDialog, "getSaveFileName", mock_getSaveFileName)
+        monkeypatch.setattr(QFileDialog, "getSaveFileName", mock_get_save_file_name)
 
         # monkey patch QInputDialog.getItem to just return desired option
-        def mock_getItem(*args: Any, **kwargs: Any) -> Tuple[str, bool]:
-            return data_option, True
+        def mock_get_item(
+            *args: Any,
+            mock_return_value: tuple[str, bool] = (data_option, True),
+            **kwargs: Any,
+        ) -> tuple[str, bool]:
+            return mock_return_value
 
-        monkeypatch.setattr(QInputDialog, "getItem", mock_getItem)
+        monkeypatch.setattr(QInputDialog, "getItem", mock_get_item)
 
         gui = Gui(filename=str(filepath))
         assert gui.experiment.metadata == experiment_with_results.metadata

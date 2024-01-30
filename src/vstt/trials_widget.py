@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from psychopy.visual.window import Window
 from qtpy import QtCore
 from qtpy import QtWidgets
+
 from vstt.experiment import Experiment
+from vstt.trial import Trial
 from vstt.trial import describe_trial
 from vstt.trial import get_trial_from_user
-from vstt.trial import Trial
 
 
 class TrialsWidget(QtWidgets.QWidget):
     experiment_modified = QtCore.Signal()
 
     def __init__(
-        self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
+        self, parent: QtWidgets.QWidget | None = None, win: Window | None = None
     ):
         super().__init__(parent)
         self._win = win
@@ -64,7 +63,7 @@ class TrialsWidget(QtWidgets.QWidget):
         self._btn_move_up.setEnabled(self._can_move_up(row))
         self._btn_move_down.setEnabled(self._can_move_down(row))
 
-    def _current_trial(self) -> Optional[Trial]:
+    def _current_trial(self) -> Trial | None:
         row = self._widget_list_trials.currentRow()
         if not self._is_valid(row):
             return None

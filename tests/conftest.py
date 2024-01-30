@@ -3,7 +3,6 @@ from __future__ import annotations
 import copy
 import os
 import sys
-from typing import Tuple
 
 import numpy as np
 import pyautogui
@@ -58,7 +57,7 @@ def noise(scale: float = 0.02) -> float:
 
 
 def make_mouse_positions(
-    pos: Tuple[float, float], time_points: np.ndarray
+    pos: tuple[float, float], time_points: np.ndarray
 ) -> np.ndarray:
     return np.array([(pos[0] * t + noise(), pos[1] * t + noise()) for t in time_points])
 

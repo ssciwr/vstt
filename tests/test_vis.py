@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict
-from typing import List
-from typing import Tuple
-
 import gui_test_utils as gtu
 import numpy as np
 import pytest
@@ -56,7 +52,7 @@ def test_make_cursor(window: Window) -> None:
     ],
 )
 def test_make_targets(
-    window: Window, args: Dict, xys: List[Tuple[float, float]], add_central_target: bool
+    window: Window, args: dict, xys: list[tuple[float, float]], add_central_target: bool
 ) -> None:
     args["add_central_target"] = add_central_target
     targets = vstt.vis.make_targets(window, **args)
@@ -142,7 +138,7 @@ def test_update_target_colors(
     ],
 )
 def test_make_target_labels(
-    window: Window, args: Dict, xys: List[Tuple[float, float]]
+    window: Window, args: dict, xys: list[tuple[float, float]]
 ) -> None:
     # more labels than targets: label each target and ignore any extra labels
     args["labels_string"] = "a b c d e f"

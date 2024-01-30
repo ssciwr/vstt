@@ -5,15 +5,15 @@ For pyglet backend psychopy Joystick constructor calls .open() on the pyglet inp
 If this device is already open (i.e. we already created a Joystick) then pyglet raises an exception.
 Here we keep track of the current joystick object and attempt to close the underlying pyglet device.
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from psychopy.hardware import joystick
 from pyglet.input import DeviceOpenException
 
-js: Optional[joystick.Joystick] = None
+js: joystick.Joystick | None = None
 
 
 def _close_open_device() -> None:
@@ -35,7 +35,7 @@ def _updated_joystick() -> joystick.Joystick:
         return joystick.Joystick(0)
 
 
-def get_joystick() -> Optional[joystick.Joystick]:
+def get_joystick() -> joystick.Joystick | None:
     global js
     if joystick.getNumJoysticks() == 0:
         return None
