@@ -29,6 +29,10 @@ def default_display_options() -> vstt.vtypes.DisplayOptions:
         "peak_acceleration": False,
         "to_target_spatial_error": False,
         "to_center_spatial_error": False,
+        "movement_time_at_peak_velocity": False,
+        "total_time_at_peak_velocity": False,
+        "movement_distance_at_peak_velocity": False,
+        "rmse_movement_at_peak_velocity": False,
         "averages": True,
     }
 
@@ -57,6 +61,10 @@ def display_options_labels() -> Dict[str, str]:
         "peak_acceleration": "Statistic: maximum acceleration during cursor movement",
         "to_target_spatial_error": "Statistic: distance from the movement end point to the target",
         "to_center_spatial_error": "Statistic: distance from the movement end point to the center",
+        "movement_time_at_peak_velocity": "Statistic: movement time to the point at the peak velocity",
+        "total_time_at_peak_velocity": "Statistic: total time to the point at the peak velocity",
+        "movement_distance_at_peak_velocity": "Statistic: movement distance to the point at the peak velocity",
+        "rmse_movement_at_peak_velocity": "Statistic: RMSE movement to the point at the peak velocity",
         "averages": "Also show statistics averaged over all targets",
     }
 

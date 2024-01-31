@@ -171,32 +171,32 @@ def test_normalized_area() -> None:
 
 
 def test_peak_velocity() -> None:
-    assert np.allclose(vstt.stats._peak_velocity(np.array([]), np.array([])), [0])
+    assert np.allclose(vstt.stats._peak_velocity(np.array([]), np.array([]))[0], [0])
     assert np.allclose(
-        vstt.stats._peak_velocity(np.array([0, 0.5, 0.6, 1]), np.array([])), [0]
+        vstt.stats._peak_velocity(np.array([0, 0.5, 0.6, 1]), np.array([]))[0], [0]
     )
     assert np.allclose(
         vstt.stats._peak_velocity(
             np.array([]), np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
-        ),
+        )[0],
         [0],
     )
     assert np.allclose(
         vstt.stats._peak_velocity(
             np.array([0, 0.5, 0.6, 1]), np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
-        ),
+        )[0],
         [10],
     )
     assert np.allclose(
-        vstt.stats._peak_velocity(np.array([0.5]), np.array([[0, 0]])),
+        vstt.stats._peak_velocity(np.array([0.5]), np.array([[0, 0]]))[0],
         [0],
     )
     assert np.allclose(
-        vstt.stats._peak_velocity(np.array([0.5]), np.array([])),
+        vstt.stats._peak_velocity(np.array([0.5]), np.array([]))[0],
         [0],
     )
     assert np.allclose(
-        vstt.stats._peak_velocity(np.array([]), np.array([[0, 0]])),
+        vstt.stats._peak_velocity(np.array([]), np.array([[0, 0]]))[0],
         [0],
     )
 
@@ -246,3 +246,218 @@ def test_spatial_error() -> None:
         vstt.stats._spatial_error(np.array([[-1, -1], [0, 0]]), np.array([1, 1]), 0.01),
         [1.404213562],
     )
+
+
+def test_movement_time_at_peak_velocity() -> None:
+    np.testing.assert_equal(
+        vstt.stats._movement_time_at_peak_velocity(
+            np.array([]),
+            np.array(
+                [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+            ),
+            0,
+        ),
+        None,
+    )
+    # assert np.allclose(
+    #     vstt.stats._movement_time_at_peak_velocity(np.array([]), np.array([[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]), 0), [None]
+    # )
+
+    np.testing.assert_equal(
+        vstt.stats._movement_time_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]), np.array([]), 0
+        ),
+        None,
+    )
+    # assert np.allclose(
+    #     vstt.stats._movement_time_at_peak_velocity(np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]), np.array([]), 0), [None]
+    # )
+
+    np.testing.assert_equal(
+        vstt.stats._movement_time_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+            ),
+            0,
+        ),
+        0.020000000000000004,
+    )
+    # assert np.allclose(
+    #     vstt.stats._movement_time_at_peak_velocity(
+    #         np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+    #         np.array(
+    #             [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+    #         ),
+    #         0,
+    #     ),
+    #     [0.02],
+    # )
+
+
+def test_total_time_at_peak_velocity() -> None:
+    np.testing.assert_equal(
+        vstt.stats._total_time_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+            ),
+            5,
+        ),
+        None,
+    )
+    # assert np.allclose(
+    #     vstt.stats._total_time_at_peak_velocity(np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]), np.array([[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]), 5), [None]
+    # )
+
+    np.testing.assert_equal(
+        vstt.stats._total_time_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+            ),
+            0,
+        ),
+        0.03,
+    )
+    # assert np.allclose(
+    #     vstt.stats._total_time_at_peak_velocity(
+    #         np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+    #         np.array(
+    #             [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+    #         ),
+    #         0,
+    #     ),
+    #     [0.03],
+    # )
+
+
+def test_movement_distance_at_peak_velocity() -> None:
+    np.testing.assert_equal(
+        vstt.stats._movement_distance_at_peak_velocity(
+            np.array([]),
+            np.array(
+                [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+            ),
+            0,
+        ),
+        None,
+    )
+    # assert np.allclose(
+    #     vstt.stats._movement_distance_at_peak_velocity(np.array([]), np.array(
+    #         [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]), 0), [None]
+    # )
+
+    np.testing.assert_equal(
+        vstt.stats._movement_distance_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]), np.array([]), 0
+        ),
+        None,
+    )
+    # assert np.allclose(
+    #     vstt.stats._movement_distance_at_peak_velocity(np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]), np.array([]), 0),
+    #     [None]
+    # )
+
+    np.testing.assert_equal(
+        vstt.stats._movement_distance_at_peak_velocity(
+            np.array([0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [
+                    [0, 0],
+                    [0, 0],
+                    [0.1, 0.4],
+                    [0.4, 0.6],
+                    [0.6, 0.75],
+                    [1, 1.2],
+                    [1.1, 1.5],
+                ]
+            ),
+            0,
+        ),
+        0.610555127546399,
+    )
+    # assert np.allclose(
+    #     vstt.stats._movement_distance_at_peak_velocity(
+    #         np.array([0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+    #         np.array(
+    #             [
+    #                 [0, 0],
+    #                 [0, 0],
+    #                 [0.1, 0.4],
+    #                 [0.4, 0.6],
+    #                 [0.6, 0.75],
+    #                 [1, 1.2],
+    #                 [1.1, 1.5],
+    #             ]
+    #         ),
+    #         0,
+    #     ),
+    #     [0.610555],
+    # )
+
+
+def test_rmse_movement_at_peak_velocity() -> None:
+    np.testing.assert_equal(
+        vstt.stats._rmse_movement_at_peak_velocity(
+            np.array([]),
+            np.array(
+                [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+            ),
+            np.array([1.1, 1.5]),
+            0,
+        ),
+        None,
+    )
+    # assert np.allclose(
+    #     vstt.stats._rmse_movement_at_peak_velocity(
+    #         np.array([]),
+    #         np.array(
+    #             [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+    #         ),
+    #         np.array([1.1, 1.5]),
+    #         0,
+    #     ),
+    #     [None],
+    # )
+    np.testing.assert_equal(
+        vstt.stats._rmse_movement_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array([]),
+            np.array([1.1, 1.5]),
+            0,
+        ),
+        None,
+    )
+    # assert np.allclose(
+    #     vstt.stats._rmse_movement_at_peak_velocity(
+    #         np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+    #         np.array([]),
+    #         np.array([1.1, 1.5]),
+    #         0,
+    #     ),
+    #     [None],
+    # )
+
+    np.testing.assert_equal(
+        vstt.stats._rmse_movement_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+            ),
+            np.array([1.1, 1.5]),
+            0,
+        ),
+        0.13453455879926254,
+    )
+    # assert np.allclose(
+    #     vstt.stats._rmse_movement_at_peak_velocity(
+    #         np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+    #         np.array(
+    #             [[0, 0], [0.1, 0.4], [0.4, 0.6], [0.6, 0.75], [1, 1.2], [1.1, 1.5]]
+    #         ),
+    #         np.array([1.1, 1.5]),
+    #         0,
+    #     ),
+    #     [0.13453455879926254],
+    # )

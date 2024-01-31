@@ -39,6 +39,10 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
         "peak_acceleration": False,
         "to_target_spatial_error": False,
         "to_center_spatial_error": False,
+        "movement_time_at_peak_velocity": False,
+        "total_time_at_peak_velocity": False,
+        "movement_distance_at_peak_velocity": False,
+        "rmse_movement_at_peak_velocity": False,
     }
     for key in default_display_options:
         assert key in display_options_dict

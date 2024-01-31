@@ -7,6 +7,7 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
+import numpy
 import numpy as np
 import pandas as pd
 from numpy import linalg as LA
@@ -15,6 +16,8 @@ from psychopy.event import xydist
 from shapely.geometry import LineString
 from shapely.ops import polygonize
 from shapely.ops import unary_union
+
+import docs.conf
 
 
 def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]:
@@ -36,6 +39,30 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
     list_dest_stats.append(("", [("normalized_area", "Normalized Area", "")]))
     list_dest_stats.append(("", [("peak_velocity", "Peak Velocity", "")]))
     list_dest_stats.append(("", [("peak_acceleration", "Peak Acceleration", "")]))
+    list_dest_stats.append(
+        (
+            "",
+            [("movement_time_at_peak_velocity", "Movement Time at Peak Velocity", "s")],
+        )
+    )
+    list_dest_stats.append(
+        ("", [("total_time_at_peak_velocity", "Total Time at Peak Velocity", "s")])
+    )
+    list_dest_stats.append(
+        (
+            "",
+            [
+                (
+                    "movement_distance_at_peak_velocity",
+                    "Movement Distance at Peak Velocity",
+                    "",
+                )
+            ],
+        )
+    )
+    list_dest_stats.append(
+        ("", [("rmse_movement_at_peak_velocity", "RMSE Movement at Peak Velocity", "")])
+    )
     return list_dest_stats
 
 
@@ -221,6 +248,67 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
         ),
         axis=1,
     )
+    df["movement_time_at_peak_velocity"] = df.apply(
+        lambda x: _movement_time_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            np.concatenate(
+                (
+                    x["to_target_mouse_positions"],
+                    x["to_center_mouse_positions"].reshape(
+                        x["to_center_mouse_positions"].shape[0], 2
+                    ),
+                )
+            ),
+            x["to_target_num_timestamps_before_visible"],
+        ),
+        axis=1,
+    )
+    df["total_time_at_peak_velocity"] = df.apply(
+        lambda x: _total_time_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            np.concatenate(
+                (
+                    x["to_target_mouse_positions"],
+                    x["to_center_mouse_positions"].reshape(
+                        x["to_center_mouse_positions"].shape[0], 2
+                    ),
+                )
+            ),
+            x["to_target_num_timestamps_before_visible"],
+        ),
+        axis=1,
+    )
+    df["movement_distance_at_peak_velocity"] = df.apply(
+        lambda x: _movement_distance_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            np.concatenate(
+                (
+                    x["to_target_mouse_positions"],
+                    x["to_center_mouse_positions"].reshape(
+                        x["to_center_mouse_positions"].shape[0], 2
+                    ),
+                )
+            ),
+            x["to_target_num_timestamps_before_visible"],
+        ),
+        axis=1,
+    )
+    df["rmse_movement_at_peak_velocity"] = df.apply(
+        lambda x: _rmse_movement_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            np.concatenate(
+                (
+                    x["to_target_mouse_positions"],
+                    x["to_center_mouse_positions"].reshape(
+                        x["to_center_mouse_positions"].shape[0], 2
+                    ),
+                )
+            ),
+            x["target_pos"],
+            x["to_target_num_timestamps_before_visible"],
+        ),
+        axis=1,
+    )
     return df
 
 
@@ -343,7 +431,7 @@ def _reaction_time(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-    epsilon: float = 1e-12,
+    # epsilon: float = 1e-12,
 ) -> float:
     """
     The reaction time is defined as the timestamp where the cursor first moves,
@@ -364,9 +452,9 @@ def _reaction_time(
     ):
         return np.nan
     i = 0
-    while xydist(mouse_positions[0], mouse_positions[i]) < epsilon and i + 1 < len(
-        mouse_times
-    ):
+    while xydist(
+        mouse_positions[0], mouse_positions[i]
+    ) < docs.conf.epsilon and i + 1 < len(mouse_times):
         i += 1
     return mouse_times[i] - mouse_times[to_target_num_timestamps_before_visible]
 
@@ -542,10 +630,13 @@ def preprocess_mouse_positions(mouse_positions: np.ndarray) -> np.ndarray:
     return mouse_positions
 
 
-def _peak_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> float:
+def _peak_velocity(
+    mouse_times: np.ndarray, mouse_positions: np.ndarray
+) -> Tuple[numpy.floating, numpy.integer]:
     velocity = get_velocity(mouse_times, mouse_positions)
     peak_velocity = np.amax(velocity)
-    return peak_velocity
+    peak_index = np.argmax(velocity)
+    return peak_velocity, peak_index
 
 
 def _peak_acceleration(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> float:
@@ -583,3 +674,80 @@ def _spatial_error(
         return 0
     spatial_error = xydist(mouse_position[-1], target) - target_radius
     return max(spatial_error, 0)
+
+
+def get_first_movement_index(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> int | None:
+    if (
+        mouse_times.shape[0] != mouse_positions.shape[0]
+        or mouse_times.shape[0] == 0
+        or mouse_times.shape[0] < to_target_num_timestamps_before_visible
+    ):
+        return None
+    i = 0
+    while xydist(
+        mouse_positions[0], mouse_positions[i]
+    ) < docs.conf.epsilon and i + 1 < len(mouse_times):
+        i += 1
+    return i
+
+
+def _movement_time_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float | None:
+    i = get_first_movement_index(
+        mouse_times, mouse_positions, to_target_num_timestamps_before_visible
+    )
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    # print(f"type of movement_time:{type(mouse_times[peak_index] - mouse_times[i])}\n")
+    return mouse_times[peak_index] - mouse_times[i] if i is not None else None
+
+
+def _total_time_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float | None:
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    return (
+        mouse_times[peak_index] - mouse_times[to_target_num_timestamps_before_visible]
+        if to_target_num_timestamps_before_visible < peak_index
+        else None
+    )
+
+
+def _movement_distance_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float | None:
+    i = get_first_movement_index(
+        mouse_times, mouse_positions, to_target_num_timestamps_before_visible
+    )
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    # print(f"type of movement_distance:{type(_distance(mouse_positions[i: peak_index + 1]))}\n")
+    return _distance(mouse_positions[i : peak_index + 1]) if i is not None else None
+
+
+def _rmse_movement_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    target_position: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> numpy.floating | None:
+    i = get_first_movement_index(
+        mouse_times, mouse_positions, to_target_num_timestamps_before_visible
+    )
+    if i is not None:
+        p1 = mouse_positions[i]
+    else:
+        return None
+    p2 = target_position
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    p3 = mouse_positions[peak_index]
+    return LA.norm(np.cross(p2 - p1, p1 - p3)) / LA.norm(p2 - p1)

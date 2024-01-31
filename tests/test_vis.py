@@ -235,6 +235,10 @@ def test_display_results_nothing(
         "peak_acceleration": False,
         "to_target_spatial_error": False,
         "to_center_spatial_error": False,
+        "movement_time_at_peak_velocity": False,
+        "total_time_at_peak_velocity": False,
+        "movement_distance_at_peak_velocity": False,
+        "rmse_movement_at_peak_velocity": False,
     }
     for all_trials_for_this_condition in [False, True]:
         # trial 0: 0,1,2 are trials without auto-move to center
@@ -304,6 +308,10 @@ def test_display_results_everything(
         "peak_acceleration": True,
         "to_target_spatial_error": True,
         "to_center_spatial_error": True,
+        "movement_time_at_peak_velocity": True,
+        "total_time_at_peak_velocity": True,
+        "movement_distance_at_peak_velocity": True,
+        "rmse_movement_at_peak_velocity": True,
     }
     for all_trials_for_this_condition in [False, True]:
         # trial 0: 0,1,2 are trials without auto-move to center
