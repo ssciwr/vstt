@@ -182,7 +182,7 @@ class MotorTask:
                 self.trial_handler.thisTrialN
             )
             if (
-                current_condition_max_time == 0.0
+                current_condition_max_time <= 0.0
                 or current_condition_clock.getTime() < current_condition_max_time
             ):
                 # only do the trial if there is still time left for this condition

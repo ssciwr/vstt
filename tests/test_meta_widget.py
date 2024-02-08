@@ -4,6 +4,7 @@ import gui_test_utils as gtu
 import qt_test_utils as qtu
 import vstt
 from psychopy.visual.window import Window
+from pytest import approx
 from qtpy import QtWidgets
 from vstt.experiment import Experiment
 from vstt.meta_widget import MetadataWidget
@@ -48,7 +49,7 @@ def test_metadata_widget(window: Window) -> None:
     empty_grey_pixel_fraction = gtu.pixel_color_fraction(screenshot, (128, 128, 128))
     assert empty_grey_pixel_fraction > default_grey_pixel_fraction
     # no other text so no black pixels
-    assert gtu.pixel_color_fraction(screenshot, (0, 0, 0)) == 0.000
+    assert gtu.pixel_color_fraction(screenshot, (0, 0, 0)) == approx(0)
     # reset to experiment with empty metadata, then type variable name in each line edit
     assert widget.experiment.has_unsaved_changes is False
     assert widget.experiment.metadata == empty_metadata

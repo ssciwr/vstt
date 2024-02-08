@@ -62,8 +62,10 @@ def make_mouse_positions(
     return np.array([(pos[0] * t + noise(), pos[1] * t + noise()) for t in time_points])
 
 
-def make_timestamps(t0: float, n_min: int = 8, n_max: int = 20) -> np.ndarray:
-    return np.linspace(t0, t0 + 1.0, np.random.randint(n_min, n_max))
+def make_timestamps(
+    rng: np.random.Generator, t0: float, n_min: int = 8, n_max: int = 20
+) -> np.ndarray:
+    return np.linspace(t0, t0 + 1.0, rng.integers(n_min, n_max))
 
 
 @pytest.fixture
@@ -93,6 +95,7 @@ def experiment_no_results() -> Experiment:
 
 @pytest.fixture
 def experiment_with_results() -> Experiment:
+    rng = np.random.default_rng(seed=123)
     experiment = Experiment()
     # trial without auto-move to center, 3 reps, 8 targets
     trial0 = default_trial()
@@ -127,7 +130,7 @@ def experiment_with_results() -> Experiment:
         )
         t0 = 0.0
         for pos in target_pos:
-            to_target_timestamps.append(make_timestamps(t0))
+            to_target_timestamps.append(make_timestamps(rng, t0))
             to_target_num_timestamps_before_visible.append(0)
             to_target_mouse_positions.append(
                 make_mouse_positions(pos, to_target_timestamps[-1])
@@ -135,7 +138,7 @@ def experiment_with_results() -> Experiment:
             to_target_success.append(True)
             t0 = to_target_timestamps[-1][-1] + 1.0 / 60.0
             if not trial["automove_cursor_to_center"]:
-                to_center_timestamps.append(make_timestamps(t0))
+                to_center_timestamps.append(make_timestamps(rng, t0))
                 to_center_num_timestamps_before_visible.append(0)
                 to_center_mouse_positions.append(
                     list(reversed(make_mouse_positions(pos, to_center_timestamps[-1])))

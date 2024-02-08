@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import vstt
+from pytest import approx
 
 
 def test_describe_trial() -> None:
@@ -122,11 +123,11 @@ def test_validate_trial_durations() -> None:
     vtrial = vstt.trial.import_and_validate_trial(trial)
     assert vtrial["target_duration"] == 1
     assert vtrial["central_target_duration"] == 1
-    assert vtrial["pre_target_delay"] == 0.1
-    assert vtrial["pre_central_target_delay"] == 0.087
-    assert vtrial["pre_first_target_extra_delay"] == 0.08123
-    assert vtrial["post_trial_delay"] == 0.2
-    assert vtrial["post_block_delay"] == 0.7
+    assert vtrial["pre_target_delay"] == approx(0.1)
+    assert vtrial["pre_central_target_delay"] == approx(0.087)
+    assert vtrial["pre_first_target_extra_delay"] == approx(0.08123)
+    assert vtrial["post_trial_delay"] == approx(0.2)
+    assert vtrial["post_block_delay"] == approx(0.7)
     # negative durations are cast to zero
     trial["target_duration"] = -1
     trial["central_target_duration"] = -0.8
