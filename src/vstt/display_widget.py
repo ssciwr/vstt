@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from typing import Callable
-from typing import Dict
-from typing import Optional
 
 from psychopy.visual.window import Window
 from qtpy import QtCore
 from qtpy import QtWidgets
+
 from vstt.display import display_options_labels
 from vstt.experiment import Experiment
 
@@ -15,12 +14,12 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
     experiment_modified = QtCore.Signal()
 
     def __init__(
-        self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
+        self, parent: QtWidgets.QWidget | None = None, win: Window | None = None
     ):
         super().__init__(parent)
         self._win = win
         self._experiment: Experiment = Experiment()
-        self._widgets: Dict[str, QtWidgets.QCheckBox] = {}
+        self._widgets: dict[str, QtWidgets.QCheckBox] = {}
 
         outer_layout = QtWidgets.QVBoxLayout()
         group_box = QtWidgets.QGroupBox("Display Options")
@@ -28,7 +27,7 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
         inner_layout = QtWidgets.QVBoxLayout()
         group_box.setLayout(inner_layout)
         labels = display_options_labels()
-        for row_index, key in enumerate(labels.keys()):
+        for _row_index, key in enumerate(labels.keys()):
             checkbox = QtWidgets.QCheckBox(f"{labels[key]}", self)
             inner_layout.addWidget(checkbox)
             checkbox.clicked.connect(self._update_value_callback(key))

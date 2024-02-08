@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import copy
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Mapping
-from typing import Optional
 
 import numpy as np
 from psychopy.gui.qtgui import DlgFromDict
+
 from vstt.common import import_typed_dict
 from vstt.vtypes import Trial
 
@@ -22,7 +20,7 @@ def describe_trial(trial: Trial) -> str:
     return f"{repeats} of {trial['num_targets']} {trial['target_order']} {targets}"
 
 
-def describe_trials(trials: List[Trial]) -> str:
+def describe_trials(trials: list[Trial]) -> str:
     return "\n".join(["  - " + describe_trial(trial) for trial in trials])
 
 
@@ -66,7 +64,7 @@ def default_trial() -> Trial:
     }
 
 
-def trial_labels() -> Dict:
+def trial_labels() -> dict:
     return {
         "weight": "Repetitions",
         "condition_timeout": "Maximum time, 0=unlimited (secs)",
@@ -107,12 +105,9 @@ def trial_labels() -> Dict:
 
 
 def get_trial_from_user(
-    initial_trial: Optional[Trial] = None,
-) -> Optional[Trial]:
-    if initial_trial:
-        trial = copy.deepcopy(initial_trial)
-    else:
-        trial = default_trial()
+    initial_trial: Trial | None = None,
+) -> Trial | None:
+    trial = copy.deepcopy(initial_trial) if initial_trial else default_trial()
     order_of_targets = [trial["target_order"]]
     for target_order in ["clockwise", "anti-clockwise", "random", "fixed"]:
         if target_order != order_of_targets[0]:

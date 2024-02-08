@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pathlib
 from typing import Any
-from typing import Tuple
 
 import gui_test_utils as gtu
 import numpy as np
@@ -49,10 +48,10 @@ def test_results_widget_experiment_with_results(
     png_path = tmp_path / "tmp.png"
 
     # monkey patch QFileDialog.getSaveFileName to just return desired filename
-    def mock_getSaveFileName(*args: Any, **kwargs: Any) -> Tuple[str, str]:
+    def mock_get_save_file_name(*args: Any, **kwargs: Any) -> tuple[str, str]:
         return str(png_path), ""
 
-    monkeypatch.setattr(QFileDialog, "getSaveFileName", mock_getSaveFileName)
+    monkeypatch.setattr(QFileDialog, "getSaveFileName", mock_get_save_file_name)
 
     widget = ResultsWidget(parent=None, win=window)
     # assign experiment with results

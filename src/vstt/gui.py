@@ -3,14 +3,14 @@ from __future__ import annotations
 import logging
 import pathlib
 from typing import Callable
-from typing import Optional
 
-import vstt
 from psychopy.visual.window import Window
 from qtpy import QtGui
 from qtpy import QtWidgets
 from qtpy.compat import getsavefilename
 from qtpy.QtCore import Qt
+
+import vstt
 from vstt.display_widget import DisplayOptionsWidget
 from vstt.experiment import Experiment
 from vstt.meta_widget import MetadataWidget
@@ -22,7 +22,7 @@ from vstt.update import do_pip_upgrade
 
 
 class Gui(QtWidgets.QMainWindow):
-    def __init__(self, filename: Optional[str] = None, win: Optional[Window] = None):
+    def __init__(self, filename: str | None = None, win: Window | None = None):
         super().__init__()
         self.experiment = Experiment()
         self._win = win
@@ -254,9 +254,9 @@ def _add_action(
     name: str,
     callback: Callable,
     menu: QtWidgets.QMenu,
-    toolbar: Optional[QtWidgets.QToolBar] = None,
-    shortcut: Optional[str] = None,
-    icon_pixmap: Optional[QtWidgets.QStyle.StandardPixmap] = None,
+    toolbar: QtWidgets.QToolBar | None = None,
+    shortcut: str | None = None,
+    icon_pixmap: QtWidgets.QStyle.StandardPixmap | None = None,
 ) -> None:
     action = QtWidgets.QAction(name, menu)
     action.triggered.connect(callback)

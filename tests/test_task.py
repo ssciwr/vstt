@@ -3,9 +3,6 @@ from __future__ import annotations
 import threading
 from copy import deepcopy
 from time import sleep
-from typing import Dict
-from typing import List
-from typing import Tuple
 
 import gui_test_utils as gtu
 import numpy as np
@@ -19,8 +16,8 @@ from vstt.task import MotorTask
 
 
 def move_mouse_to_target(
-    target_pixel: Tuple[float, float],
-    target_color: Tuple[int, int, int] = (255, 0, 0),
+    target_pixel: tuple[float, float],
+    target_color: tuple[int, int, int] = (255, 0, 0),
     movement_time: float = 0.1,
 ) -> None:
     # wait until target is activated
@@ -39,17 +36,17 @@ def move_mouse_to_target(
 
 
 def do_task(
-    experiment: Experiment, target_pixels: List[List[Tuple[float, float]]]
+    experiment: Experiment, target_pixels: list[list[tuple[float, float]]]
 ) -> None:
     gtu.ascii_screenshot()
     for target_pixels_block, trial in zip(target_pixels, experiment.trial_list):
-        for rep in range(trial["weight"]):
+        for _rep in range(trial["weight"]):
             for target_pixel in target_pixels_block:
                 move_mouse_to_target(target_pixel)
 
 
 def launch_do_task(
-    experiment: Experiment, target_pixels: List[List[Tuple[float, float]]]
+    experiment: Experiment, target_pixels: list[list[tuple[float, float]]]
 ) -> threading.Thread:
     thread = threading.Thread(
         target=do_task,
@@ -86,7 +83,7 @@ def test_task_no_trials(window: Window) -> None:
     ids=["automove_to_center", "no_central_target"],
 )
 def test_task(
-    experiment_no_results: Experiment, window: Window, trial_settings: Dict
+    experiment_no_results: Experiment, window: Window, trial_settings: dict
 ) -> None:
     target_pixels = []
     experiment_no_results.has_unsaved_changes = False

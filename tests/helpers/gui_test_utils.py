@@ -5,7 +5,6 @@ import sys
 import threading
 from time import sleep
 from typing import Callable
-from typing import Tuple
 
 from ascii_magic import AsciiArt
 from psychopy.visual.window import Window
@@ -34,7 +33,7 @@ def press_enter() -> None:
 
 
 # return true if pixel or any neighbours is of the desired color
-def pixel_color(pixel: Tuple[float, float], color: Tuple[int, int, int]) -> bool:
+def pixel_color(pixel: tuple[float, float], color: tuple[int, int, int]) -> bool:
     img = pyautogui.screenshot().load()
     for dx in [0, 1, -1]:
         for dy in [0, 1, -1]:
@@ -45,7 +44,7 @@ def pixel_color(pixel: Tuple[float, float], color: Tuple[int, int, int]) -> bool
 
 
 # convert a position in units of screen height to a pair of pixels
-def pos_to_pixels(pos: Tuple[float, float]) -> Tuple[float, float]:
+def pos_to_pixels(pos: tuple[float, float]) -> tuple[float, float]:
     # pos is in units of screen height, with 0,0 in centre of screen
     width, height = pyautogui.size()
     # return equivalent position in pixels with 0,0 in top left of screen
@@ -113,7 +112,7 @@ def get_screenshot_when_ready(
 
 # call target with args, get screenshot when ready, press Enter to close screen
 def call_target_and_get_screenshot(
-    target: Callable, args: Tuple, win: Window
+    target: Callable, args: tuple, win: Window
 ) -> np.ndarray:
     screenshot_queue: queue.Queue = queue.Queue()
     screenshot_before = pyautogui.screenshot()
@@ -131,10 +130,10 @@ def call_target_and_get_screenshot(
 
 
 # return fraction of pixels in image of the supplied color
-def pixel_color_fraction(img: np.ndarray, color: Tuple[int, int, int]) -> float:
+def pixel_color_fraction(img: np.ndarray, color: tuple[int, int, int]) -> float:
     return np.count_nonzero((img == np.array(color)).all(axis=2)) / (img.size / 3)
 
 
 # return fraction of pixels in current screen of the supplied color
-def screenshot_pixel_color_fraction(color: Tuple[int, int, int]) -> float:
+def screenshot_pixel_color_fraction(color: tuple[int, int, int]) -> float:
     return pixel_color_fraction(np.asarray(pyautogui.screenshot()), color)

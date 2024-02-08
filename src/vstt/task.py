@@ -2,15 +2,9 @@ from __future__ import annotations
 
 import logging
 from typing import Any
-from typing import Dict
 from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Union
 
 import numpy as np
-import vstt.vtypes
 from psychopy.clock import Clock
 from psychopy.data import TrialHandlerExt
 from psychopy.event import Mouse
@@ -20,6 +14,8 @@ from psychopy.visual.basevisual import BaseVisualStim
 from psychopy.visual.elementarray import ElementArrayStim
 from psychopy.visual.shape import ShapeStim
 from psychopy.visual.window import Window
+
+import vstt.vtypes
 from vstt import joystick_wrapper
 from vstt import vis
 from vstt.experiment import Experiment
@@ -29,7 +25,7 @@ from vstt.geom import to_target_dists
 from vstt.stats import stats_dataframe
 
 
-def _get_target_indices(outer_target_index: int, trial: Dict[str, Any]) -> List[int]:
+def _get_target_indices(outer_target_index: int, trial: dict[str, Any]) -> list[int]:
     # always include outer target index
     indices = [outer_target_index]
     if trial["add_central_target"] and not trial["automove_cursor_to_center"]:
@@ -41,21 +37,21 @@ def _get_target_indices(outer_target_index: int, trial: Dict[str, Any]) -> List[
 class TrialData:
     """Stores the data from the trial that will be stored in the psychopy trial_handler"""
 
-    def __init__(self, trial: Dict[str, Any], rng: np.random.Generator):
+    def __init__(self, trial: dict[str, Any], rng: np.random.Generator):
         self.target_indices = np.fromstring(
             trial["target_indices"], dtype="int", sep=" "
         )
         if trial["target_order"] == "random":
             rng.shuffle(self.target_indices)
-        self.target_pos: List[np.ndarray] = []
-        self.to_target_timestamps: List[np.ndarray] = []
-        self.to_target_num_timestamps_before_visible: List[int] = []
-        self.to_center_timestamps: List[np.ndarray] = []
-        self.to_center_num_timestamps_before_visible: List[int] = []
-        self.to_target_mouse_positions: List[np.ndarray] = []
-        self.to_center_mouse_positions: List[np.ndarray] = []
-        self.to_target_success: List[bool] = []
-        self.to_center_success: List[bool] = []
+        self.target_pos: list[np.ndarray] = []
+        self.to_target_timestamps: list[np.ndarray] = []
+        self.to_target_num_timestamps_before_visible: list[int] = []
+        self.to_center_timestamps: list[np.ndarray] = []
+        self.to_center_num_timestamps_before_visible: list[int] = []
+        self.to_target_mouse_positions: list[np.ndarray] = []
+        self.to_center_mouse_positions: list[np.ndarray] = []
+        self.to_target_success: list[bool] = []
+        self.to_center_success: list[bool] = []
 
 
 class TrialManager:
@@ -70,7 +66,7 @@ class TrialManager:
             trial["add_central_target"],
             trial["central_target_size"],
         )
-        self.drawables: List[Union[BaseVisualStim, ElementArrayStim]] = [self.targets]
+        self.drawables: list[BaseVisualStim | ElementArrayStim] = [self.targets]
         self.target_labels = None
         if trial["show_target_labels"]:
             self.target_labels = vis.make_target_labels(
@@ -92,7 +88,7 @@ class TrialManager:
         self._cursor_path = ShapeStim(
             win, vertices=[(0.0, 0.0)], lineColor="white", closeShape=False
         )
-        self._cursor_path_vertices: List[Tuple[float, float]] = []
+        self._cursor_path_vertices: list[tuple[float, float]] = []
         self.clock = Clock()
         if trial["show_cursor_path"]:
             self.drawables.append(self._cursor_path)
@@ -101,7 +97,7 @@ class TrialManager:
         self.final_target_display_time_previous_trial = 0.0
 
     def cursor_path_add_vertex(
-        self, vertex: Tuple[float, float], clear_existing: bool = False
+        self, vertex: tuple[float, float], clear_existing: bool = False
     ) -> None:
         if clear_existing:
             self._cursor_path_vertices = []
@@ -125,7 +121,7 @@ def add_trial_data_to_trial_handler(
 
 
 class MotorTask:
-    def __init__(self, experiment: Experiment, win: Optional[Window] = None):
+    def __init__(self, experiment: Experiment, win: Window | None = None):
         self.close_window_when_done = False
         self.experiment = experiment
         if win is None:
@@ -165,7 +161,7 @@ class MotorTask:
 
     def _do_trials(self) -> None:
         self._do_splash_screen()
-        condition_trial_indices: List[List[int]] = [
+        condition_trial_indices: list[list[int]] = [
             [] for _ in self.trial_handler.trialList
         ]
         current_condition_index = -1
@@ -227,11 +223,11 @@ class MotorTask:
 
     def _do_trial(
         self,
-        trial: Dict[str, Any],
+        trial: dict[str, Any],
         trial_manager: TrialManager,
-        initial_cursor_pos: Tuple[float, float],
+        initial_cursor_pos: tuple[float, float],
         condition_timeout: float,
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         if trial["use_joystick"] and self.js is None:
             raise RuntimeError("Use joystick option is enabled, but no joystick found.")
         trial_manager.cursor.setPos(initial_cursor_pos)
@@ -279,7 +275,7 @@ class MotorTask:
         return trial_manager.cursor.pos
 
     def _do_target(
-        self, trial: Dict[str, Any], index: int, tm: TrialManager, trial_data: TrialData
+        self, trial: dict[str, Any], index: int, tm: TrialManager, trial_data: TrialData
     ) -> None:
         minimum_window_for_flip = 1.0 / 60.0
         mouse_pos = tm.cursor.pos
@@ -333,7 +329,8 @@ class MotorTask:
                     if not trial["freeze_cursor_between_targets"]:
                         if trial["use_joystick"]:
                             mouse_pos = tm.joystick_point_updater(
-                                mouse_pos, (self.js.getX(), self.js.getY())  # type: ignore
+                                mouse_pos,
+                                (self.js.getX(), self.js.getY()),  # type: ignore
                             )
                         else:
                             mouse_pos = tm.point_rotator(self.mouse.getPos())
@@ -381,7 +378,8 @@ class MotorTask:
                 vis.draw_and_flip(self.win, tm.drawables, self.kb)
                 if trial["use_joystick"]:
                     mouse_pos = tm.joystick_point_updater(
-                        mouse_pos, (self.js.getX(), self.js.getY())  # type: ignore
+                        mouse_pos,
+                        (self.js.getX(), self.js.getY()),  # type: ignore
                     )
                 else:
                     mouse_pos = tm.point_rotator(self.mouse.getPos())
