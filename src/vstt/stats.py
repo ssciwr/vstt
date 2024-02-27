@@ -7,7 +7,6 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
-import numpy
 import numpy as np
 import pandas as pd
 from numpy import linalg as LA
@@ -17,7 +16,8 @@ from shapely.geometry import LineString
 from shapely.ops import polygonize
 from shapely.ops import unary_union
 
-import docs.conf
+
+min_distance: float = 1e-12
 
 
 def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]:
@@ -223,42 +223,21 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
     df["peak_velocity"] = df.apply(
         lambda x: _peak_velocity(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
-        ),
+            concatenate_mouse_positions(x),
+        )[0],
         axis=1,
     )
     df["peak_acceleration"] = df.apply(
         lambda x: _peak_acceleration(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
+            concatenate_mouse_positions(x),
         ),
         axis=1,
     )
     df["movement_time_at_peak_velocity"] = df.apply(
         lambda x: _movement_time_at_peak_velocity(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
+            concatenate_mouse_positions(x),
             x["to_target_num_timestamps_before_visible"],
         ),
         axis=1,
@@ -266,14 +245,7 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
     df["total_time_at_peak_velocity"] = df.apply(
         lambda x: _total_time_at_peak_velocity(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
+            concatenate_mouse_positions(x),
             x["to_target_num_timestamps_before_visible"],
         ),
         axis=1,
@@ -281,14 +253,7 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
     df["movement_distance_at_peak_velocity"] = df.apply(
         lambda x: _movement_distance_at_peak_velocity(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
+            concatenate_mouse_positions(x),
             x["to_target_num_timestamps_before_visible"],
         ),
         axis=1,
@@ -296,20 +261,30 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
     df["rmse_movement_at_peak_velocity"] = df.apply(
         lambda x: _rmse_movement_at_peak_velocity(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
+            concatenate_mouse_positions(x),
             x["target_pos"],
             x["to_target_num_timestamps_before_visible"],
         ),
         axis=1,
     )
     return df
+
+
+def concatenate_mouse_positions(x: np.ndarray) -> np.ndarray:
+    """
+    concatenate the "to_target_mouse_positions" and "to_center_mouse_positions"
+
+    :param x: the data to concatenate
+    :return: the concatenated result
+    """
+    return np.concatenate(
+        (
+            x["to_target_mouse_positions"],
+            x["to_center_mouse_positions"].reshape(
+                x["to_center_mouse_positions"].shape[0], 2
+            ),
+        )
+    )
 
 
 def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) -> None:
@@ -431,7 +406,6 @@ def _reaction_time(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-    # epsilon: float = 1e-12,
 ) -> float:
     """
     The reaction time is defined as the timestamp where the cursor first moves,
@@ -442,7 +416,6 @@ def _reaction_time(
     :param mouse_times: The array of timestamps
     :param mouse_positions: The array of mouse positions
     :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
-    :param epsilon: The minimum euclidean distance to qualify as moving the cursor
     :return: The reaction time
     """
     if (
@@ -452,9 +425,9 @@ def _reaction_time(
     ):
         return np.nan
     i = 0
-    while xydist(
-        mouse_positions[0], mouse_positions[i]
-    ) < docs.conf.epsilon and i + 1 < len(mouse_times):
+    while xydist(mouse_positions[0], mouse_positions[i]) < min_distance and i + 1 < len(
+        mouse_times
+    ):
         i += 1
     return mouse_times[i] - mouse_times[to_target_num_timestamps_before_visible]
 
@@ -632,7 +605,7 @@ def preprocess_mouse_positions(mouse_positions: np.ndarray) -> np.ndarray:
 
 def _peak_velocity(
     mouse_times: np.ndarray, mouse_positions: np.ndarray
-) -> Tuple[numpy.floating, numpy.integer]:
+) -> Tuple[np.floating, np.integer]:
     """
     get peak velocity and the corresponding index
 
@@ -723,7 +696,7 @@ def get_first_movement_index(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> int | None:
+) -> Any:
     """
     get index of the first movement in mouse_times
 
@@ -739,9 +712,9 @@ def get_first_movement_index(
     ):
         return None
     i = 0
-    while xydist(
-        mouse_positions[0], mouse_positions[i]
-    ) < docs.conf.epsilon and i + 1 < len(mouse_times):
+    while xydist(mouse_positions[0], mouse_positions[i]) < min_distance and i + 1 < len(
+        mouse_times
+    ):
         i += 1
     return i
 
@@ -750,7 +723,7 @@ def _movement_time_at_peak_velocity(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> float | None:
+) -> float:
     """
     get the time from first movement to the peak velocity
 
@@ -770,7 +743,7 @@ def _total_time_at_peak_velocity(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> float | None:
+) -> float:
     """
     get the time from the target becomes visible to the peak velocity
 
@@ -791,7 +764,7 @@ def _movement_distance_at_peak_velocity(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> float | None:
+) -> Any:
     """
     get the euclidean point-to-point distance travelled from first movement to the peak velocity
 
@@ -812,7 +785,7 @@ def _rmse_movement_at_peak_velocity(
     mouse_positions: np.ndarray,
     target_position: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> numpy.floating | None:
+) -> Any:
     """
     The Root Mean Square Error (RMSE) of the perpendicular distance from the peak velocity mouse point
     to the straight line that intersects the first mouse location and the target.

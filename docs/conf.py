@@ -62,5 +62,3 @@ html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "navigation_depth": 4,
 }
-
-epsilon: float = 1e-12
