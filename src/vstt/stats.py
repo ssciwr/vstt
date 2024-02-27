@@ -710,7 +710,7 @@ def get_first_movement_index(
         or mouse_times.shape[0] == 0
         or mouse_times.shape[0] < to_target_num_timestamps_before_visible
     ):
-        return None
+        return np.nan
     i = 0
     while xydist(mouse_positions[0], mouse_positions[i]) < min_distance and i + 1 < len(
         mouse_times
@@ -736,7 +736,7 @@ def _movement_time_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    return mouse_times[peak_index] - mouse_times[i] if i is not None else None
+    return mouse_times[peak_index] - mouse_times[i] if not np.isnan(i) else None
 
 
 def _total_time_at_peak_velocity(
@@ -777,7 +777,7 @@ def _movement_distance_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    return _distance(mouse_positions[i : peak_index + 1]) if i is not None else None
+    return _distance(mouse_positions[i : peak_index + 1]) if not np.isnan(i) else None
 
 
 def _rmse_movement_at_peak_velocity(
@@ -801,7 +801,7 @@ def _rmse_movement_at_peak_velocity(
     i = get_first_movement_index(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
-    if i is not None:
+    if not np.isnan(i):
         p1 = mouse_positions[i]
     else:
         return None
