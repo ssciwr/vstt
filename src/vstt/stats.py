@@ -764,7 +764,7 @@ def _movement_distance_at_peak_velocity(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> Any:
+) -> float:
     """
     get the euclidean point-to-point distance travelled from first movement to the peak velocity
 
@@ -777,7 +777,7 @@ def _movement_distance_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    return _distance(mouse_positions[i : peak_index + 1]) if not np.isnan(i) else None
+    return _distance(mouse_positions[i : peak_index + 1]) if not np.isnan(i) else np.nan
 
 
 def _rmse_movement_at_peak_velocity(
