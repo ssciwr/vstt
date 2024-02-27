@@ -696,7 +696,7 @@ def get_first_movement_index(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> Any:
+) -> int | None:
     """
     get index of the first movement in mouse_times
 
@@ -710,7 +710,7 @@ def get_first_movement_index(
         or mouse_times.shape[0] == 0
         or mouse_times.shape[0] < to_target_num_timestamps_before_visible
     ):
-        return np.nan
+        return None
     i = 0
     while xydist(mouse_positions[0], mouse_positions[i]) < min_distance and i + 1 < len(
         mouse_times
@@ -736,7 +736,7 @@ def _movement_time_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    return mouse_times[peak_index] - mouse_times[i] if not np.isnan(i) else None
+    return mouse_times[peak_index] - mouse_times[i] if i is not None else np.nan
 
 
 def _total_time_at_peak_velocity(
@@ -777,7 +777,7 @@ def _movement_distance_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    return _distance(mouse_positions[i : peak_index + 1]) if not np.isnan(i) else np.nan
+    return _distance(mouse_positions[i : peak_index + 1]) if i is not None else np.nan
 
 
 def _rmse_movement_at_peak_velocity(
@@ -785,7 +785,7 @@ def _rmse_movement_at_peak_velocity(
     mouse_positions: np.ndarray,
     target_position: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-) -> Any:
+) -> float:
     """
     The Root Mean Square Error (RMSE) of the perpendicular distance from the peak velocity mouse point
     to the straight line that intersects the first mouse location and the target.
@@ -801,11 +801,11 @@ def _rmse_movement_at_peak_velocity(
     i = get_first_movement_index(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
-    if not np.isnan(i):
+    if i is not None:
         p1 = mouse_positions[i]
     else:
-        return None
+        return np.nan
     p2 = target_position
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
     p3 = mouse_positions[peak_index]
-    return LA.norm(np.cross(p2 - p1, p1 - p3)) / LA.norm(p2 - p1)
+    return float(LA.norm(np.cross(p2 - p1, p1 - p3)) / LA.norm(p2 - p1))
