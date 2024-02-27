@@ -249,7 +249,19 @@ def test_spatial_error() -> None:
 
 
 def test_movement_time_at_peak_velocity() -> None:
-    np.testing.assert_equal(
+    assert np.allclose(
+        vstt.stats._movement_time_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4]]
+            ),
+            0,
+        ),
+        np.nan,
+        equal_nan=True,
+    )
+
+    assert np.allclose(
         vstt.stats._movement_time_at_peak_velocity(
             np.array([]),
             np.array(
@@ -257,17 +269,19 @@ def test_movement_time_at_peak_velocity() -> None:
             ),
             0,
         ),
-        None,
+        np.nan,
+        equal_nan=True,
     )
 
-    np.testing.assert_equal(
+    assert np.allclose(
         vstt.stats._movement_time_at_peak_velocity(
             np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]), np.array([]), 0
         ),
-        None,
+        np.nan,
+        equal_nan=True,
     )
 
-    np.testing.assert_allclose(
+    assert np.allclose(
         vstt.stats._movement_time_at_peak_velocity(
             np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
             np.array(
@@ -280,7 +294,19 @@ def test_movement_time_at_peak_velocity() -> None:
 
 
 def test_total_time_at_peak_velocity() -> None:
-    np.testing.assert_equal(
+    assert np.allclose(
+        vstt.stats._total_time_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4]]
+            ),
+            0,
+        ),
+        np.nan,
+        equal_nan=True,
+    )
+
+    assert np.allclose(
         vstt.stats._total_time_at_peak_velocity(
             np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
             np.array(
@@ -288,10 +314,11 @@ def test_total_time_at_peak_velocity() -> None:
             ),
             5,
         ),
-        None,
+        np.nan,
+        equal_nan=True,
     )
 
-    np.testing.assert_allclose(
+    assert np.allclose(
         vstt.stats._total_time_at_peak_velocity(
             np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
             np.array(
@@ -304,7 +331,19 @@ def test_total_time_at_peak_velocity() -> None:
 
 
 def test_movement_distance_at_peak_velocity() -> None:
-    np.testing.assert_equal(
+    assert np.allclose(
+        vstt.stats._movement_distance_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4]]
+            ),
+            0,
+        ),
+        np.nan,
+        equal_nan=True,
+    )
+
+    assert np.allclose(
         vstt.stats._movement_distance_at_peak_velocity(
             np.array([]),
             np.array(
@@ -312,17 +351,19 @@ def test_movement_distance_at_peak_velocity() -> None:
             ),
             0,
         ),
-        None,
+        np.nan,
+        equal_nan=True,
     )
 
-    np.testing.assert_equal(
+    assert np.allclose(
         vstt.stats._movement_distance_at_peak_velocity(
             np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]), np.array([]), 0
         ),
-        None,
+        np.nan,
+        equal_nan=True,
     )
 
-    np.testing.assert_allclose(
+    assert np.allclose(
         vstt.stats._movement_distance_at_peak_velocity(
             np.array([0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
             np.array(
@@ -344,7 +385,20 @@ def test_movement_distance_at_peak_velocity() -> None:
 
 
 def test_rmse_movement_at_peak_velocity() -> None:
-    np.testing.assert_equal(
+    assert np.allclose(
+        vstt.stats._rmse_movement_at_peak_velocity(
+            np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
+            np.array(
+                [[0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4], [0.1, 0.4]]
+            ),
+            np.array([1.1, 1.5]),
+            0,
+        ),
+        np.nan,
+        equal_nan=True,
+    )
+
+    assert np.allclose(
         vstt.stats._rmse_movement_at_peak_velocity(
             np.array([]),
             np.array(
@@ -353,20 +407,22 @@ def test_rmse_movement_at_peak_velocity() -> None:
             np.array([1.1, 1.5]),
             0,
         ),
-        None,
+        np.nan,
+        equal_nan=True,
     )
 
-    np.testing.assert_equal(
+    assert np.allclose(
         vstt.stats._rmse_movement_at_peak_velocity(
             np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
             np.array([]),
             np.array([1.1, 1.5]),
             0,
         ),
-        None,
+        np.nan,
+        equal_nan=True,
     )
 
-    np.testing.assert_allclose(
+    assert np.allclose(
         vstt.stats._rmse_movement_at_peak_velocity(
             np.array([0.1, 0.11, 0.12, 0.13, 0.14, 0.15]),
             np.array(

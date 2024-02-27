@@ -736,7 +736,15 @@ def _movement_time_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    return mouse_times[peak_index] - mouse_times[i] if i is not None else np.nan
+    # if mouse_times[peak_index] - mouse_times[i] < 0 and peak_index is not None:
+    #     print("can't be negative")
+    # if peak_index is None:
+    #     print("didn't move")
+    return (
+        mouse_times[peak_index] - mouse_times[i]
+        if i is not None and peak_index >= i
+        else np.nan
+    )
 
 
 def _total_time_at_peak_velocity(
@@ -756,7 +764,7 @@ def _total_time_at_peak_velocity(
     return (
         mouse_times[peak_index] - mouse_times[to_target_num_timestamps_before_visible]
         if to_target_num_timestamps_before_visible < peak_index
-        else None
+        else np.nan
     )
 
 
@@ -777,7 +785,11 @@ def _movement_distance_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    return _distance(mouse_positions[i : peak_index + 1]) if i is not None else np.nan
+    return (
+        _distance(mouse_positions[i : peak_index + 1])
+        if i is not None and peak_index >= i
+        else np.nan
+    )
 
 
 def _rmse_movement_at_peak_velocity(
@@ -808,4 +820,8 @@ def _rmse_movement_at_peak_velocity(
     p2 = target_position
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
     p3 = mouse_positions[peak_index]
-    return float(LA.norm(np.cross(p2 - p1, p1 - p3)) / LA.norm(p2 - p1))
+    return (
+        float(LA.norm(np.cross(p2 - p1, p1 - p3)) / LA.norm(p2 - p1))
+        if peak_index >= i
+        else np.nan
+    )
