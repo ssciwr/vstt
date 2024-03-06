@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from typing import Dict
-from typing import List
-from typing import Tuple
-
 import gui_test_utils as gtu
 import numpy as np
 import pytest
 import vstt
 from psychopy.visual.window import Window
+from pytest import approx
 from vstt.experiment import Experiment
 
 
@@ -56,7 +53,7 @@ def test_make_cursor(window: Window) -> None:
     ],
 )
 def test_make_targets(
-    window: Window, args: Dict, xys: List[Tuple[float, float]], add_central_target: bool
+    window: Window, args: dict, xys: list[tuple[float, float]], add_central_target: bool
 ) -> None:
     args["add_central_target"] = add_central_target
     targets = vstt.vis.make_targets(window, **args)
@@ -142,7 +139,7 @@ def test_update_target_colors(
     ],
 )
 def test_make_target_labels(
-    window: Window, args: Dict, xys: List[Tuple[float, float]]
+    window: Window, args: dict, xys: list[tuple[float, float]]
 ) -> None:
     # more labels than targets: label each target and ignore any extra labels
     args["labels_string"] = "a b c d e f"
@@ -205,7 +202,7 @@ def test_splash_screen_defaults(window: Window) -> None:
     # some black pixels
     assert 0.000 < gtu.pixel_color_fraction(screenshot, (0, 0, 0)) < 0.100
     # no white pixels
-    assert gtu.pixel_color_fraction(screenshot, (255, 255, 255)) == 0.000
+    assert gtu.pixel_color_fraction(screenshot, (255, 255, 255)) == approx(0)
 
 
 def test_display_results_nothing(
@@ -259,7 +256,7 @@ def test_display_results_nothing(
         # all pixels grey except for blue continue text
         assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
         # no off-white pixels
-        assert gtu.pixel_color_fraction(screenshot, (240, 248, 255)) == 0.000
+        assert gtu.pixel_color_fraction(screenshot, (240, 248, 255)) == approx(0)
         # trial 3: with auto-move to center
         screenshot = gtu.call_target_and_get_screenshot(
             vstt.vis.display_results,
@@ -278,7 +275,7 @@ def test_display_results_nothing(
         # all pixels grey except for blue continue text
         assert 0.990 < gtu.pixel_color_fraction(screenshot, (128, 128, 128)) < 0.999
         # no off-white pixels
-        assert gtu.pixel_color_fraction(screenshot, (240, 248, 255)) == 0.000
+        assert gtu.pixel_color_fraction(screenshot, (240, 248, 255)) == approx(0)
 
 
 def test_display_results_everything(

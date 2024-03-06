@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict
-
 import vstt
 
 
@@ -24,7 +22,7 @@ def default_metadata() -> vstt.vtypes.Metadata:
     }
 
 
-def metadata_labels() -> Dict:
+def metadata_labels() -> dict:
     return {
         "name": "Experiment Name",
         "subject": "Subject Name",

@@ -2,10 +2,6 @@ from __future__ import annotations
 
 import logging
 from typing import Any
-from typing import Dict
-from typing import List
-from typing import Tuple
-from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -19,8 +15,7 @@ from shapely.ops import unary_union
 
 min_distance: float = 1e-12
 
-
-def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]:
+def list_dest_stat_label_units() -> list[tuple[str, list[tuple[str, str, str]]]]:
     list_dest_stats = []
     for destination in ["target", "center"]:
         stats = []
@@ -66,7 +61,7 @@ def list_dest_stat_label_units() -> List[Tuple[str, List[Tuple[str, str, str]]]]
     return list_dest_stats
 
 
-def _get_trial_data_columns() -> List[str]:
+def _get_trial_data_columns() -> list[str]:
     return [
         "i_trial",
         "i_rep",
@@ -89,7 +84,7 @@ def _get_trial_data_columns() -> List[str]:
 
 
 def _get_dat(
-    data: Dict, key: str, index: Tuple, i_target: int, default_value: Any
+    data: dict, key: str, index: tuple, i_target: int, default_value: Any
 ) -> Any:
     ar = data.get(key)
     if ar is None:
@@ -107,8 +102,8 @@ def _get_dat(
 
 
 def _get_target_data(
-    trial_handler: TrialHandlerExt, index: Tuple, i_target: int
-) -> List:
+    trial_handler: TrialHandlerExt, index: tuple, i_target: int
+) -> list:
     data = trial_handler.data
     condition_index = trial_handler.sequenceIndices[index]
     conditions = trial_handler.trialList[condition_index]
@@ -125,7 +120,7 @@ def _get_target_data(
         np.array(data["to_target_mouse_positions"][index][i_target])
     )  # type: ignore
     to_target_success = np.array(data["to_target_success"][index][i_target])
-    to_center_success: Union[np.ndarray, bool]
+    to_center_success: np.ndarray | bool
     to_center_timestamps = np.array(
         _get_dat(data, "to_center_timestamps", index, i_target, [])
     )
@@ -179,7 +174,7 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             _distance
         )
         df[f"to_{destination}_reaction_time"] = df.apply(
-            lambda x: _reaction_time(
+            lambda x, destination=destination: _reaction_time(
                 x[f"to_{destination}_timestamps"],
                 x[f"to_{destination}_mouse_positions"],
                 x[f"to_{destination}_num_timestamps_before_visible"],
@@ -187,7 +182,7 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             axis=1,
         )
         df[f"to_{destination}_time"] = df.apply(
-            lambda x: _total_time(
+            lambda x, destination=destination: _total_time(
                 x[f"to_{destination}_timestamps"],
                 x[f"to_{destination}_num_timestamps_before_visible"],
             ),
@@ -197,13 +192,13 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
             df[f"to_{destination}_time"] - df[f"to_{destination}_reaction_time"]
         )
         df[f"to_{destination}_rmse"] = df.apply(
-            lambda x: _rmse(
+            lambda x, destination=destination: _rmse(
                 x[f"to_{destination}_mouse_positions"], x[f"{destination}_pos"]
             ),
             axis=1,
         )
         df[f"to_{destination}_spatial_error"] = df.apply(
-            lambda x: _spatial_error(
+            lambda x, destination=destination: _spatial_error(
                 x[f"to_{destination}_mouse_positions"],
                 x[f"{destination}_pos"],
                 x[f"{destination}_radius"],

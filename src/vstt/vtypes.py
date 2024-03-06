@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import sys
-from typing import List
-from typing import Union
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict
@@ -14,7 +12,7 @@ class Trial(TypedDict):
     weight: int
     condition_timeout: float
     num_targets: int
-    target_order: Union[str, List]
+    target_order: str | list
     target_indices: str
     add_central_target: bool
     hide_target_when_reached: bool

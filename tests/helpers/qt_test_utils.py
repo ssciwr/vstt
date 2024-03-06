@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from typing import Any
-from typing import List
-from typing import Optional
 
 import qtpy
 from qtpy import QtCore
@@ -60,15 +58,15 @@ class SignalReceived:
 class ModalWidgetTimer:
     def __init__(
         self,
-        keys: List[str],
-        start_after: Optional[ModalWidgetTimer] = None,
+        keys: list[str],
+        start_after: ModalWidgetTimer | None = None,
     ) -> None:
         self._keys = keys
         if start_after is not None:
             start_after._other_mwt_to_start = self
-        self._other_mwt_to_start: Optional[ModalWidgetTimer] = None
+        self._other_mwt_to_start: ModalWidgetTimer | None = None
         self._timer = QtCore.QTimer()
-        self._widget_to_ignore: Optional[QtWidgets.QWidget] = None
+        self._widget_to_ignore: QtWidgets.QWidget | None = None
         self._timeout = 30000
         self._timer.timeout.connect(self._send_keys)
         self._widget_type: str = ""
@@ -112,10 +110,7 @@ class ModalWidgetTimer:
         for key in self._keys:
             key_seq = QtGui.QKeySequence(key)
             str_key = key_seq.toString()
-            if qtpy.QT6:
-                qt_key = key_seq[0].key()
-            else:
-                qt_key = Qt.Key(key_seq[0])
+            qt_key = key_seq[0].key() if qtpy.QT6 else Qt.Key(key_seq[0])
             print(
                 f"ModalWidgetTimer ::   - sending '{str_key} [{qt_key}]' to {widget}",
                 flush=True,

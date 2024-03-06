@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-from typing import Tuple
-
 import numpy as np
 
 
@@ -27,10 +24,10 @@ def points_on_circle(
 
 
 def rotate_point(
-    point: Tuple[float, float],
+    point: tuple[float, float],
     angle_radians: float,
-    pivot_point: Tuple[float, float] = (0, 0),
-) -> Tuple[float, float]:
+    pivot_point: tuple[float, float] = (0, 0),
+) -> tuple[float, float]:
     """
     Rotate `point` by an angle `angle_radians` around the point `pivot_point`
     """
@@ -52,7 +49,7 @@ class PointRotator:
         self._s = np.sin(angle_radians)
         self._c = np.cos(angle_radians)
 
-    def __call__(self, point: Tuple[float, float]) -> np.ndarray:
+    def __call__(self, point: tuple[float, float]) -> np.ndarray:
         return np.array(
             [
                 self._c * point[0] - self._s * point[1],
@@ -83,7 +80,7 @@ class JoystickPointUpdater:
         self,
         angle_degrees: float,
         max_speed: float,
-        window_size: Optional[np.ndarray] = None,
+        window_size: np.ndarray | None = None,
     ):
         self.angle_degrees = angle_degrees
         self.max_speed = max_speed
@@ -95,7 +92,7 @@ class JoystickPointUpdater:
         self._s = self.max_speed * np.sin(angle_radians)
         self._c = self.max_speed * np.cos(angle_radians)
 
-    def __call__(self, point: np.ndarray, velocity: Tuple[float, float]) -> np.ndarray:
+    def __call__(self, point: np.ndarray, velocity: tuple[float, float]) -> np.ndarray:
         return np.clip(
             np.array(
                 [
@@ -110,7 +107,7 @@ class JoystickPointUpdater:
 
 def to_target_dists(
     pos: np.ndarray, target_xys: np.ndarray, target_index: int, has_central_target: bool
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     rms_dists = np.linalg.norm(target_xys - np.array(pos), axis=1)
     n_targets_excluding_central = target_xys.shape[0]
     if has_central_target:

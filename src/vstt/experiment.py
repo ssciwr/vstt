@@ -4,13 +4,11 @@ import json
 import pathlib
 import pickle
 from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
 
 import pandas as pd
 from psychopy.data import TrialHandlerExt
 from psychopy.misc import fromFile
+
 from vstt.display import default_display_options
 from vstt.display import import_display_options
 from vstt.meta import default_metadata
@@ -22,14 +20,14 @@ from vstt.trial import import_and_validate_trial
 
 
 class Experiment:
-    def __init__(self, filename: Optional[str] = None):
+    def __init__(self, filename: str | None = None):
         self.filename = "default-experiment.psydat"
         self.has_unsaved_changes = False
         self.metadata = default_metadata()
         self.display_options = default_display_options()
         self.trial_list = [default_trial()]
-        self.trial_handler_with_results: Optional[TrialHandlerExt] = None
-        self.stats: Optional[pd.DataFrame] = None
+        self.trial_handler_with_results: TrialHandlerExt | None = None
+        self.stats: pd.DataFrame | None = None
         if filename is not None:
             self.load_file(filename)
 
@@ -50,7 +48,7 @@ class Experiment:
     def clear_results(self) -> None:
         self.trial_handler_with_results = None
 
-    def _as_dict(self) -> Dict[str, Any]:
+    def _as_dict(self) -> dict[str, Any]:
         return {
             "metadata": self.metadata,
             "display_options": self.display_options,
@@ -131,7 +129,7 @@ class Experiment:
             json.dump(self._as_dict(), f)
 
     def load_json(self, filename: str) -> None:
-        with open(filename, "r") as f:
+        with open(filename) as f:
             d = json.load(f)
         self.import_and_validate_dicts(
             filename, d["metadata"], d["display_options"], d["trial_list"]
@@ -140,9 +138,9 @@ class Experiment:
     def import_and_validate_dicts(
         self,
         filename: str,
-        metadata_dict: Dict,
-        display_options_dict: Dict,
-        trial_dict_list: List[Dict],
+        metadata_dict: dict,
+        display_options_dict: dict,
+        trial_dict_list: list[dict],
     ) -> None:
         self.metadata = import_metadata(metadata_dict)
         self.display_options = import_display_options(display_options_dict)

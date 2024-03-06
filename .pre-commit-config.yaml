@@ -9,14 +9,17 @@ repos:
       - id: mixed-line-ending
       - id: check-toml
 
-  - repo: https://github.com/psf/black
-    rev: 23.12.1
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.2.1
     hooks:
-      - id: black
-      - id: black-jupyter
+      - id: ruff
+        types_or: [python, pyi, jupyter]
+        args: [--fix]
+      - id: ruff-format
+        types_or: [python, pyi, jupyter]
 
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.6.1
+    rev: 0.7.1
     hooks:
       - id: nbstripout
 
@@ -29,7 +32,7 @@ repos:
           - "prettier-plugin-toml"
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.27.3
+    rev: 0.28.0
     hooks:
       - id: check-github-workflows
       - id: check-readthedocs
@@ -46,19 +49,6 @@ repos:
             --warn-redundant-casts,
             --no-namespace-packages,
           ]
-
-  - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.12.0
-    hooks:
-      - id: reorder-python-imports
-
-  - repo: https://github.com/pycqa/flake8
-    rev: "6.1.0"
-    hooks:
-      - id: flake8
-        args:
-          - "--max-line-length=88"
-          - "--ignore=E501,W503,E203"
 
   - repo: https://github.com/rhysd/actionlint
     rev: "v1.6.26"

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict
-
 import vstt
 
 
@@ -37,7 +35,7 @@ def default_display_options() -> vstt.vtypes.DisplayOptions:
     }
 
 
-def display_options_labels() -> Dict[str, str]:
+def display_options_labels() -> dict[str, str]:
     return {
         "to_target_paths": "Display cursor paths to target",
         "to_center_paths": "Display cursor paths back to center",

@@ -11,7 +11,7 @@ def test_data_df(experiment_with_results: Experiment) -> None:
     # results from 3 reps of 8-target trial, 1 rep of 4-target trial with automove back to center
     df = vstt.stats._data_df(experiment_with_results.trial_handler_with_results)
     assert len(df.columns) == len(vstt.stats._get_trial_data_columns())
-    for index, row in df.iterrows():
+    for _index, row in df.iterrows():
         assert row["to_target_mouse_positions"].shape[1] == 2
         assert (
             row["to_center_mouse_positions"].shape[0] == 0
@@ -41,8 +41,8 @@ def test_data_df(experiment_with_results: Experiment) -> None:
 def test_stats_df(experiment_with_results: Experiment) -> None:
     df = vstt.stats.stats_dataframe(experiment_with_results.trial_handler_with_results)
     assert np.all(np.isnan(df.loc[df.condition_index == 1]["to_center_time"]))
-    for destination, stat_label_units in vstt.stats.list_dest_stat_label_units():
-        for stat, label, unit in stat_label_units:
+    for _destination, stat_label_units in vstt.stats.list_dest_stat_label_units():
+        for stat, _label, _unit in stat_label_units:
             assert stat in df.columns
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import vstt
+from pytest import approx
 
 
 def test_equidistant_angles() -> None:
@@ -129,13 +130,13 @@ def test_to_target_dists() -> None:
     dist_correct, dist_any = vstt.geom.to_target_dists(
         p, xys, 0, has_central_target=True
     )
-    assert dist_correct == 1.0
-    assert dist_any == 1.0
+    assert dist_correct == approx(1.0)
+    assert dist_any == approx(1.0)
     dist_correct, dist_any = vstt.geom.to_target_dists(
         p, xys, 0, has_central_target=False
     )
-    assert dist_correct == 1.0
-    assert dist_any == 0.0
+    assert dist_correct == approx(1.0)
+    assert dist_any == approx(0.0)
     #
     p = np.array([1.0, 0.0])
     xys = np.array([[1.0, 1.0], [1.0, 0.0], [-1.0, 0.0], [0.0, 0.0]])
@@ -143,20 +144,20 @@ def test_to_target_dists() -> None:
         dist_correct, dist_any = vstt.geom.to_target_dists(
             p, xys, 0, has_central_target
         )
-        assert dist_correct == 1.0
-        assert dist_any == 0.0
+        assert dist_correct == approx(1.0)
+        assert dist_any == approx(0.0)
         dist_correct, dist_any = vstt.geom.to_target_dists(
             p, xys, 1, has_central_target
         )
-        assert dist_correct == 0.0
-        assert dist_any == 0.0
+        assert dist_correct == approx(0.0)
+        assert dist_any == approx(0.0)
         dist_correct, dist_any = vstt.geom.to_target_dists(
             p, xys, 2, has_central_target
         )
-        assert dist_correct == 2.0
-        assert dist_any == 0.0
+        assert dist_correct == approx(2.0)
+        assert dist_any == approx(0.0)
         dist_correct, dist_any = vstt.geom.to_target_dists(
             p, xys, 3, has_central_target
         )
-        assert dist_correct == 1.0
-        assert dist_any == 0.0
+        assert dist_correct == approx(1.0)
+        assert dist_any == approx(0.0)

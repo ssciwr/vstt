@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 import subprocess
 import sys
-from typing import Tuple
 
 import requests
-import vstt
 from packaging import version
+
+import vstt
 
 
 def _get_latest_pypi_version() -> version.Version:
@@ -19,7 +19,7 @@ def _get_latest_pypi_version() -> version.Version:
     return ver
 
 
-def check_for_new_version() -> Tuple[bool, str]:
+def check_for_new_version() -> tuple[bool, str]:
     try:
         current_version = version.Version(vstt.__version__)
         logging.info(f"Current version: {current_version}")
@@ -43,7 +43,7 @@ def check_for_new_version() -> Tuple[bool, str]:
         )
 
 
-def do_pip_upgrade() -> Tuple[bool, str]:
+def do_pip_upgrade() -> tuple[bool, str]:
     logging.info(f"Doing pip upgrade using {sys.executable}...")
     try:
         subprocess.check_call(

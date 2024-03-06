@@ -2,20 +2,19 @@ from __future__ import annotations
 
 import logging
 import pathlib
-from typing import List
-from typing import Optional
 
 import numpy as np
 from psychopy.visual.window import Window
 from qtpy import QtWidgets
 from qtpy.compat import getsavefilename
+
 from vstt.experiment import Experiment
 from vstt.vis import display_results
 
 
 class ResultsWidget(QtWidgets.QWidget):
     def __init__(
-        self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
+        self, parent: QtWidgets.QWidget | None = None, win: Window | None = None
     ):
         super().__init__(parent)
         self._win = win
@@ -26,7 +25,7 @@ class ResultsWidget(QtWidgets.QWidget):
         outer_layout.addWidget(group_box)
         inner_layout = QtWidgets.QGridLayout()
         group_box.setLayout(inner_layout)
-        self._list_trial_row_to_trial_index: List[int] = []
+        self._list_trial_row_to_trial_index: list[int] = []
         self._list_trials = QtWidgets.QListWidget()
         self._list_trials.currentRowChanged.connect(self._row_changed)
         self._list_trials.itemDoubleClicked.connect(self._btn_display_trial_clicked)

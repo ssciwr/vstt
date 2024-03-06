@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 from typing import Callable
-from typing import Dict
-from typing import Optional
-from typing import Union
 
 from psychopy.visual.window import Window
 from qtpy import QtCore
 from qtpy import QtWidgets
 from qtpy.QtCore import Qt
+
 from vstt.experiment import Experiment
 from vstt.meta import default_metadata
 from vstt.meta import metadata_labels
@@ -19,14 +17,14 @@ class MetadataWidget(QtWidgets.QWidget):
     experiment_modified = QtCore.Signal()
 
     def __init__(
-        self, parent: Optional[QtWidgets.QWidget] = None, win: Optional[Window] = None
+        self, parent: QtWidgets.QWidget | None = None, win: Window | None = None
     ):
         super().__init__(parent)
         self._win = win
         self._experiment = Experiment()
-        self._str_widgets: Dict[str, QtWidgets.QLineEdit] = {}
-        self._bool_widgets: Dict[str, QtWidgets.QCheckBox] = {}
-        self._float_widgets: Dict[str, QtWidgets.QDoubleSpinBox] = {}
+        self._str_widgets: dict[str, QtWidgets.QLineEdit] = {}
+        self._bool_widgets: dict[str, QtWidgets.QCheckBox] = {}
+        self._float_widgets: dict[str, QtWidgets.QDoubleSpinBox] = {}
 
         group_box = QtWidgets.QGroupBox("Metadata")
         outer_layout = QtWidgets.QVBoxLayout()
@@ -66,10 +64,8 @@ class MetadataWidget(QtWidgets.QWidget):
         inner_layout.addWidget(self._btn_preview_metadata)
         self.setLayout(outer_layout)
 
-    def _update_value_callback(
-        self, key: str
-    ) -> Callable[[Union[str, bool, float]], None]:
-        def _update_value(value: Union[str, bool, float]) -> None:
+    def _update_value_callback(self, key: str) -> Callable[[str | bool | float], None]:
+        def _update_value(value: str | bool | float) -> None:
             if value != self._experiment.metadata[key]:  # type: ignore
                 self._experiment.metadata[key] = value  # type: ignore
                 self._experiment.has_unsaved_changes = True
