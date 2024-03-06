@@ -12,6 +12,8 @@ from shapely.geometry import LineString
 from shapely.ops import polygonize
 from shapely.ops import unary_union
 
+min_distance: float = 1e-12
+
 
 def list_dest_stat_label_units() -> list[tuple[str, list[tuple[str, str, str]]]]:
     list_dest_stats = []
@@ -32,6 +34,30 @@ def list_dest_stat_label_units() -> list[tuple[str, list[tuple[str, str, str]]]]
     list_dest_stats.append(("", [("normalized_area", "Normalized Area", "")]))
     list_dest_stats.append(("", [("peak_velocity", "Peak Velocity", "")]))
     list_dest_stats.append(("", [("peak_acceleration", "Peak Acceleration", "")]))
+    list_dest_stats.append(
+        (
+            "",
+            [("movement_time_at_peak_velocity", "Movement Time at Peak Velocity", "s")],
+        )
+    )
+    list_dest_stats.append(
+        ("", [("total_time_at_peak_velocity", "Total Time at Peak Velocity", "s")])
+    )
+    list_dest_stats.append(
+        (
+            "",
+            [
+                (
+                    "movement_distance_at_peak_velocity",
+                    "Movement Distance at Peak Velocity",
+                    "",
+                )
+            ],
+        )
+    )
+    list_dest_stats.append(
+        ("", [("rmse_movement_at_peak_velocity", "RMSE Movement at Peak Velocity", "")])
+    )
     return list_dest_stats
 
 
@@ -192,32 +218,68 @@ def stats_dataframe(trial_handler: TrialHandlerExt) -> pd.DataFrame:
     df["peak_velocity"] = df.apply(
         lambda x: _peak_velocity(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
-        ),
+            concatenate_mouse_positions(x),
+        )[0],
         axis=1,
     )
     df["peak_acceleration"] = df.apply(
         lambda x: _peak_acceleration(
             np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
-            np.concatenate(
-                (
-                    x["to_target_mouse_positions"],
-                    x["to_center_mouse_positions"].reshape(
-                        x["to_center_mouse_positions"].shape[0], 2
-                    ),
-                )
-            ),
+            concatenate_mouse_positions(x),
+        ),
+        axis=1,
+    )
+    df["movement_time_at_peak_velocity"] = df.apply(
+        lambda x: _movement_time_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            concatenate_mouse_positions(x),
+            x["to_target_num_timestamps_before_visible"],
+        ),
+        axis=1,
+    )
+    df["total_time_at_peak_velocity"] = df.apply(
+        lambda x: _total_time_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            concatenate_mouse_positions(x),
+            x["to_target_num_timestamps_before_visible"],
+        ),
+        axis=1,
+    )
+    df["movement_distance_at_peak_velocity"] = df.apply(
+        lambda x: _movement_distance_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            concatenate_mouse_positions(x),
+            x["to_target_num_timestamps_before_visible"],
+        ),
+        axis=1,
+    )
+    df["rmse_movement_at_peak_velocity"] = df.apply(
+        lambda x: _rmse_movement_at_peak_velocity(
+            np.concatenate((x["to_target_timestamps"], x["to_center_timestamps"])),
+            concatenate_mouse_positions(x),
+            x["target_pos"],
+            x["to_target_num_timestamps_before_visible"],
         ),
         axis=1,
     )
     return df
+
+
+def concatenate_mouse_positions(x: np.ndarray) -> np.ndarray:
+    """
+    concatenate the "to_target_mouse_positions" and "to_center_mouse_positions"
+
+    :param x: the data to concatenate
+    :return: the concatenated result
+    """
+    return np.concatenate(
+        (
+            x["to_target_mouse_positions"],
+            x["to_center_mouse_positions"].reshape(
+                x["to_center_mouse_positions"].shape[0], 2
+            ),
+        )
+    )
 
 
 def append_stats_data_to_excel(df: pd.DataFrame, writer: Any, data_format: str) -> None:
@@ -339,7 +401,6 @@ def _reaction_time(
     mouse_times: np.ndarray,
     mouse_positions: np.ndarray,
     to_target_num_timestamps_before_visible: int,
-    epsilon: float = 1e-12,
 ) -> float:
     """
     The reaction time is defined as the timestamp where the cursor first moves,
@@ -350,7 +411,6 @@ def _reaction_time(
     :param mouse_times: The array of timestamps
     :param mouse_positions: The array of mouse positions
     :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
-    :param epsilon: The minimum euclidean distance to qualify as moving the cursor
     :return: The reaction time
     """
     if (
@@ -360,7 +420,7 @@ def _reaction_time(
     ):
         return np.nan
     i = 0
-    while xydist(mouse_positions[0], mouse_positions[i]) < epsilon and i + 1 < len(
+    while xydist(mouse_positions[0], mouse_positions[i]) < min_distance and i + 1 < len(
         mouse_times
     ):
         i += 1
@@ -409,7 +469,7 @@ def _rmse(mouse_positions: np.ndarray, target_position: np.ndarray) -> float:
 
     :param mouse_positions: The array of mouse positions
     :param target: The x,y coordinates of the target
-    :return: The RMSE of the distance from the ideal trajectoty
+    :return: The RMSE of the distance from the ideal trajectory
     """
     if mouse_positions.shape[0] <= 1:
         return np.nan
@@ -538,19 +598,43 @@ def preprocess_mouse_positions(mouse_positions: np.ndarray) -> np.ndarray:
     return mouse_positions
 
 
-def _peak_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> float:
+def _peak_velocity(
+    mouse_times: np.ndarray, mouse_positions: np.ndarray
+) -> tuple[np.floating, np.integer]:
+    """
+    get peak velocity and the corresponding index
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :return: peak velocity and the corresponding index
+    """
     velocity = get_velocity(mouse_times, mouse_positions)
     peak_velocity = np.amax(velocity)
-    return peak_velocity
+    peak_index = np.argmax(velocity)
+    return peak_velocity, peak_index
 
 
 def _peak_acceleration(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> float:
+    """
+    get peak acceleration
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :return: peak acceleration
+    """
     acceleration = get_acceleration(mouse_times, mouse_positions)
     peak_acceleration = np.amax(acceleration)
     return peak_acceleration
 
 
 def get_derivative(y: np.ndarray, x: np.ndarray) -> np.ndarray:
+    """
+    get derivative dy/dx
+
+    :param y: the array of y
+    :param x: the array of x
+    :return: the array of dy/dx
+    """
     if x.size <= 1 or y.size <= 1:
         return np.array([0])
     dy_dx = np.diff(y) / np.diff(x)
@@ -558,6 +642,13 @@ def get_derivative(y: np.ndarray, x: np.ndarray) -> np.ndarray:
 
 
 def get_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> np.ndarray:
+    """
+    get velocity
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :return: the array of velocity
+    """
     first_order_derivative = get_derivative(mouse_positions.transpose(), mouse_times)
     velocity = LA.norm(first_order_derivative, axis=0)
     return velocity
@@ -566,6 +657,13 @@ def get_velocity(mouse_times: np.ndarray, mouse_positions: np.ndarray) -> np.nda
 def get_acceleration(
     mouse_times: np.ndarray, mouse_positions: np.ndarray
 ) -> np.ndarray:
+    """
+    get acceleration
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :return: the array of acceleration
+    """
     first_order_derivative = get_derivative(mouse_positions.transpose(), mouse_times)
     second_order_derivative = get_derivative(first_order_derivative, mouse_times[:-1])
     acceleration = LA.norm(second_order_derivative, axis=0)
@@ -575,7 +673,146 @@ def get_acceleration(
 def _spatial_error(
     mouse_position: np.ndarray, target: np.ndarray, target_radius: float
 ) -> float:
+    """
+    at timeout linear distance from cursor to target - target radius
+
+    :param mouse_position: The array of mouse positions
+    :param target: The position of the target
+    :param target_radius: radius of the target
+    :return: the distance between the end point of the movement to the center of the target - target radius
+    """
     if mouse_position.size < 1:
         return 0
     spatial_error = xydist(mouse_position[-1], target) - target_radius
     return max(spatial_error, 0)
+
+
+def get_first_movement_index(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> int | None:
+    """
+    get index of the first movement in mouse_times
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
+    :return: the first movement index in mouse_times
+    """
+    if (
+        mouse_times.shape[0] != mouse_positions.shape[0]
+        or mouse_times.shape[0] == 0
+        or mouse_times.shape[0] < to_target_num_timestamps_before_visible
+    ):
+        return None
+    i = 0
+    while xydist(mouse_positions[0], mouse_positions[i]) < min_distance and i + 1 < len(
+        mouse_times
+    ):
+        i += 1
+    return i
+
+
+def _movement_time_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float:
+    """
+    get the time from first movement to the peak velocity
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
+    :return: the time from first movement to the peak velocity
+    """
+    i = get_first_movement_index(
+        mouse_times, mouse_positions, to_target_num_timestamps_before_visible
+    )
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    return (
+        mouse_times[peak_index] - mouse_times[i]
+        if i is not None and peak_index >= i
+        else np.nan
+    )
+
+
+def _total_time_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float:
+    """
+    get the time from the target becomes visible to the peak velocity
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
+    :return: the time from the target becomes visible to the peak velocity
+    """
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    return (
+        mouse_times[peak_index] - mouse_times[to_target_num_timestamps_before_visible]
+        if to_target_num_timestamps_before_visible < peak_index
+        else np.nan
+    )
+
+
+def _movement_distance_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float:
+    """
+    get the euclidean point-to-point distance travelled from first movement to the peak velocity
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
+    :return: the distance travelled from first movement -> the peak velocity
+    """
+    i = get_first_movement_index(
+        mouse_times, mouse_positions, to_target_num_timestamps_before_visible
+    )
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    return (
+        _distance(mouse_positions[i : peak_index + 1])
+        if i is not None and peak_index >= i
+        else np.nan
+    )
+
+
+def _rmse_movement_at_peak_velocity(
+    mouse_times: np.ndarray,
+    mouse_positions: np.ndarray,
+    target_position: np.ndarray,
+    to_target_num_timestamps_before_visible: int,
+) -> float:
+    """
+    The Root Mean Square Error (RMSE) of the perpendicular distance from the peak velocity mouse point
+    to the straight line that intersects the first mouse location and the target.
+
+    See: https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points.
+
+    :param mouse_times: The array of timestamps
+    :param mouse_positions: The array of mouse positions
+    :param target_position: The position of the target
+    :param to_target_num_timestamps_before_visible: The index of the first timestamp where the target is visible
+    :return: The RMSE of the distance from the ideal trajectory
+    """
+    i = get_first_movement_index(
+        mouse_times, mouse_positions, to_target_num_timestamps_before_visible
+    )
+    if i is not None:
+        p1 = mouse_positions[i]
+    else:
+        return np.nan
+    p2 = target_position
+    _, peak_index = _peak_velocity(mouse_times, mouse_positions)
+    p3 = mouse_positions[peak_index]
+    return (
+        float(LA.norm(np.cross(p2 - p1, p1 - p3)) / LA.norm(p2 - p1))
+        if peak_index >= i
+        else np.nan
+    )

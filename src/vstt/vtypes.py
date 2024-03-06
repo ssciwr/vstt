@@ -70,6 +70,10 @@ class DisplayOptions(TypedDict):
     peak_acceleration: bool
     to_target_spatial_error: bool
     to_center_spatial_error: bool
+    movement_time_at_peak_velocity: bool
+    total_time_at_peak_velocity: bool
+    movement_distance_at_peak_velocity: bool
+    rmse_movement_at_peak_velocity: bool
 
 
 class Metadata(TypedDict):

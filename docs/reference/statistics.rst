@@ -134,3 +134,31 @@ Given pairs of :math:`(x, y)` cursor locations,the following statistics are calc
 
     * Spatial Error to central target
         * the distance between the end point of the movement to the center of the central target - radius of central target
+
+
+Statistics at peak velocity
+---------------------------
+
+.. figure:: images/peak.png
+   :alt: the statistics include movement time, total time, movement distance, RMSE movement at peak velocity
+
+The cursor location at a timestamp is given by a pair of :math:`(x, y)` coordinates,
+where :math:`(0, 0)` corresponds to the center of the screen, and 1 in these units is equal to the screen height.
+
+Given pairs of :math:`(x, y)` cursor locations,the following statistics are calculated, all in units of screen height:
+
+    * Movement time
+        * :math:`t_{peak} - t_{move}`
+        * Time from first cursor movement to the movement at peak velocity
+
+    * Total time
+        * :math:`t_{peak} - t_{display}`
+        * Time from target being displayed to the movement at peak velocity
+
+    * Movement distance
+        * .. figure:: images/movement_distance.png
+        * Euclidean point-to-point distance travelled from first cursor movement to the peak velocity
+
+    * RMSE movement
+        * .. figure:: images/RMSE_movement.png
+        * Root Mean Square Error (RMSE) of the perpendicular distance from the peak velocity mouse point to the straight line that intersects the first mouse location and the target.

@@ -47,6 +47,7 @@ repos:
             --ignore-missing-imports,
             --disallow-untyped-defs,
             --warn-redundant-casts,
+            --no-namespace-packages,
           ]
 
   - repo: https://github.com/rhysd/actionlint

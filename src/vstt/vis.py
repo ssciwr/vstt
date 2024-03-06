@@ -160,12 +160,16 @@ def _make_stats_txt(
                         stat_str = f"{stats[stat]: .0%}"
                     else:
                         stat_str = f"{stats[stat] == 1}"
-                if (
-                    stat == "area"
-                    or stat == "normalized_area"
-                    or stat == "peak_velocity"
-                    or stat == "peak_acceleration"
-                ):
+                if stat in [
+                    "area",
+                    "normalized_area",
+                    "peak_velocity",
+                    "peak_acceleration",
+                    "movement_time_at_peak_velocity",
+                    "total_time_at_peak_velocity",
+                    "movement_distance_at_peak_velocity",
+                    "rmse_movement_at_peak_velocity",
+                ]:
                     txt_stats += f"{label}: {stat_str}\n"
                 else:
                     txt_stats += f"{label} (to {destination}): {stat_str}\n"
