@@ -731,10 +731,6 @@ def _movement_time_at_peak_velocity(
         mouse_times, mouse_positions, to_target_num_timestamps_before_visible
     )
     _, peak_index = _peak_velocity(mouse_times, mouse_positions)
-    # if mouse_times[peak_index] - mouse_times[i] < 0 and peak_index is not None:
-    #     print("can't be negative")
-    # if peak_index is None:
-    #     print("didn't move")
     return (
         mouse_times[peak_index] - mouse_times[i]
         if i is not None and peak_index >= i
