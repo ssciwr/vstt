@@ -12,8 +12,8 @@ from shapely.geometry import LineString
 from shapely.ops import polygonize
 from shapely.ops import unary_union
 
-
 min_distance: float = 1e-12
+
 
 def list_dest_stat_label_units() -> list[tuple[str, list[tuple[str, str, str]]]]:
     list_dest_stats = []
@@ -600,7 +600,7 @@ def preprocess_mouse_positions(mouse_positions: np.ndarray) -> np.ndarray:
 
 def _peak_velocity(
     mouse_times: np.ndarray, mouse_positions: np.ndarray
-) -> Tuple[np.floating, np.integer]:
+) -> tuple[np.floating, np.integer]:
     """
     get peak velocity and the corresponding index
 
