@@ -26,9 +26,12 @@ class MetadataWidget(QtWidgets.QWidget):
         self._bool_widgets: dict[str, QtWidgets.QCheckBox] = {}
         self._float_widgets: dict[str, QtWidgets.QDoubleSpinBox] = {}
 
-        group_box = QtWidgets.QGroupBox("Metadata")
         outer_layout = QtWidgets.QVBoxLayout()
-        outer_layout.addWidget(group_box)
+        group_box = QtWidgets.QGroupBox("Metadata")
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(group_box)
+        outer_layout.addWidget(scroll_area)
         inner_layout = QtWidgets.QVBoxLayout()
         group_box.setLayout(inner_layout)
         fields_layout = QtWidgets.QGridLayout()
