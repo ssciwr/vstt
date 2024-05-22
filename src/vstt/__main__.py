@@ -19,7 +19,7 @@ def main(filename: str | None) -> None:
     app = QtWidgets.QApplication.instance()
     assert app is not None
     gui = Gui(filename=filename)
-    gui.show()
+    gui.showMaximized()
     app.exec()
 
 

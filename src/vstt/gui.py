@@ -39,7 +39,7 @@ class Gui(QtWidgets.QMainWindow):
             self.update_window_title
         )
         split_metadata_display.addWidget(self.display_options_widget)
-        split_metadata_display.setSizes([5000, 1000])
+        split_metadata_display.setSizes([1000, 1000])
 
         split_trial_results = QtWidgets.QSplitter()
         self.trials_widget = TrialsWidget(self)
@@ -50,7 +50,7 @@ class Gui(QtWidgets.QMainWindow):
 
         split_top_bottom.addWidget(split_metadata_display)
         split_top_bottom.addWidget(split_trial_results)
-        split_top_bottom.setSizes([1000, 5000])
+        split_top_bottom.setSizes([3000, 1000])
         grid_layout.addWidget(split_top_bottom)
 
         self.toolbar = _create_menu_and_toolbar(self)
