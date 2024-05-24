@@ -45,6 +45,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - run: pip install uv
       - name: Install Mesa 3D to get OpenGL support on Windows without a GPU
         uses: ssciwr/setup-mesa-dist-win@v2
         with:
@@ -55,7 +56,7 @@ jobs:
           # various psychopy & qt system dependencies
           sudo apt-get update -yy && sudo apt-get install -yy libasound2-dev portaudio19-dev libpulse-dev libusb-1.0-0-dev libsndfile1-dev libportmidi-dev liblo-dev libsdl2-mixer-2.0-0 libsdl2-image-2.0-0 libsdl2-2.0-0 freeglut3-dev scrot libnotify-dev pandoc libglu1-mesa-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev libxcb-glx0-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev libxcb-sync-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-randr0-dev libxcb-render-util0-dev libxkbcommon-dev libxkbcommon-x11-dev '^libxcb.*-dev' gnome-screenshot
           # install pre-built ubuntu/gtk3 wxPython wheel
-          pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }}/ wxPython
+          uv pip install --system -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/${{ matrix.os }}/ wxPython
           # enable colours in logs
           echo "FORCE_COLOR=1" >> $GITHUB_ENV
           echo "TERM=xterm-256color" >> $GITHUB_ENV
@@ -69,8 +70,8 @@ jobs:
           # workaround for Xlib.error.XauthError ~/.Xauthority: [Errno 2] No such file or directory
           sudo touch ~/.Xauthority
       - if: matrix.psychopy-version != 'latest'
-        run: pip install psychopy==${{ matrix.psychopy-version }} --verbose
-      - run: pip install -e .[tests,docs] --verbose
+        run: uv pip install --system psychopy==${{ matrix.psychopy-version }} --verbose
+      - run: uv pip install --system -e .[tests,docs] --verbose
       - run: python -m pytest --cov=vstt --cov-report=xml -v -s -x
       - uses: actions/upload-artifact@v4
         if: failure()
