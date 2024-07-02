@@ -32,6 +32,7 @@ running and analyzing motor skill acquisition experiments.
    notebooks/example
    notebooks/raw_data
    notebooks/area_calculation
+   notebooks/path_and_velocity
 
 .. toctree::
    :maxdepth: 2
