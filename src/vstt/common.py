@@ -22,10 +22,8 @@ def _has_valid_type(var: Any, correct_type: type) -> bool:
     if isinstance(var, correct_type):
         # var has the correct type
         return True
-    if correct_type in (float, int) and type(var) in (float, int):
-        # int instead of float or vice versa is ok
-        return True
-    return False
+    # int instead of float or vice versa is also ok - anything else is not
+    return correct_type in (float, int) and type(var) in (float, int)
 
 
 def import_typed_dict(
