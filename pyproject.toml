@@ -26,7 +26,7 @@ classifiers = [
 ]
 dependencies = [
   "click",
-  "numpy",
+  "numpy<2",
   "packaging",
   "pillow",
   "psychopy",
