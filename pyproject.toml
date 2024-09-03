@@ -26,7 +26,7 @@ classifiers = [
 ]
 dependencies = [
   "click",
-  "numpy",
+  "numpy<2.0.0",
   "packaging",
   "pillow",
   "psychopy",
@@ -62,6 +62,7 @@ docs = [
   "pandoc",
   "sphinx>=4.5.0",
   "sphinx_rtd_theme>=1.0.0",
+  "ipywidgets",
 ]
 
 [tool.setuptools.dynamic]
