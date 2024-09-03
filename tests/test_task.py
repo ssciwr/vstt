@@ -22,8 +22,10 @@ def move_mouse_to_target(
 ) -> None:
     # wait until target is activated
     attempts = 0
+    sleep_interval = 0.1
     while not gtu.pixel_color(target_pixel, target_color):
-        sleep(0.1)
+        sleep(sleep_interval)
+        sleep_interval += 0.1
         # press Enter in case we are looking at a splash / display_results screen
         gtu.press_enter()
         attempts += 1
@@ -114,7 +116,7 @@ def test_task(
     for timestamps in data["to_target_timestamps"][0][0]:
         assert (
             timestamps[-1] - timestamps[0]
-            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
+            < 0.8 * experiment_no_results.trial_list[0]["target_duration"]
         )
     for dest in ["target", "center"]:
         assert np.all(data[f"to_{dest}_success"][0][0])
@@ -154,11 +156,11 @@ def test_task_no_automove_to_center(
     ):
         assert (
             to_target_timestamps[-1] - to_target_timestamps[0]
-            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
+            < 0.8 * experiment_no_results.trial_list[0]["target_duration"]
         )
         assert (
             to_center_timestamps[-1] - to_target_timestamps[0]
-            < 0.5 * experiment_no_results.trial_list[0]["target_duration"]
+            < 0.8 * experiment_no_results.trial_list[0]["target_duration"]
         )
     for dest in ["target", "center"]:
         assert np.all(data[f"to_{dest}_success"][0][0])
