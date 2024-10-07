@@ -4,10 +4,11 @@ import pathlib
 from typing import Any
 
 import qt_test_utils as qtu
-import vstt
 from pytest import MonkeyPatch
 from qtpy.QtWidgets import QFileDialog
 from qtpy.QtWidgets import QInputDialog
+
+import vstt
 from vstt.experiment import Experiment
 from vstt.gui import Gui
 

@@ -2,6 +2,7 @@ import cProfile
 import ctypes
 
 from psychopy import core
+
 from vstt.experiment import Experiment
 from vstt.task import MotorTask
 

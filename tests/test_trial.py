@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import vstt
 from pytest import approx
+
+import vstt
 
 
 def test_describe_trial() -> None:

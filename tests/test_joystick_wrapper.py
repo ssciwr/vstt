@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from psychopy.hardware import joystick
 from psychopy.visual.window import Window
+
 from vstt import joystick_wrapper
 
 

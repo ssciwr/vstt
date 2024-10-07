@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import sys
 
-import vstt
 from pytest import MonkeyPatch
+
+import vstt
 from vstt.update import check_for_new_version
 from vstt.update import do_pip_upgrade
 
