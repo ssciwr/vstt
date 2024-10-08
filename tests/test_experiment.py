@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from psychopy.data import TrialHandlerExt
+
 from vstt.display import default_display_options
 from vstt.experiment import Experiment
 from vstt.meta import default_metadata

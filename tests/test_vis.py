@@ -3,9 +3,10 @@ from __future__ import annotations
 import gui_test_utils as gtu
 import numpy as np
 import pytest
-import vstt
 from psychopy.visual.window import Window
 from pytest import approx
+
+import vstt
 from vstt.experiment import Experiment
 
 

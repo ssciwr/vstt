@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import qt_test_utils as qtu
-import vstt
 from psychopy.visual.window import Window
+
+import vstt
 from vstt.display_widget import DisplayOptionsWidget
 from vstt.experiment import Experiment
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
+
 import vstt
 from vstt.experiment import Experiment
 

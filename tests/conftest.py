@@ -9,6 +9,7 @@ import pyautogui
 import pytest
 from psychopy.gui.qtgui import ensureQtApp
 from psychopy.visual.window import Window
+
 from vstt.experiment import Experiment
 from vstt.geom import points_on_circle
 from vstt.stats import stats_dataframe

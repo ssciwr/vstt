@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import gui_test_utils as gtu
 import qt_test_utils as qtu
-import vstt
 from psychopy.visual.window import Window
 from pytest import approx
 from qtpy import QtWidgets
+
+import vstt
 from vstt.experiment import Experiment
 from vstt.meta_widget import MetadataWidget
 

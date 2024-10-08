@@ -23,7 +23,7 @@ build:
       # install attrdict as this may be used in wxPython setup.py
       - python -m pip install attrdict
       # install pre-built ubuntu/gtk3 wxPython wheel
-      - python -m pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/ wxPython
+      - python -m pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/ wxPython==4.2.1
       # check if any required system libs are missing by trying to import it
       - python -c "import wx"
       # create virtual display for pyglet

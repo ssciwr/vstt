@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import numpy as np
-import vstt
 from pytest import approx
+
+import vstt
 
 
 def test_equidistant_angles() -> None:

@@ -10,6 +10,7 @@ from PIL import Image
 from psychopy.visual.window import Window
 from pytest import MonkeyPatch
 from qtpy.QtWidgets import QFileDialog
+
 from vstt.experiment import Experiment
 from vstt.results_widget import ResultsWidget
 
