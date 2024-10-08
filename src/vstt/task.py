@@ -23,7 +23,7 @@ from vstt.geom import JoystickPointUpdater
 from vstt.geom import PointRotator
 from vstt.geom import to_target_dists
 from vstt.stats import stats_dataframe
-import time
+
 
 def _get_target_indices(outer_target_index: int, trial: dict[str, Any]) -> list[int]:
     # always include outer target index
@@ -292,6 +292,7 @@ class MotorTask:
             is_central_target = target_index == trial["num_targets"]
             mouse_times = []
             mouse_positions = []
+            green_target_index = None
             # current target is not yet displayed
             if not is_central_target:
                 if trial["automove_cursor_to_center"]:
@@ -410,10 +411,26 @@ class MotorTask:
             )
             # When the target is reached, turn the color to green
             if success:
-                vis.update_target_colors(tm.targets, trial["hide_target_when_reached"], target_index,trial["turn_target_to_green_when_reached"])
-                # Adjust the number to control how long the green color stays visible
-                for _ in range(30):
-                    vis.draw_and_flip(self.win, tm.drawables, self.kb)
+                green_target_index = target_index
+            vis.update_target_colors(
+                tm.targets,
+                trial["hide_target_when_reached"],
+                target_index,
+                trial["turn_target_to_green_when_reached"],
+                green_target_index,
+            )
+            should_continue_highlighting = True
+            while should_continue_highlighting:
+                vis.draw_and_flip(self.win, tm.drawables, self.kb)
+                should_continue_highlighting = (
+                    dist_correct <= target_size
+                    and tm.clock.getTime() + minimum_window_for_flip < stop_target_time
+                )
+            # if success:
+            #     vis.update_target_colors(tm.targets, trial["hide_target_when_reached"], target_index,trial["turn_target_to_green_when_reached"])
+            #     # Adjust the number to control how long the green color stays visible
+            #     for _ in range(30):
+            #         vis.draw_and_flip(self.win, tm.drawables, self.kb)
             if is_central_target:
                 trial_data.to_center_success.append(success)
             else:

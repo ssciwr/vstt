@@ -98,14 +98,18 @@ def make_target_labels(
 
 
 def update_target_colors(
-    targets: ElementArrayStim, show_inactive_targets: bool, index: int | None = None,turn_target_to_green_when_reached: bool = False
+    targets: ElementArrayStim,
+    show_inactive_targets: bool,
+    index: int | None = None,
+    turn_target_to_green_when_reached: bool = False,
+    green_target_index: int | None = None,
 ) -> None:
     inactive_rgb = 0.0
     if show_inactive_targets:
         inactive_rgb = 0.9
     c = np.array([[inactive_rgb, inactive_rgb, inactive_rgb]] * targets.nElements)
     if index is not None:
-        if turn_target_to_green_when_reached:
+        if turn_target_to_green_when_reached and green_target_index is not None:
             # Set specified target to green
             c[index] = [-1, 1, -1]
         else:
