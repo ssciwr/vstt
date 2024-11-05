@@ -95,6 +95,7 @@ class TrialManager:
         self.first_target_of_condition_shown = False
         self.most_recent_target_display_time = 0.0
         self.final_target_display_time_previous_trial = 0.0
+        self.green_target_index: int | None = None
 
     def cursor_path_add_vertex(
         self, vertex: tuple[float, float], clear_existing: bool = False
@@ -281,7 +282,7 @@ class MotorTask:
         mouse_pos = tm.cursor.pos
         stop_waiting_time = 0.0
         stop_target_time = 0.0
-        green_target_index = None
+        tm.green_target_index = None
         if trial["fixed_target_intervals"]:
             num_completed_targets = len(trial_data.to_target_timestamps)
             stop_waiting_time = (num_completed_targets + 1) * trial[
@@ -319,7 +320,7 @@ class MotorTask:
                         tm.targets,
                         trial["show_inactive_targets"],
                         None,
-                        green_target_index,
+                        tm,
                     )
                     if trial["show_target_labels"] and tm.target_labels is not None:
                         vis.update_target_label_colors(
@@ -415,26 +416,7 @@ class MotorTask:
             )
             # When the target is reached, turn the color to green
             if success and trial["turn_target_to_green_when_reached"]:
-                green_target_index = target_index
-            # vis.update_target_colors(
-            #     tm.targets,
-            #     trial["hide_target_when_reached"],
-            #     target_index,
-            #     trial["turn_target_to_green_when_reached"],
-            #     green_target_index,
-            # )
-            # should_continue_highlighting = True
-            # while should_continue_highlighting:
-            #     vis.draw_and_flip(self.win, tm.drawables, self.kb)
-            #     should_continue_highlighting = (
-            #         dist_correct <= target_size
-            #         and tm.clock.getTime() + minimum_window_for_flip < stop_target_time
-            #     )
-            # if success:
-            #     vis.update_target_colors(tm.targets, trial["hide_target_when_reached"], target_index,trial["turn_target_to_green_when_reached"])
-            #     # Adjust the number to control how long the green color stays visible
-            #     for _ in range(30):
-            #         vis.draw_and_flip(self.win, tm.drawables, self.kb)
+                tm.green_target_index = target_index
             if is_central_target:
                 trial_data.to_center_success.append(success)
             else:

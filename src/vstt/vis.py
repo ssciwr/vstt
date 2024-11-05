@@ -19,6 +19,7 @@ from vstt.geom import points_on_circle
 from vstt.stats import get_closed_polygon
 from vstt.stats import list_dest_stat_label_units
 from vstt.stats import stats_dataframe
+from vstt.task import TrialManager
 from vstt.vtypes import DisplayOptions
 from vstt.vtypes import Metadata
 
@@ -101,8 +102,7 @@ def update_target_colors(
     targets: ElementArrayStim,
     show_inactive_targets: bool,
     index: int | None = None,
-    # turn_target_to_green_when_reached: bool = False,
-    green_target_index: int | None = None,
+    tm: TrialManager | None = None,
 ) -> None:
     inactive_rgb = 0.0
     if show_inactive_targets:
@@ -111,10 +111,9 @@ def update_target_colors(
     if index is not None:
         # Set specified target to red
         c[index] = [1, -1, -1]
-    if green_target_index is not None:
+    if tm is not None and tm.green_target_index is not None:
         # Set specified target to green
-        c[green_target_index] = [-1, 1, -1]
-
+        c[tm.green_target_index] = [-1, 1, -1]
     targets.setColors(c, colorSpace="rgb")
 
 
