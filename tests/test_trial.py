@@ -55,6 +55,7 @@ def test_import_trial() -> None:
         "add_central_target": True,
         "show_target_labels": False,
         "hide_target_when_reached": True,
+        "turn_target_to_green_when_reached": False,
         "target_labels": "0 1 2 3 4 5",
         "fixed_target_intervals": False,
         "target_duration": 3,

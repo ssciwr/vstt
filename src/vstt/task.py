@@ -282,7 +282,11 @@ class MotorTask:
         mouse_pos = tm.cursor.pos
         stop_waiting_time = 0.0
         stop_target_time = 0.0
-        tm.green_target_index = None
+        tm.green_target_index = (
+            tm.green_target_index
+            if tm.green_target_index == trial["num_targets"]
+            else None
+        )
         if trial["fixed_target_intervals"]:
             num_completed_targets = len(trial_data.to_target_timestamps)
             stop_waiting_time = (num_completed_targets + 1) * trial[
@@ -320,7 +324,7 @@ class MotorTask:
                         tm.targets,
                         trial["show_inactive_targets"],
                         None,
-                        tm,
+                        tm.green_target_index,
                     )
                     if trial["show_target_labels"] and tm.target_labels is not None:
                         vis.update_target_label_colors(

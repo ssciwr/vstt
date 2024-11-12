@@ -33,7 +33,7 @@ def default_trial() -> Trial:
         "target_indices": "0 1 2 3 4 5 6 7",
         "add_central_target": True,
         "hide_target_when_reached": True,
-        "turn_target_to_green_when_reached": True,
+        "turn_target_to_green_when_reached": False,
         "show_target_labels": False,
         "target_labels": "0 1 2 3 4 5 6 7",
         "fixed_target_intervals": False,
