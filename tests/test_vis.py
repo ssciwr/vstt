@@ -77,7 +77,7 @@ def test_update_target_colors(
     window: Window, n_targets: int, add_central_target: bool
 ) -> None:
     for show_inactive_targets, inactive_color in [
-        (True, (0.1, 0.1, 0.1)),
+        (True, (0.9, 0.9, 0.9)),
         (False, (0, 0, 0)),
     ]:
         red = (1.0, -1.0, -1.0)
