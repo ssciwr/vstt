@@ -16,6 +16,7 @@ class Trial(TypedDict):
     target_indices: str
     add_central_target: bool
     hide_target_when_reached: bool
+    turn_target_to_green_when_reached: bool
     show_target_labels: bool
     target_labels: str
     fixed_target_intervals: bool

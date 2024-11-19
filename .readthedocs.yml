@@ -18,6 +18,8 @@ build:
     - mesa-utils
     # system sound driver for sounddevice
     - libportaudio2
+    # Required for libsecret-1.so.0, fixes ImportError when importing wxPython
+    - libsecret-1-dev
   jobs:
     pre_install:
       # install attrdict as this may be used in wxPython setup.py

@@ -95,6 +95,7 @@ class TrialManager:
         self.first_target_of_condition_shown = False
         self.most_recent_target_display_time = 0.0
         self.final_target_display_time_previous_trial = 0.0
+        self.green_target_index: int | None = None
 
     def cursor_path_add_vertex(
         self, vertex: tuple[float, float], clear_existing: bool = False
@@ -292,6 +293,7 @@ class MotorTask:
             is_central_target = target_index == trial["num_targets"]
             mouse_times = []
             mouse_positions = []
+
             # current target is not yet displayed
             if not is_central_target:
                 if trial["automove_cursor_to_center"]:
@@ -311,10 +313,13 @@ class MotorTask:
                         pre_target_delay += trial["pre_first_target_extra_delay"]
                         tm.first_target_of_condition_shown = True
                 stop_waiting_time = t0 + pre_target_delay
-            if stop_waiting_time > t0:
+            if stop_waiting_time >= t0:
                 if trial["hide_target_when_reached"]:
                     vis.update_target_colors(
-                        tm.targets, trial["show_inactive_targets"], None
+                        tm.targets,
+                        trial["show_inactive_targets"],
+                        None,
+                        tm.green_target_index,
                     )
                     if trial["show_target_labels"] and tm.target_labels is not None:
                         vis.update_target_label_colors(
@@ -408,6 +413,9 @@ class MotorTask:
                 dist_correct <= target_size
                 and tm.clock.getTime() + minimum_window_for_flip < stop_target_time
             )
+            # When the target is reached, turn the color to green
+            if success and trial["turn_target_to_green_when_reached"]:
+                tm.green_target_index = target_index
             if is_central_target:
                 trial_data.to_center_success.append(success)
             else:
