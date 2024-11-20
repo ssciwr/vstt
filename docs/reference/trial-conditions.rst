@@ -33,6 +33,9 @@ the screen height (i.e. a line of length 1.0 in these units would extend from th
 * Hide target when reached
    * Enable to hide a target once the cursor has reached it
    * Default: ``enabled``
+* Turn target green when reached
+   * Enable to paint the target green once the cursor has reached it
+   * Default: ``disabled``
 * Display target labels
    * Enable to show a label inside each target
    * The labels are taken from "Target labels" (see below)
