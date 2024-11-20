@@ -27,7 +27,7 @@ jobs:
         include:
           - os: "ubuntu-22.04"
             python-version: "3.10"
-            psychopy-version: "2024.2.1"
+            psychopy-version: "2024.2.4"
           - os: "ubuntu-22.04"
             python-version: "3.10"
             psychopy-version: "2024.1.4"

@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0] - 2024-11-20
+
+### Added
+
+- spatial error statistic [#255](https://github.com/ssciwr/vstt/pull/255)
+- statistics at peak velocity [#267](https://github.com/ssciwr/vstt/pull/267)
+- example jupyter notebook for filtering data [#274](https://github.com/ssciwr/vstt/pull/274), [#277](https://github.com/ssciwr/vstt/pull/277)
+- option to turn target green when it is reached [#279](https://github.com/ssciwr/vstt/pull/279)
+
+### Changed
+
+- tone duration is now 160ms [#261](https://github.com/ssciwr/vstt/pull/261)
+
 ## [1.4.0] - 2023-12-08
 
 ### Added
