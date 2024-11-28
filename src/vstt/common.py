@@ -18,7 +18,7 @@ VsttTypedDict = TypeVar(
 )
 
 
-def _has_valid_type(var: Any,       correct_type: type) -> bool:
+def _has_valid_type(var: Any, correct_type: type) -> bool:
     if isinstance(var, correct_type):
         # var has the correct type
         return True
