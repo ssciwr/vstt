@@ -22,22 +22,6 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
         self._experiment: Experiment = Experiment()
         self._widgets: dict[str, QtWidgets.QCheckBox] = {}
 
-        # outer_layout = QtWidgets.QVBoxLayout()
-        # group_box = QtWidgets.QGroupBox("Display Options")
-        # scroll_area = QtWidgets.QScrollArea()
-        # scroll_area.setWidgetResizable(True)
-        # scroll_area.setWidget(group_box)
-        # outer_layout.addWidget(scroll_area)
-        # inner_layout = QtWidgets.QVBoxLayout()
-        # group_box.setLayout(inner_layout)
-        # labels = display_options_labels()
-        # for _row_index, key in enumerate(labels.keys()):
-        #     checkbox = QtWidgets.QCheckBox(f"{labels[key]}", self)
-        #     inner_layout.addWidget(checkbox)
-        #     checkbox.clicked.connect(self._update_value_callback(key))
-        #     self._widgets[key] = checkbox
-        # self.setLayout(outer_layout)
-
         # Main layout
         outer_layout = QtWidgets.QVBoxLayout()
 
