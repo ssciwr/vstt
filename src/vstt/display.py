@@ -69,7 +69,7 @@ def display_options_labels() -> dict[str, str]:
 
 def display_options_groups() -> dict[str, list[str]]:
     return {
-        "Reaction and Movement Times": [
+        "Reaction and Movement Times:": [
             "to_target_reaction_time",
             "to_center_reaction_time",
             "to_target_movement_time",
@@ -79,7 +79,7 @@ def display_options_groups() -> dict[str, list[str]]:
             "movement_time_at_peak_velocity",
             "total_time_at_peak_velocity",
         ],
-        "Distance and RMSE": [
+        "Distance and RMSE:": [
             "to_target_distance",
             "center_distance",
             "to_target_rmse",

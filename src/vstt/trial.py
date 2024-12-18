@@ -5,7 +5,19 @@ from typing import Any
 from typing import Mapping
 
 import numpy as np
-from psychopy.gui.qtgui import DlgFromDict
+from PyQt5.QtWidgets import QCheckBox
+from PyQt5.QtWidgets import QComboBox
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDoubleSpinBox
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtWidgets import QTreeWidget
+from PyQt5.QtWidgets import QTreeWidgetItem
+from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QWidget
 
 from vstt.common import import_typed_dict
 from vstt.vtypes import Trial
@@ -106,20 +118,148 @@ def trial_labels() -> dict:
     }
 
 
+def trial_groups() -> dict[str, list[str]]:
+    return {
+        "Target Settings:": [
+            "num_targets",
+            "target_order",
+            "target_indices",
+            "add_central_target",
+            "hide_target_when_reached",
+            "turn_target_to_green_when_reached",
+            "show_target_labels",
+            "target_labels",
+            "fixed_target_intervals",
+            "target_duration",
+            "central_target_duration",
+            "pre_target_delay",
+            "pre_central_target_delay",
+            "pre_first_target_extra_delay",
+            "target_distance",
+            "target_size",
+            "central_target_size",
+            "show_inactive_targets",
+            "ignore_incorrect_targets",
+        ],
+    }
+
+
+class TreeDialog(QDialog):
+    def __init__(self, trial: Trial):
+        super().__init__()
+        self.setWindowTitle("Trial Conditions")
+        self.tree_layout = QVBoxLayout(self)
+        self.tree_widget = QTreeWidget()
+        self.tree_widget.setHeaderHidden(True)  # Hide header for cleaner UI
+        self.trial = trial
+
+        # fix layout size
+        self.setFixedSize(600, 800)
+
+        # Populate the QTreeWidget with categories and settings
+        collapsible_keys = []
+        for category, items in trial_groups().items():
+            parent_item = QTreeWidgetItem(self.tree_widget)
+            parent_item.setText(0, category)
+
+            for key in items:
+                label = trial_labels()[key]
+                collapsible_keys.append(key)
+                value = self.trial[key] # type: ignore
+                child_item = QTreeWidgetItem(parent_item)
+
+                # Create a label + input widget for every setting
+                widget = self._create_labeled_widget(label, key, value)
+                self.tree_widget.setItemWidget(child_item, 0, widget)
+        for key, label in trial_labels().items():
+            if key not in collapsible_keys:
+                item = QTreeWidgetItem(self.tree_widget)
+                value = self.trial[key]  # type: ignore
+                # Create an appropriate input widget for each setting
+                widget = self._create_labeled_widget(label, key, value)
+                self.tree_widget.setItemWidget(item, 0, widget)
+
+        self.tree_layout.addWidget(self.tree_widget)
+
+        # OK and Cancel buttons
+        self.ok_button = QPushButton("OK")
+        self.ok_button.clicked.connect(self.accept)
+        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button.clicked.connect(self.reject)
+        self.tree_layout.addWidget(self.ok_button)
+        self.tree_layout.addWidget(self.cancel_button)
+
+    def _create_labeled_widget(
+        self, label_text: str, key: str, value: bool | str | int | float
+    ) -> QWidget:
+        """
+        Creates a container widget with a label on the left and an input widget on the right.
+        """
+        container = QWidget()
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)  # Remove extra margins
+
+        # Create label and input widget
+        label = QLabel(label_text)
+        input_widget = self._create_input_widget(label_text, key, value)
+
+        # Add label and input widget to the layout
+        if not isinstance(value, bool):  # put checkbox in front of the label
+            layout.addWidget(label)
+        layout.addWidget(input_widget)
+        layout.addStretch()  # Add stretch to align everything neatly
+
+        # container = label + input widget
+        container.input_widget = input_widget
+        return container
+
+    def _create_input_widget(
+        self, label_text: str, key: str, value: bool | str | int | float
+    ) -> QCheckBox | QSpinBox | QDoubleSpinBox | QComboBox | QLineEdit:
+        """Creates an input widget based on the type of value."""
+        if isinstance(value, bool):
+            widget = QCheckBox(f"{label_text}")
+            widget.setChecked(value)
+            widget.stateChanged.connect(lambda val: self._update_trial(key, val))
+        elif isinstance(value, int):
+            widget = QSpinBox()
+            widget.setValue(value)
+            widget.valueChanged.connect(lambda val: self._update_trial(key, val))
+        elif isinstance(value, float):
+            widget = QDoubleSpinBox()
+            widget.setValue(value)
+            widget.setDecimals(2)
+            widget.valueChanged.connect(lambda val: self._update_trial(key, val))
+        elif key == "target_order":
+            widget = QComboBox()
+            options = ["clockwise", "anti-clockwise", "random", "fixed"]
+            for option in options:
+                widget.addItem(option)
+            widget.setCurrentText(value)
+            widget.currentTextChanged.connect(lambda val: self._update_trial(key, val))
+        else:
+            widget = QLineEdit(value)
+            widget.textChanged.connect(lambda val: self._update_trial(key, val))
+        return widget
+
+    def _update_trial(self, key: str, value: bool | str | int | float) -> None:
+        self.trial[key] = value
+
+    def get_values(self) -> Trial:
+        """Retrieve updated values from the dialog."""
+        return self.trial
+
+
 def get_trial_from_user(
     initial_trial: Trial | None = None,
 ) -> Trial | None:
     trial = copy.deepcopy(initial_trial) if initial_trial else default_trial()
-    order_of_targets = [trial["target_order"]]
-    for target_order in ["clockwise", "anti-clockwise", "random", "fixed"]:
-        if target_order != order_of_targets[0]:
-            order_of_targets.append(target_order)
-    trial["target_order"] = order_of_targets
-    dialog = DlgFromDict(
-        trial, title="Trial conditions", labels=trial_labels(), sortKeys=False
-    )
-    if not dialog.OK:
-        return None
+    dialog = TreeDialog(trial)
+    if dialog.exec_() == QDialog.Accepted:
+        updated_values = dialog.get_values()
+        print("Updated Trial Settings:", updated_values)
+    else:
+        print("Dialog canceled.")
     return import_and_validate_trial(trial)
 
 
