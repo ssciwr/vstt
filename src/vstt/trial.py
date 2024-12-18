@@ -165,7 +165,7 @@ class TreeDialog(QDialog):
             for key in items:
                 label = trial_labels()[key]
                 collapsible_keys.append(key)
-                value = self.trial[key] # type: ignore
+                value = self.trial[key]  # type: ignore
                 child_item = QTreeWidgetItem(parent_item)
 
                 # Create a label + input widget for every setting
@@ -210,13 +210,14 @@ class TreeDialog(QDialog):
         layout.addStretch()  # Add stretch to align everything neatly
 
         # container = label + input widget
-        container.input_widget = input_widget
+        # container.input_widget = input_widget
         return container
 
     def _create_input_widget(
         self, label_text: str, key: str, value: bool | str | int | float
     ) -> QCheckBox | QSpinBox | QDoubleSpinBox | QComboBox | QLineEdit:
         """Creates an input widget based on the type of value."""
+        widget: QCheckBox | QComboBox | QSpinBox | QDoubleSpinBox | QLineEdit
         if isinstance(value, bool):
             widget = QCheckBox(f"{label_text}")
             widget.setChecked(value)
@@ -243,7 +244,7 @@ class TreeDialog(QDialog):
         return widget
 
     def _update_trial(self, key: str, value: bool | str | int | float) -> None:
-        self.trial[key] = value
+        self.trial[key] = value  # type: ignore
 
     def get_values(self) -> Trial:
         """Retrieve updated values from the dialog."""
