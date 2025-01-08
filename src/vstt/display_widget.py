@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Callable
 
 from psychopy.visual.window import Window
+from PyQt5.QtGui import QFont
 from qtpy import QtCore
 from qtpy import QtWidgets
 
@@ -39,6 +40,7 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
         for group_title, keys in collapsible_labels.items():
             parent_item = QtWidgets.QTreeWidgetItem(tree_widget)
             parent_item.setText(0, group_title)
+            parent_item.setFont(0, QFont("Arial", 11, QFont.Bold))
 
             for key in keys:
                 collapsible_keys.append(key)

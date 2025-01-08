@@ -5,6 +5,7 @@ from typing import Any
 from typing import Mapping
 
 import numpy as np
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QDialog
@@ -161,6 +162,7 @@ class TreeDialog(QDialog):
         for category, items in trial_groups().items():
             parent_item = QTreeWidgetItem(self.tree_widget)
             parent_item.setText(0, category)
+            parent_item.setFont(0, QFont("Arial", 11, QFont.Bold))
 
             for key in items:
                 label = trial_labels()[key]
@@ -208,9 +210,6 @@ class TreeDialog(QDialog):
             layout.addWidget(label)
         layout.addWidget(input_widget)
         layout.addStretch()  # Add stretch to align everything neatly
-
-        # container = label + input widget
-        # container.input_widget = input_widget
         return container
 
     def _create_input_widget(
