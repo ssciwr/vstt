@@ -81,7 +81,7 @@ def display_options_groups() -> dict[str, list[str]]:
         ],
         "Distance and RMSE:": [
             "to_target_distance",
-            "center_distance",
+            "to_center_distance",
             "to_target_rmse",
             "to_center_rmse",
             "movement_distance_at_peak_velocity",
