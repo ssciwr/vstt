@@ -72,3 +72,13 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
         "Ignoring unknown key 'unknown_key2'",
     }
     assert log_messages == expected_log_messages
+
+
+def test_display_options_group() -> None:
+    display_options = vstt.display.default_display_options()
+    display_options_groups = vstt.display.display_options_groups()
+    all_values = [
+        value for sublist in display_options_groups.values() for value in sublist
+    ]
+    for value in all_values:
+        assert value in display_options
