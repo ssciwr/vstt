@@ -30,7 +30,6 @@ dependencies = [
   "packaging",
   "pillow",
   "psychopy",
-  "psychopy-sounddevice",
   "qtpy",
   "requests",
   "shapely",
