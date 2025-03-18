@@ -53,6 +53,7 @@ tests = [
   "pytest",
   "pytest-cov",
   "pytest-randomly",
+  "pytest-qt",
 ]
 docs = [
   "ipykernel",

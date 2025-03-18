@@ -5,20 +5,20 @@ from typing import Any
 from typing import Mapping
 
 import numpy as np
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QCheckBox
-from PyQt5.QtWidgets import QComboBox
-from PyQt5.QtWidgets import QDialog
-from PyQt5.QtWidgets import QDoubleSpinBox
-from PyQt5.QtWidgets import QHBoxLayout
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QLineEdit
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QSpinBox
-from PyQt5.QtWidgets import QTreeWidget
-from PyQt5.QtWidgets import QTreeWidgetItem
-from PyQt5.QtWidgets import QVBoxLayout
-from PyQt5.QtWidgets import QWidget
+from qtpy.QtGui import QFont
+from qtpy.QtWidgets import QCheckBox
+from qtpy.QtWidgets import QComboBox
+from qtpy.QtWidgets import QDialog
+from qtpy.QtWidgets import QDoubleSpinBox
+from qtpy.QtWidgets import QHBoxLayout
+from qtpy.QtWidgets import QLabel
+from qtpy.QtWidgets import QLineEdit
+from qtpy.QtWidgets import QPushButton
+from qtpy.QtWidgets import QSpinBox
+from qtpy.QtWidgets import QTreeWidget
+from qtpy.QtWidgets import QTreeWidgetItem
+from qtpy.QtWidgets import QVBoxLayout
+from qtpy.QtWidgets import QWidget
 
 from vstt.common import import_typed_dict
 from vstt.vtypes import Trial
@@ -257,10 +257,11 @@ def get_trial_from_user(
     dialog = TreeDialog(trial)
     if dialog.exec_() == QDialog.Accepted:
         updated_values = dialog.get_values()
-        print("Updated Trial Settings:", updated_values)
+        print("\nUpdated Trial Settings:", updated_values)
+        return import_and_validate_trial(trial)
     else:
-        print("Dialog canceled.")
-    return import_and_validate_trial(trial)
+        print("\nDialog canceled.")
+        return None
 
 
 def import_and_validate_trial(trial_or_dict: Mapping[str, Any]) -> Trial:

@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Callable
 
 from psychopy.visual.window import Window
-from PyQt5.QtGui import QFont
 from qtpy import QtCore
 from qtpy import QtWidgets
+from qtpy.QtGui import QFont
 
 from vstt.display import display_options_groups
 from vstt.display import display_options_labels

@@ -74,7 +74,10 @@ def test_import_display_options(caplog: pytest.LogCaptureFixture) -> None:
     assert log_messages == expected_log_messages
 
 
-def test_display_options_group() -> None:
+def test_display_options_groups() -> None:
+    """
+    test  if the elements in display_options_groups() exists in default_display_options()
+    """
     display_options = vstt.display.default_display_options()
     display_options_groups = vstt.display.display_options_groups()
     all_values = [
