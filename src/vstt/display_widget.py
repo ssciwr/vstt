@@ -45,28 +45,32 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
             for key in keys:
                 collapsible_keys.append(key)
                 if key in labels:
-                    child_item = QtWidgets.QTreeWidgetItem(parent_item)
-                    child_item.setText(
-                        0, "    " + labels[key]
-                    )  # set text explicitly so that text can be obtained in the test cases
-                    checkbox = QtWidgets.QCheckBox()
-                    tree_widget.setItemWidget(child_item, 0, checkbox)
-                    checkbox.clicked.connect(self._update_value_callback(key))
-                    self._widgets[key] = checkbox
+                    self._add_checkbox_to_tree_widget(
+                        key, labels[key], parent_item, tree_widget
+                    )
 
         # Add non-collapsible options
         for key, label in labels.items():
             if key not in collapsible_keys:
-                item = QtWidgets.QTreeWidgetItem(tree_widget)
-                item.setText(
-                    0, "    " + label
-                )  # set text explicitly so that text can be obtained in the test cases
-                checkbox = QtWidgets.QCheckBox()
-                tree_widget.setItemWidget(item, 0, checkbox)
-                checkbox.clicked.connect(self._update_value_callback(key))
-                self._widgets[key] = checkbox
+                self._add_checkbox_to_tree_widget(key, label, tree_widget, tree_widget)
 
         self.setLayout(outer_layout)
+
+    def _add_checkbox_to_tree_widget(
+        self,
+        key: str,
+        label: str,
+        parent_item: QtWidgets.QTreeWidgetItem | QtWidgets.QTreeWidget,
+        tree_widget: QtWidgets.QTreeWidget,
+    ) -> None:
+        child_item = QtWidgets.QTreeWidgetItem(parent_item)
+        child_item.setText(
+            0, "    " + label
+        )  # set text explicitly so that text can be obtained in the test cases
+        checkbox = QtWidgets.QCheckBox()
+        tree_widget.setItemWidget(child_item, 0, checkbox)
+        checkbox.clicked.connect(self._update_value_callback(key))
+        self._widgets[key] = checkbox
 
     def _update_value_callback(self, key: str) -> Callable[[bool], None]:
         def _update_value(value: bool) -> None:
