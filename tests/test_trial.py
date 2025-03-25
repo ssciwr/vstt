@@ -303,7 +303,7 @@ def test_get_trial_from_user_accepted(mocker: MockerFixture, mock_trial: Trial) 
     test get_trial_from_user() when dialog is accepted.
     """
     mock_dialog = mocker.patch("vstt.trial.TreeDialog")
-    mock_dialog.return_value.exec_.return_value = QDialog.Accepted
+    mock_dialog.return_value.exec.return_value = QDialog.Accepted
     mock_dialog.return_value.get_values.return_value = mock_trial
     mock_validate = mocker.patch(
         "vstt.trial.import_and_validate_trial", return_value=mock_trial
