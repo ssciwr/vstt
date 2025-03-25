@@ -255,7 +255,7 @@ def get_trial_from_user(
 ) -> Trial | None:
     trial = copy.deepcopy(initial_trial) if initial_trial else default_trial()
     dialog = TreeDialog(trial)
-    if dialog.exec_() == QDialog.Accepted:
+    if dialog.exec() == QDialog.Accepted:
         updated_values = dialog.get_values()
         print("\nUpdated Trial Settings:", updated_values)
         return import_and_validate_trial(trial)

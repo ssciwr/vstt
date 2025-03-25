@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
@@ -262,7 +264,7 @@ def test_tree_dialog_updates_trial(qtbot: QtBot, mock_trial: Trial) -> None:
     qtbot.keyClicks(
         double_spinbox, "0.08"
     )  # Simulate user updating 'target_size' to '0.08'
-    assert dialog.trial["target_size"] == 0.08
+    assert math.isclose(dialog.trial["target_size"], 0.08) is True
 
     combobox = dialog.tree_widget.itemWidget(
         dialog.tree_widget.topLevelItem(0).child(1), 0

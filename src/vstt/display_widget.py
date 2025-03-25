@@ -46,7 +46,10 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
                 collapsible_keys.append(key)
                 if key in labels:
                     child_item = QtWidgets.QTreeWidgetItem(parent_item)
-                    checkbox = QtWidgets.QCheckBox(f"{labels[key]}")
+                    child_item.setText(
+                        0, "    " + labels[key]
+                    )  # set text explicitly so that text can be obtained in the test cases
+                    checkbox = QtWidgets.QCheckBox()
                     tree_widget.setItemWidget(child_item, 0, checkbox)
                     checkbox.clicked.connect(self._update_value_callback(key))
                     self._widgets[key] = checkbox
@@ -55,7 +58,10 @@ class DisplayOptionsWidget(QtWidgets.QWidget):
         for key, label in labels.items():
             if key not in collapsible_keys:
                 item = QtWidgets.QTreeWidgetItem(tree_widget)
-                checkbox = QtWidgets.QCheckBox(f"{label}")
+                item.setText(
+                    0, "    " + label
+                )  # set text explicitly so that text can be obtained in the test cases
+                checkbox = QtWidgets.QCheckBox()
                 tree_widget.setItemWidget(item, 0, checkbox)
                 checkbox.clicked.connect(self._update_value_callback(key))
                 self._widgets[key] = checkbox

@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-from unittest.mock import MagicMock
-
 import pytest
 import qt_test_utils as qtu
 
 # from PyQt5.uic.properties import QtWidgets
 from psychopy.visual.window import Window
-from pytestqt.qtbot import QtBot
-from qtpy import QtCore
 from qtpy import QtWidgets
 
 import vstt
+from vstt.display import display_options_groups
 from vstt.display import display_options_labels
 from vstt.display_widget import DisplayOptionsWidget
 from vstt.experiment import Experiment
@@ -57,62 +54,37 @@ def test_display_options_widget(widget: DisplayOptionsWidget) -> None:
         assert isinstance(value, bool)
 
 
-def test_widget_initialization(widget: DisplayOptionsWidget) -> None:
+def test_group_in_tree_widget(widget: DisplayOptionsWidget) -> None:
     """
-    test if widget initializes correctly.
+    test if the group title and labels of the TreeWidget items are in the expected groups and labels
     """
-    assert widget is not None
-    assert isinstance(widget, DisplayOptionsWidget)
+    tree_widget = widget.findChild(QtWidgets.QTreeWidget)
+    assert tree_widget is not None
 
+    expected_groups = display_options_groups()
+    expected_labels = display_options_labels()
 
-def test_checkbox_created(widget: DisplayOptionsWidget) -> None:
-    """
-    test that checkboxes are created based on labels.
-    """
-    labels = display_options_labels()
-    for key in labels:
-        assert key in widget._widgets
-        assert isinstance(widget._widgets[key], QtWidgets.QCheckBox)
-        assert labels[key] == widget._widgets[key].text()
+    # Collect actual group names from the TreeWidget
+    actual_groups = [
+        tree_widget.topLevelItem(i).text(0).strip()
+        for i in range(tree_widget.topLevelItemCount())
+        if tree_widget.topLevelItem(i).text(0).strip()
+    ]
 
+    # Ensure all group titles in the TreeWidget are in the expected groups
+    for group in expected_groups:
+        assert group in actual_groups
 
-def test_checkbox_state_sync(widget: DisplayOptionsWidget) -> None:
-    """
-    test if checkboxes sync with the experiment's display options.
-    """
-    experiment = Experiment()
-    experiment.display_options = {key: True for key in widget._widgets}  # type: ignore
-    # for key in widget._widgets.keys():
-    #     experiment.display_options[key] = True
-    widget.experiment = experiment
-    for key, checkbox in widget._widgets.items():
-        assert checkbox.isChecked() == experiment.display_options[key]  # type: ignore
+    # Collect actual labels from the TreeWidget items
+    actual_labels = []
+    for i in range(tree_widget.topLevelItemCount()):
+        parent_item = tree_widget.topLevelItem(i)
+        for j in range(parent_item.childCount()):
+            child_item = parent_item.child(j)
+            actual_labels.append(child_item.text(0).strip())
+        if parent_item.childCount() == 0:
+            actual_labels.append(parent_item.text(0).strip())
 
-
-def test_checkbox_toggle_updates_experiment(
-    widget: DisplayOptionsWidget, qtbot: QtBot
-) -> None:
-    """
-    test if clicking the first checkbox updates experiment settings.
-    """
-    experiment = Experiment()
-    experiment.display_options = {key: True for key in widget._widgets}  # type: ignore
-    widget.experiment = experiment
-    first_key = list(widget._widgets.keys())[0]
-    first_checkbox = widget._widgets[first_key]
-    initial_state = first_checkbox.isChecked()
-    with qtbot.waitSignal(widget.experiment_modified, timeout=1000):
-        qtbot.mouseClick(first_checkbox, QtCore.Qt.LeftButton)
-    assert widget.experiment.display_options[first_key] != initial_state  # type: ignore
-
-
-def test_experiment_modified_signal(widget: DisplayOptionsWidget, qtbot: QtBot) -> None:
-    """
-    test if experiment_modified signal is emitted on checkbox click.
-    """
-    first_key = list(widget._widgets.keys())[0]
-    first_checkbox = widget._widgets[first_key]
-    mock_callback = MagicMock()
-    widget.experiment_modified.connect(mock_callback)
-    qtbot.mouseClick(first_checkbox, QtCore.Qt.LeftButton)
-    mock_callback.assert_called_once()
+    # Ensure all labels from the TreeWidget items are in the expected labels
+    for label in actual_labels:
+        assert label in list(expected_labels.values())

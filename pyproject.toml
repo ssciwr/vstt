@@ -54,6 +54,7 @@ tests = [
   "pytest-cov",
   "pytest-randomly",
   "pytest-qt",
+  "pytest_mock",
 ]
 docs = [
   "ipykernel",
