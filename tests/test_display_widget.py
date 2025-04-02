@@ -6,6 +6,7 @@ import qt_test_utils as qtu
 # from PyQt5.uic.properties import QtWidgets
 from psychopy.visual.window import Window
 from qtpy import QtWidgets
+from qtpy.QtTest import QTest
 
 import vstt
 from vstt.display import display_options_groups
@@ -17,6 +18,7 @@ from vstt.experiment import Experiment
 @pytest.fixture
 def widget(window: Window) -> DisplayOptionsWidget:
     widget = DisplayOptionsWidget(parent=None, win=window)
+    widget.show()
     return widget
 
 
@@ -41,12 +43,13 @@ def test_display_options_widget(widget: DisplayOptionsWidget) -> None:
     for key, check_box in widget._widgets.items():
         signal_received.clear()
         assert widget.experiment.display_options[key] is False  # type: ignore
-        qtu.click(check_box)
+        qtu.press_space_key(check_box)
+        QTest.qWait(200)
         assert widget.experiment.display_options[key] is True  # type: ignore
         assert widget.experiment.has_unsaved_changes is True
         assert signal_received
         signal_received.clear()
-        qtu.click(check_box)
+        qtu.press_space_key(check_box)
         assert widget.experiment.display_options[key] is False  # type: ignore
         assert signal_received
     # check that all values have the correct type
