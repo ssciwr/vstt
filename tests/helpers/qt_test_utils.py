@@ -30,6 +30,11 @@ def press_down_key(widget: QtWidgets.QWidget) -> None:
     QTest.keyClick(widget, Qt.Key_Down)
 
 
+# send space key click to a widget
+def press_space_key(widget: QtWidgets.QWidget) -> None:
+    QTest.keyClick(widget, Qt.Key_Space)
+
+
 # click on a widget
 def click(
     widget: QtWidgets.QWidget, button: Qt.MouseButton = Qt.MouseButton.LeftButton

@@ -72,7 +72,7 @@ def test_gui_no_file() -> None:
     assert mwt.widget_type == "QFileDialog.Open"
     assert mwt.widget_text == "Open an experiment"
     # make a change so the experiment has unsaved changes
-    qtu.click(gui.display_options_widget._widgets["to_target_paths"])
+    qtu.click(gui.display_options_widget._widgets["to_target_distance"])
     assert gui.experiment.has_unsaved_changes is True
     assert "*" in gui.windowTitle()
     # mwt to click yes when asked if we want to save our changes
