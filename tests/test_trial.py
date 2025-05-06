@@ -1,8 +1,31 @@
 from __future__ import annotations
 
+import math
+
+import pytest
 from pytest import approx
+from pytest_mock import MockerFixture
+from pytestqt.qtbot import QtBot
+from qtpy.QtCore import QLocale
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QCheckBox
+from qtpy.QtWidgets import QComboBox
+from qtpy.QtWidgets import QDialog
+from qtpy.QtWidgets import QDoubleSpinBox
+from qtpy.QtWidgets import QLineEdit
+from qtpy.QtWidgets import QSpinBox
+from qtpy.QtWidgets import QTreeWidget
+from qtpy.QtWidgets import QVBoxLayout
 
 import vstt
+from vstt.trial import TreeDialog
+from vstt.trial import get_trial_from_user
+from vstt.vtypes import Trial
+
+
+@pytest.fixture
+def mock_trial() -> Trial:
+    return vstt.trial.default_trial()
 
 
 def test_describe_trial() -> None:
@@ -178,3 +201,125 @@ def test_validate_trial_target_order() -> None:
     vtrial = vstt.trial.import_and_validate_trial(trial)
     assert isinstance(vtrial["target_indices"], str)
     assert vtrial["target_indices"] == "0 7 1 5 7 0"
+
+
+def test_trial_groups() -> None:
+    """
+    test if the elements in trial_groups() exists in trial_labels()
+    """
+    trial_labels = vstt.trial.trial_labels()
+    trial_groups = vstt.trial.trial_groups()
+    all_values = [value for sublist in trial_groups.values() for value in sublist]
+    for value in all_values:
+        assert value in trial_labels
+
+
+def test_tree_dialog_initialization(mock_trial: Trial) -> None:
+    """
+    test if TreeDialog initializes correctly.
+    """
+    tree_dialog = TreeDialog(mock_trial)
+    assert tree_dialog.windowTitle() == "Trial Conditions"
+    assert isinstance(tree_dialog.tree_layout, QVBoxLayout)
+    assert isinstance(tree_dialog.tree_widget, QTreeWidget)
+    assert tree_dialog.tree_widget.isHeaderHidden() is True
+    assert tree_dialog.trial == mock_trial
+    assert tree_dialog.tree_widget.topLevelItemCount() == 18
+
+
+def test_tree_dialog_updates_trial(qtbot: QtBot, mock_trial: Trial) -> None:
+    """
+    test if every kind of widget in TreeDialog can be updated correctly.
+    """
+    dialog = TreeDialog(mock_trial)
+    qtbot.addWidget(dialog)
+    checkbox = dialog.tree_widget.itemWidget(
+        dialog.tree_widget.topLevelItem(0).child(3), 0
+    ).findChild(QCheckBox)
+    assert checkbox is not None
+    initial_state = checkbox.isChecked()
+    qtbot.mouseClick(
+        checkbox, Qt.LeftButton
+    )  # Simulate user clicking 'add_central_target'
+    assert dialog.trial["add_central_target"] != initial_state
+
+    spinbox = dialog.tree_widget.itemWidget(
+        dialog.tree_widget.topLevelItem(0).child(0), 0
+    ).findChild(QSpinBox)
+    assert spinbox is not None
+    spinbox.selectAll()
+    qtbot.keyPress(spinbox, Qt.Key_Backspace)
+    qtbot.keyClicks(spinbox, "10")  # Simulate user updating 'num_targets' to '10'
+    assert dialog.trial["num_targets"] == 10
+
+    double_spinbox = dialog.tree_widget.itemWidget(
+        dialog.tree_widget.topLevelItem(0).child(15), 0
+    ).findChild(QDoubleSpinBox)
+    double_spinbox.setLocale(
+        QLocale(QLocale.English)
+    )  # Explicitly set the double_spinbox’s locale
+    assert double_spinbox is not None
+    double_spinbox.selectAll()
+    qtbot.keyPress(double_spinbox, Qt.Key_Backspace)
+    qtbot.keyClicks(
+        double_spinbox, "0.08"
+    )  # Simulate user updating 'target_size' to '0.08'
+    assert math.isclose(dialog.trial["target_size"], 0.08) is True
+
+    combobox = dialog.tree_widget.itemWidget(
+        dialog.tree_widget.topLevelItem(0).child(1), 0
+    ).findChild(QComboBox)
+    assert combobox is not None
+    qtbot.keyClicks(
+        combobox, "fixed"
+    )  # Simulate user updating 'target_order' to 'fixed'
+    assert combobox.currentText() in ["clockwise", "anti-clockwise", "random", "fixed"]
+    assert dialog.trial["target_order"] == "fixed"
+
+    line_edit = dialog.tree_widget.itemWidget(
+        dialog.tree_widget.topLevelItem(0).child(7), 0
+    ).findChild(QLineEdit)
+    assert line_edit is not None
+    line_edit.selectAll()
+    qtbot.keyPress(line_edit, Qt.Key_Backspace)
+    qtbot.keyClicks(
+        line_edit, "0 1 2 3"
+    )  # Simulate user updating 'target_labels' to '0 1 2 3'
+    assert dialog.trial["target_labels"] == "0 1 2 3"
+
+
+def test_tree_dialog_accept(qtbot: QtBot, mock_trial: Trial) -> None:
+    """
+    test if clicking OK closes the dialog and accepts the input.
+    """
+    dialog = TreeDialog(mock_trial)
+    qtbot.addWidget(dialog)
+    qtbot.mouseClick(dialog.ok_button, Qt.LeftButton)
+    assert dialog.result() == QDialog.Accepted
+
+
+def test_get_trial_from_user_accepted(mocker: MockerFixture, mock_trial: Trial) -> None:
+    """
+    test get_trial_from_user() when dialog is accepted.
+    """
+    mock_dialog = mocker.patch("vstt.trial.TreeDialog")
+    mock_dialog.return_value.exec.return_value = QDialog.Accepted
+    mock_dialog.return_value.get_values.return_value = mock_trial
+    mock_validate = mocker.patch(
+        "vstt.trial.import_and_validate_trial", return_value=mock_trial
+    )
+    trial_result = get_trial_from_user(mock_trial)
+    assert trial_result == mock_trial
+    mock_validate.assert_called_once_with(mock_trial)
+
+
+def test_get_trial_from_user_cancelled(
+    mocker: MockerFixture, mock_trial: Trial
+) -> None:
+    """
+    test get_trial_from_user() when dialog is cancelled.
+    """
+    mock_dialog = mocker.patch("vstt.trial.TreeDialog")
+    mock_dialog.return_value.exec_.return_value = QDialog.Rejected
+    trial_result = get_trial_from_user(mock_trial)
+    assert trial_result is None

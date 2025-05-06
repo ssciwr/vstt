@@ -67,6 +67,29 @@ def display_options_labels() -> dict[str, str]:
     }
 
 
+def display_options_groups() -> dict[str, list[str]]:
+    return {
+        "Reaction and Movement Times:": [
+            "to_target_reaction_time",
+            "to_center_reaction_time",
+            "to_target_movement_time",
+            "to_center_movement_time",
+            "to_target_time",
+            "to_center_time",
+            "movement_time_at_peak_velocity",
+            "total_time_at_peak_velocity",
+        ],
+        "Distance and RMSE:": [
+            "to_target_distance",
+            "to_center_distance",
+            "to_target_rmse",
+            "to_center_rmse",
+            "movement_distance_at_peak_velocity",
+            "rmse_movement_at_peak_velocity",
+        ],
+    }
+
+
 def import_display_options(display_options_dict: dict) -> vstt.vtypes.DisplayOptions:
     return vstt.common.import_typed_dict(
         display_options_dict, default_display_options()
