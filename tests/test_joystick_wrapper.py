@@ -6,9 +6,17 @@ from psychopy.visual.window import Window
 from vstt import joystick_wrapper
 
 
+def have_joystick() -> bool:
+    if hasattr(joystick, "getNumJoysticks"):
+        return joystick.getNumJoysticks() > 0
+    if hasattr(joystick, "getAllJoysticks"):
+        return len(joystick.getAllJoysticks()) > 0
+    return False
+
+
 def test_joystick_wrapper(window: Window) -> None:
     # check that calling repeatedly doesn't raise an exception
-    if joystick.getNumJoysticks() > 0:
+    if have_joystick():
         assert joystick_wrapper.get_joystick() is not None
         assert joystick_wrapper.get_joystick() is not None
     else:
