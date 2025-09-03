@@ -28,7 +28,7 @@ jobs:
         include:
           - os: "ubuntu-24.04"
             python-version: "3.11"
-            psychopy-version: "2025.2.4"
+            psychopy-version: "2025.1.1"
             wxpython-version: "4.2.3"
           - os: "ubuntu-22.04"
             python-version: "3.10"
