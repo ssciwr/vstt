@@ -9,8 +9,8 @@ from vstt import joystick_wrapper
 def have_joystick() -> bool:
     if hasattr(joystick, "getNumJoysticks"):
         return joystick.getNumJoysticks() > 0
-    if hasattr(joystick, "getAllJoysticks"):
-        return len(joystick.getAllJoysticks()) > 0
+    if hasattr(joystick.Joystick, "getAvailableDevices"):
+        return len(joystick.Joystick.getAvailableDevices()) > 0
     return False
 
 
