@@ -34,7 +34,7 @@ build:
       # check xvfb is working
       #      - xdpyinfo -display $DISPLAY
       # check opengl is working
-      - LIBGL_DEBUG=verbose glxinfo -v -B
+    #      - LIBGL_DEBUG=verbose glxinfo -v -B
     post_install:
       # psychtoolbox is installed by psychopy but is actually optional and only used if available
       # it requires python to have permission to set its priority level otherwise it exits with an error

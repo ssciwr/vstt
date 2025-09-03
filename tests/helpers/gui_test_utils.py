@@ -131,7 +131,9 @@ def call_target_and_get_screenshot(
 
 # return fraction of pixels in image of the supplied color
 def pixel_color_fraction(img: np.ndarray, color: tuple[int, int, int]) -> float:
-    return np.count_nonzero((img == np.array(color)).all(axis=2)) / (img.size / 3)
+    return float(
+        np.count_nonzero((img == np.array(color)).all(axis=2)) / (img.size / 3)
+    )
 
 
 # return fraction of pixels in current screen of the supplied color
