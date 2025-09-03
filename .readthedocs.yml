@@ -4,9 +4,9 @@
 version: 2
 
 build:
-  os: "ubuntu-22.04"
+  os: "ubuntu-24.04"
   tools:
-    python: "3.9"
+    python: "3.11"
   apt_packages:
     # system dependencies of wxPython wheel
     - libnotify-dev
@@ -25,14 +25,14 @@ build:
       # install attrdict as this may be used in wxPython setup.py
       - python -m pip install attrdict
       # install pre-built ubuntu/gtk3 wxPython wheel
-      - python -m pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/ wxPython==4.2.1
+      - python -m pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/ wxPython==4.2.3
       # check if any required system libs are missing by trying to import it
       - python -c "import wx"
       # create virtual display for pyglet
       - echo $DISPLAY
-      - Xvfb -ac +extension GLX +render -screen 0 1024x768x24 $DISPLAY &
+      #      - Xvfb -ac +extension GLX +render -screen 0 1024x768x24 $DISPLAY &
       # check xvfb is working
-      - xdpyinfo -display $DISPLAY
+      #      - xdpyinfo -display $DISPLAY
       # check opengl is working
       - LIBGL_DEBUG=verbose glxinfo -v -B
     post_install:
