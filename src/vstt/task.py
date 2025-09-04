@@ -358,7 +358,10 @@ class MotorTask:
                     tm.target_labels, trial["show_inactive_targets"], target_index
                 )
             if trial["play_sound"]:
-                Sound("A", secs=0.160, blockSize=1024, stereo=True).play()
+                try:
+                    Sound("A", secs=0.160, blockSize=1024, stereo=True).play()
+                except Exception as e:
+                    logging.warning(f"Failed to play sound: {e}")
             if is_central_target:
                 trial_data.to_center_num_timestamps_before_visible.append(
                     len(mouse_times)
