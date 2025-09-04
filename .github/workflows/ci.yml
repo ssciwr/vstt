@@ -27,7 +27,7 @@ jobs:
         # additional regression tests using older versions of psychopy
         include:
           - os: "ubuntu-24.04"
-            python-version: "3.11"
+            python-version: "3.10"
             psychopy-version: "2025.1.1"
             wxpython-version: "4.2.3"
           - os: "ubuntu-22.04"
