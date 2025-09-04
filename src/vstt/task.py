@@ -88,7 +88,7 @@ class TrialManager:
         self._cursor_path = ShapeStim(
             win, vertices=[(0.0, 0.0)], lineColor="white", closeShape=False
         )
-        self._cursor_path_vertices: list[tuple[float, float]] = []
+        self._cursor_path_vertices: list[np.ndarray] = []
         self.clock = Clock()
         if trial["show_cursor_path"]:
             self.drawables.append(self._cursor_path)
@@ -98,7 +98,7 @@ class TrialManager:
         self.green_target_index: int | None = None
 
     def cursor_path_add_vertex(
-        self, vertex: tuple[float, float], clear_existing: bool = False
+        self, vertex: np.ndarray, clear_existing: bool = False
     ) -> None:
         if clear_existing:
             self._cursor_path_vertices = []

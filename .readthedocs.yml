@@ -4,9 +4,9 @@
 version: 2
 
 build:
-  os: "ubuntu-22.04"
+  os: "ubuntu-24.04"
   tools:
-    python: "3.9"
+    python: "3.11"
   apt_packages:
     # system dependencies of wxPython wheel
     - libnotify-dev
@@ -18,6 +18,13 @@ build:
     - mesa-utils
     # system sound driver for sounddevice
     - libportaudio2
+    # system dependencies of pyo
+    - portaudio19-dev
+    - libsndfile1-dev
+    - libportmidi-dev
+    - liblo-dev
+    - freeglut3-dev
+    - libglu1-mesa-dev
     # Required for libsecret-1.so.0, fixes ImportError when importing wxPython
     - libsecret-1-dev
   jobs:
@@ -25,7 +32,7 @@ build:
       # install attrdict as this may be used in wxPython setup.py
       - python -m pip install attrdict
       # install pre-built ubuntu/gtk3 wxPython wheel
-      - python -m pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04/ wxPython==4.2.1
+      - python -m pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04/ wxPython==4.2.3
       # check if any required system libs are missing by trying to import it
       - python -c "import wx"
       # create virtual display for pyglet

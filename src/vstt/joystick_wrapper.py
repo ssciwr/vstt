@@ -37,7 +37,12 @@ def _updated_joystick() -> joystick.Joystick:
 
 def get_joystick() -> joystick.Joystick | None:
     global js
-    if joystick.getNumJoysticks() == 0:
+    if hasattr(joystick, "getNumJoysticks") and joystick.getNumJoysticks() == 0:
+        return None
+    if (
+        hasattr(joystick.Joystick, "getAvailableDevices")
+        and len(joystick.Joystick.getAvailableDevices()) == 0
+    ):
         return None
     try:
         js = _updated_joystick()
