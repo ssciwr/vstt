@@ -23,6 +23,8 @@ build:
     - libsndfile1-dev
     - libportmidi-dev
     - liblo-dev
+    - freeglut3-dev
+    - libglu1-mesa-dev
     # Required for libsecret-1.so.0, fixes ImportError when importing wxPython
     - libsecret-1-dev
   jobs:
