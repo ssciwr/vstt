@@ -18,6 +18,7 @@ build:
     - mesa-utils
     # system sound driver for sounddevice
     - libportaudio2
+    - portaudio19-dev
     # Required for libsecret-1.so.0, fixes ImportError when importing wxPython
     - libsecret-1-dev
   jobs:

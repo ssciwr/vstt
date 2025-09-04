@@ -84,7 +84,9 @@ jobs:
           # workaround for Xlib.error.XauthError ~/.Xauthority: [Errno 2] No such file or directory
           sudo touch ~/.Xauthority
       - if: matrix.psychopy-version != 'latest'
-        run: uv pip install --system psychopy==${{ matrix.psychopy-version }} --verbose
+        run: |
+          uv pip install --system "numpy<2.0.0"
+          uv pip install --system psychopy==${{ matrix.psychopy-version }} --verbose
       - run: uv pip install --system -e .[tests,docs] --verbose
       - run: python -m pytest --cov=vstt --cov-report=xml -v -s -x
       - uses: actions/upload-artifact@v4
