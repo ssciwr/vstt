@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.6.0] - 2025-09-04
+
+### Changed
+
+- reorganised trial conditions and display settings in the GUI [#285](https://github.com/ssciwr/vstt/pull/285)
+
 ## [1.5.0] - 2024-11-20
 
 ### Added
