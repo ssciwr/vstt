@@ -89,7 +89,7 @@ jobs:
           uv pip install --system psychopy==${{ matrix.psychopy-version }} --verbose
       - run: uv pip install --system -e .[tests,docs] --verbose
       - run: python -m pytest --cov=vstt --cov-report=xml -v -s -x
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: "${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.psychopy-version }}"
